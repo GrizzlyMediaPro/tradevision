@@ -743,8 +743,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                             if (globalIndex < 0) return null;
                             return (
                               <option key={cIdx} value={globalIndex}>
-                                {ch.accountType || "Account"}{" "}
-                                {ch.size && `(${ch.size})`}
+                                {ch.size ? formatDollar(ch.size) : ""}
                               </option>
                             );
                           })}
