@@ -7,7 +7,7 @@ const BRAND = {
 };
 
 const EMAIL_LOGO_URL =
-  process.env.EMAIL_LOGO_URL || `${BRAND.siteUrl}/thumbnail.png`;
+  process.env.EMAIL_LOGO_URL || `${BRAND.siteUrl}/logo.png`;
 
 export function escapeHtml(value: string): string {
   return value
@@ -81,36 +81,20 @@ export function renderEmailLayout(options: {
           <table role="presentation" width="100%" cellPadding="0" cellSpacing="0" style="max-width:640px;background-color:#020617;border-radius:24px;border:1px solid rgba(148,163,184,0.25);overflow:hidden;box-shadow:0 20px 45px rgba(0,0,0,0.7);">
             <tr>
               <td style="padding:20px 28px 16px;background:radial-gradient(circle at 10% 20%, rgba(120,61,255,0.22) 0, transparent 55%),radial-gradient(circle at 80% 0%, rgba(255,140,66,0.26) 0, transparent 55%),#020617;border-bottom:1px solid rgba(148,163,184,0.3);">
-                <table role="presentation" width="100%" cellPadding="0" cellSpacing="0">
-                  <tr>
-                    <td style="vertical-align:middle;">
-                      <a href="${BRAND.siteUrl}" style="text-decoration:none;display:inline-flex;align-items:center;gap:10px;">
-                        <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;background:radial-gradient(circle at 30% 0%, rgba(248,250,252,0.9) 0, transparent 55%),rgba(15,23,42,1);box-shadow:0 0 0 1px rgba(148,163,184,0.35),0 12px 25px rgba(0,0,0,0.8);overflow:hidden;">
-                          <img
-                            src="${EMAIL_LOGO_URL}"
-                            width="28"
-                            height="28"
-                            alt="${BRAND.siteName}"
-                            style="display:block;border-radius:999px;"
-                          />
-                        </span>
-                        <span style="display:inline-block;">
-                          <span style="display:block;font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#e5e7eb;">
-                            ${BRAND.siteName}
-                          </span>
-                          <span style="display:block;font-size:11px;color:#9ca3af;">
-                            Comparații prop firms & oferte
-                          </span>
-                        </span>
-                      </a>
-                    </td>
-                    <td align="right" style="vertical-align:middle;">
-                      <span style="display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid rgba(148,163,184,0.4);background:rgba(15,23,42,0.85);font-size:11px;font-weight:500;color:#e5e7eb;letter-spacing:0.16em;text-transform:uppercase;">
-                        Notificare email
-                      </span>
-                    </td>
-                  </tr>
-                </table>
+                <a href="${BRAND.siteUrl}" style="text-decoration:none;display:inline-flex;align-items:center;gap:12px;">
+                  <img
+                    src="${EMAIL_LOGO_URL}"
+                    width="120"
+                    height="40"
+                    alt="${BRAND.siteName}"
+                    style="display:block;height:40px;width:auto;max-width:160px;object-fit:contain;"
+                  />
+                  <span style="display:inline-block;">
+                    <span style="display:block;font-size:11px;color:#9ca3af;">
+                      Comparații prop firms & oferte
+                    </span>
+                  </span>
+                </a>
               </td>
             </tr>
             <tr>
