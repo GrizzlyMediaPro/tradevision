@@ -1,0 +1,104 @@
+// Prisma schema for TradeVision - MongoDB
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// —— Firme (prop trading) ——
+model Firm {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  slug              String   @unique
+  logo              String
+  website           String?
+  fundingUrl        String?
+  description       String?
+  payout            String?
+  country           String?
+  flag              String?
+  trustScore        Float    @default(0)
+  activeYears       Int      @default(0)
+  maxAccounts       String?
+  code              String?
+  discount          String?
+  platforms         String[]
+  paymentMethods    String[]
+  keyFeatures       Json     // [{ label, value, enabled }]
+  challenges        Json     // Challenge[]
+  payoutTimeline    Json     // PayoutStep[]
+  rules             Json     // RuleTab[]
+  excludedCountries String[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// —— Deals carousel ——
+model Deal {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firmSlug  String?
+  logo      String
+  name      String
+  rating    Float    @default(0)
+  discount  String
+  code      String
+  fundingUrl String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// —— Setări carousel (singleton) ——
+model DealCarouselSettings {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  autoPlayEnabled  Boolean  @default(true)
+  autoPlayInterval Int      @default(10000) // ms
+  updatedAt        DateTime @updatedAt
+}
+
+// —— Capitole curs ——
+model CourseChapter {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  videoId     String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// —— Link widget YouTube (singleton) ——
+model LinkWidget {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  badge       String   @default("Live Trading")
+  title       String
+  description String?
+  buttonText  String   @default("Watch Stream")
+  thumbnail   String?
+  youtubeUrl  String?
+  updatedAt   DateTime @updatedAt
+}
+
+// —— Mesaje formular contact ——
+model ContactMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  phone     String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// —— Abonați newsletter ——
+model NewsletterSubscriber {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  source       String?
+  subscribedAt DateTime @default(now())
+}

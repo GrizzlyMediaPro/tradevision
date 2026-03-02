@@ -36,8 +36,10 @@ export function Navbar() {
             Acasă
           </Link>
           <Link
-            href="#firme"
-            className="hover:text-white text-zinc-200 transition"
+            href="/firme"
+            className={`hover:text-white transition ${
+              pathname === "/firme" ? "text-yellow-300" : "text-zinc-200"
+            }`}
           >
             Firme
           </Link>
@@ -64,12 +66,15 @@ export function Navbar() {
           {/* Mobile only */}
           <div className="flex items-center gap-3 md:hidden">
             {/* Telegram icon */}
-            <button
+            <a
+              href="https://t.me/tradevisionromania"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 text-white shadow-md shadow-sky-500/40 hover:bg-sky-600 transition cursor-pointer"
               aria-label="Deschide canalul de Telegram"
             >
               <FaTelegramPlane className="h-4 w-4" />
-            </button>
+            </a>
             {/* Hamburger */}
             <button
               className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white hover:bg-white/10 transition cursor-pointer overflow-hidden"
@@ -98,10 +103,15 @@ export function Navbar() {
           </div>
 
           {/* Desktop button */}
-          <button className="hidden md:inline-flex items-center gap-2.5 rounded-full bg-sky-500 px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-md shadow-sky-500/40 transition hover:bg-sky-600">
+          <a
+            href="https://t.me/tradevisionromania"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:inline-flex items-center gap-2.5 rounded-full bg-sky-500 px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-md shadow-sky-500/40 transition hover:bg-sky-600 cursor-pointer"
+          >
             <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
             <span className="uppercase">Alătură-te echipei</span>
-          </button>
+          </a>
         </div>
       </div>
 
@@ -122,7 +132,7 @@ export function Navbar() {
             Acasă
           </Link>
           <Link
-            href="#firme"
+            href="/firme"
             className="py-2 border-b border-white/5"
             onClick={() => setMenuOpen(false)}
           >

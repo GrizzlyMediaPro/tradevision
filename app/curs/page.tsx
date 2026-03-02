@@ -9,11 +9,8 @@ import {
   FaEnvelope,
   FaPlay,
 } from "react-icons/fa";
-import {
-  type CourseChapter,
-  defaultCourseChapters,
-  COURSE_CHAPTERS_STORAGE_KEY,
-} from "../data/courseChapters";
+import { type CourseChapter, defaultCourseChapters } from "../data/courseChapters";
+import { getCourseChapters } from "../admin/actions/course";
 
 export default function CursPage() {
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -24,35 +21,37 @@ export default function CursPage() {
   );
   const [chapters, setChapters] = useState<CourseChapter[]>(defaultCourseChapters);
 
-  // Load chapters configuration from localStorage (managed via /admin/curs)
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem(COURSE_CHAPTERS_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as unknown;
-      if (!Array.isArray(parsed)) return;
-      const valid = parsed.filter(
-        (ch): ch is CourseChapter =>
-          ch &&
-          typeof ch.title === "string" &&
-          typeof ch.description === "string" &&
-          typeof ch.videoId === "string",
-      );
-      if (valid.length > 0) {
-        setChapters(valid);
-      }
-    } catch {
-      // ignore invalid localStorage content
-    }
+    getCourseChapters().then((list) => {
+      if (list.length > 0) setChapters(list);
+    });
   }, []);
 
   const handleUnlock = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
-      if (email.trim()) {
+      const trimmed = email.trim();
+      if (!trimmed) return;
+
+      try {
+        const res = await fetch("/api/newsletter", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: trimmed, source: "curs-gratuit" }),
+        });
+
+        if (!res.ok) {
+          // opțional poți afișa un mesaj de eroare în UI mai târziu
+          console.error("Eroare la abonarea la newsletter", await res.text());
+          return;
+        }
+
         setIsUnlocked(true);
         setWatchedChapters(new Set([0]));
+      } catch (err) {
+        console.error("Eroare rețea la newsletter", err);
       }
     },
     [email]

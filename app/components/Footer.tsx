@@ -20,7 +20,7 @@ export function Footer() {
           <Link href="/" className="hover:text-white transition">
             Acasă
           </Link>
-          <Link href="#firme" className="hover:text-white transition">
+          <Link href="/firme" className="hover:text-white transition">
             Firme
           </Link>
           <Link href="/curs" className="hover:text-white transition">
@@ -30,7 +30,9 @@ export function Footer() {
             Contact
           </Link>
           <a
-            href="#telegram"
+            href="https://t.me/tradevisionromania"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Telegram"
             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 text-white shadow-md shadow-sky-500/40 hover:bg-sky-600 transition"
           >

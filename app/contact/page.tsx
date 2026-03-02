@@ -1,7 +1,11 @@
 import { TelegramCtaAndLive } from "../components/TelegramCtaAndLive";
 import { FaEnvelope } from "react-icons/fa";
+import { getLinkWidget } from "../admin/actions/linkwidget";
+import { sendContactEmail } from "./actions";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const linkWidget = await getLinkWidget();
+
   return (
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-16">
       {/* Heading */}
@@ -27,7 +31,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <form className="flex flex-col gap-5">
+        <form action={sendContactEmail} className="flex flex-col gap-5">
           {/* Name + Email row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
@@ -50,6 +54,7 @@ export default function ContactPage() {
                 id="email"
                 name="email"
                 type="email"
+                required
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-yellow-300/60 focus:bg-white/8 focus:ring-1 focus:ring-yellow-300/30"
                 placeholder="email@exemplu.com"
               />
@@ -79,6 +84,7 @@ export default function ContactPage() {
               id="message"
               name="message"
               rows={5}
+              required
               className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-yellow-300/60 focus:bg-white/8 focus:ring-1 focus:ring-yellow-300/30 resize-none"
               placeholder="Spune-ne cu ce te putem ajuta..."
             />
@@ -96,7 +102,7 @@ export default function ContactPage() {
 
       {/* CTA sections */}
       <div className="mt-10">
-        <TelegramCtaAndLive />
+        <TelegramCtaAndLive linkWidget={linkWidget} />
       </div>
     </main>
   );

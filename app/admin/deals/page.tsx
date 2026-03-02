@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type FormEvent, type DragEvent } from 'react';
+import { useMemo, useState, useEffect, type FormEvent, type DragEvent } from 'react';
 import Link from 'next/link';
 import { firms } from '../../data/firms';
 import {
@@ -14,6 +14,16 @@ import {
   FaToggleOff,
   FaChevronLeft,
 } from 'react-icons/fa';
+import { UploadButton } from '@/lib/uploadthing';
+import {
+  getDeals,
+  createDeal,
+  updateDeal,
+  deleteDeal,
+  getCarouselSettings,
+  setCarouselSettings,
+} from '../actions/deals';
+import { getFirms } from '../actions/firms';
 
 type Deal = {
   id: string;
@@ -23,6 +33,7 @@ type Deal = {
   rating: number;
   discount: string;
   code: string;
+  fundingUrl?: string;
 };
 
 type FormState = {
@@ -34,38 +45,14 @@ type FormState = {
   rating: string;
   discount: string;
   code: string;
+  fundingUrl: string;
 };
 
 export default function AdminDealsPage() {
-  const [deals, setDeals] = useState<Deal[]>([
-    {
-      id: '1',
-      firmSlug: 'lucid-trading',
-      logo: '/partnersmock/My-Funded-Futures-1.webp',
-      name: 'Lucid Trading',
-      rating: 4.7,
-      discount: '50% Off',
-      code: 'MIKE',
-    },
-    {
-      id: '2',
-      firmSlug: 'take-profit-trader',
-      logo: '/partnersmock/My-Funded-Futures-4.webp',
-      name: 'Take Profit Trader',
-      rating: 4.4,
-      discount: '40% Off',
-      code: 'PFM',
-    },
-    {
-      id: '3',
-      firmSlug: 'apex-trader-funding',
-      logo: '/partnersmock/My-Funded-Futures-8.webp',
-      name: 'Apex Trader Funding',
-      rating: 4.4,
-      discount: '90% Off',
-      code: 'MIKE',
-    },
-  ]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [firmsFromDb, setFirmsFromDb] = useState<{ name: string; slug: string; logo: string; trustScore: number; discount: string; code: string; fundingUrl?: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState<FormState>({
     mode: 'create',
@@ -76,14 +63,42 @@ export default function AdminDealsPage() {
     rating: '4.5',
     discount: '50% Off',
     code: '',
+    fundingUrl: '',
   });
 
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
-  const [autoPlayInterval, setAutoPlayInterval] = useState(10000); // ms
+  const [autoPlayInterval, setAutoPlayInterval] = useState(10000);
+
+  useEffect(() => {
+    getDeals().then(setDeals).finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    getFirms().then((list) =>
+      setFirmsFromDb(
+        list.map((f) => ({
+          name: f.name,
+          slug: f.slug,
+          logo: f.logo,
+          trustScore: f.trustScore,
+          discount: f.discount,
+          code: f.code,
+          fundingUrl: f.fundingUrl,
+        })),
+      ),
+    );
+  }, []);
+
+  useEffect(() => {
+    getCarouselSettings().then((s) => {
+      setAutoPlayEnabled(s.autoPlayEnabled);
+      setAutoPlayInterval(s.autoPlayInterval);
+    });
+  }, []);
 
   const sortedFirms = useMemo(
-    () => [...firms].sort((a, b) => a.name.localeCompare(b.name)),
-    [],
+    () => firmsFromDb.length > 0 ? [...firmsFromDb].sort((a, b) => a.name.localeCompare(b.name)) : [...firms].sort((a, b) => a.name.localeCompare(b.name)),
+    [firmsFromDb],
   );
 
   const resetForm = () => {
@@ -96,11 +111,12 @@ export default function AdminDealsPage() {
       rating: '4.5',
       discount: '50% Off',
       code: '',
+      fundingUrl: '',
     });
   };
 
   const handleSelectFirm = (slug: string | 'manual' | '') => {
-    const firm = firms.find((f) => f.slug === slug);
+    const firm = sortedFirms.find((f) => f.slug === slug);
     setForm((prev) => ({
       ...prev,
       selectedFirmSlug: slug,
@@ -109,10 +125,11 @@ export default function AdminDealsPage() {
       rating: firm ? String(firm.trustScore.toFixed(1)) : prev.rating,
       discount: firm ? firm.discount : prev.discount,
       code: firm ? firm.code : prev.code,
+      fundingUrl: firm?.fundingUrl ?? prev.fundingUrl,
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const ratingNum = Math.max(
       0,
@@ -123,9 +140,9 @@ export default function AdminDealsPage() {
       return;
     }
 
-    if (form.mode === 'create') {
-      const newDeal: Deal = {
-        id: crypto.randomUUID(),
+    setSaving(true);
+    try {
+      const payload = {
         firmSlug:
           form.selectedFirmSlug && form.selectedFirmSlug !== 'manual'
             ? form.selectedFirmSlug
@@ -135,30 +152,19 @@ export default function AdminDealsPage() {
         rating: ratingNum || 0,
         discount: form.discount.trim() || '0% Off',
         code: form.code.trim(),
+        fundingUrl: form.fundingUrl.trim() || undefined,
       };
-      setDeals((prev) => [...prev, newDeal]);
-    } else if (form.mode === 'edit' && form.editingId) {
-      setDeals((prev) =>
-        prev.map((deal) =>
-          deal.id === form.editingId
-            ? {
-                ...deal,
-                firmSlug:
-                  form.selectedFirmSlug && form.selectedFirmSlug !== 'manual'
-                    ? form.selectedFirmSlug
-                    : undefined,
-                logo: form.logo.trim(),
-                name: form.name.trim(),
-                rating: ratingNum || 0,
-                discount: form.discount.trim() || '0% Off',
-                code: form.code.trim(),
-              }
-            : deal,
-        ),
-      );
+      if (form.mode === 'create') {
+        await createDeal(payload);
+      } else if (form.mode === 'edit' && form.editingId) {
+        await updateDeal(form.editingId, payload);
+      }
+      const list = await getDeals();
+      setDeals(list);
+      resetForm();
+    } finally {
+      setSaving(false);
     }
-
-    resetForm();
   };
 
   const handleEdit = (deal: Deal) => {
@@ -171,13 +177,19 @@ export default function AdminDealsPage() {
       rating: String(deal.rating.toFixed(1)),
       discount: deal.discount,
       code: deal.code,
+      fundingUrl: deal.fundingUrl || '',
     });
   };
 
-  const handleDelete = (id: string) => {
-    setDeals((prev) => prev.filter((deal) => deal.id !== id));
-    if (form.mode === 'edit' && form.editingId === id) {
-      resetForm();
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDeal(id);
+      setDeals((prev) => prev.filter((deal) => deal.id !== id));
+      if (form.mode === 'edit' && form.editingId === id) {
+        resetForm();
+      }
+    } catch {
+      // error
     }
   };
 
@@ -201,6 +213,10 @@ export default function AdminDealsPage() {
     } else {
       setAutoPlayInterval(n * 1000);
     }
+  };
+
+  const handleSaveCarouselSettings = () => {
+    setCarouselSettings(autoPlayEnabled, autoPlayInterval);
   };
 
   return (
@@ -297,29 +313,56 @@ export default function AdminDealsPage() {
                   onDrop={handleLogoDrop}
                   className="group rounded-xl border border-dashed border-white/20 bg-black/30 px-4 py-5 text-xs text-white/60 hover:border-purple-400/60 hover:bg-white/5 transition cursor-pointer"
                 >
-                  <div className="flex flex-col items-center justify-center gap-2 text-center">
-                    <span className="font-medium text-white/70">
-                      Drag & drop imaginea aici
-                    </span>
-                    <span className="text-[11px] text-white/40">
-                      (doar UI, upload-ul va fi conectat ulterior)
-                    </span>
-                    {form.logo && (
-                      <div className="mt-3 flex flex-col items-center gap-2">
-                        <div className="h-10 w-10 rounded-md bg-black/60 overflow-hidden flex items-center justify-center">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={form.logo}
-                            alt="Preview logo"
-                            className="h-8 w-8 object-contain"
-                          />
-                        </div>
-                        <span className="text-[11px] text-white/45">
-                          Imagine selectată
-                        </span>
+                  {!form.logo ? (
+                    <div className="flex flex-col items-center justify-center gap-2 text-center">
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          const url =
+                            res?.[0]?.serverData?.url ??
+                            res?.[0]?.ufsUrl ??
+                            res?.[0]?.url;
+                          if (url && typeof url === 'string') {
+                            setForm((prev) => ({ ...prev, logo: url }));
+                          }
+                        }}
+                        onUploadError={() => {
+                          // opțional: mesaj de eroare
+                        }}
+                        appearance={{
+                          button:
+                            'inline-flex items-center justify-center rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow hover:brightness-110 transition',
+                          container: 'flex flex-col items-center gap-2',
+                          allowedContent:
+                            'text-[11px] text-white/40 mt-1 text-center',
+                        }}
+                      />
+                      <span className="text-[11px] text-white/45 text-center">
+                        Încarcă un fișier imagine (max 4MB) <br />
+                        Poți și să tragi un fișier peste acest spațiu.
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-10 w-10 rounded-md bg-black/60 overflow-hidden flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={form.logo}
+                          alt="Preview logo"
+                          className="h-8 w-8 object-contain"
+                        />
                       </div>
-                    )}
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({ ...prev, logo: '' }))
+                        }
+                        className="text-[11px] text-red-300 hover:text-red-200 transition"
+                      >
+                        Șterge logo
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-2">
@@ -340,7 +383,7 @@ export default function AdminDealsPage() {
             </div>
 
             {/* Rating & Discount */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
                   Rating (0 - 5 stele)
@@ -357,7 +400,7 @@ export default function AdminDealsPage() {
                   className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
               </div>
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
                   Discount
                 </label>
@@ -371,6 +414,22 @@ export default function AdminDealsPage() {
                   className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
               </div>
+            </div>
+
+            {/* Funding URL */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-medium uppercase tracking-wider text-white/60">
+                Link Obține finanțare
+              </label>
+              <input
+                type="text"
+                value={form.fundingUrl}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, fundingUrl: e.target.value }))
+                }
+                placeholder="https://link-afiliat..."
+                className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
+              />
             </div>
 
             {/* Code */}
@@ -397,7 +456,8 @@ export default function AdminDealsPage() {
               </p>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer"
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
               >
                 {form.mode === 'create' ? (
                   <>
@@ -425,7 +485,9 @@ export default function AdminDealsPage() {
               </h2>
             </div>
 
-            {deals.length === 0 ? (
+            {loading ? (
+              <p className="text-sm text-white/45">Se încarcă...</p>
+            ) : deals.length === 0 ? (
               <p className="text-sm text-white/45">
                 Nu există încă niciun deal. Adaugă unul din formularul din
                 stânga.
@@ -551,13 +613,13 @@ export default function AdminDealsPage() {
                   : 'dezactivat'}
               </span>
             </p>
-            <p>
-              În componenta carousel, folosește acest interval pentru
-              <code className="ml-1 rounded bg-black/40 px-1.5 py-0.5 text-[10px]">
-                setInterval
-              </code>
-              .
-            </p>
+            <button
+              type="button"
+              onClick={handleSaveCarouselSettings}
+              className="mt-2 rounded-full border border-yellow-400/40 bg-yellow-500/20 px-3 py-1.5 text-xs font-medium text-yellow-200 hover:bg-yellow-500/30"
+            >
+              Salvează setări carousel
+            </button>
           </div>
         </div>
       </section>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   FaChevronLeft,
@@ -9,56 +9,32 @@ import {
   FaCheck,
   FaEnvelope,
 } from 'react-icons/fa';
-
-type ContactMessage = {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  message: string;
-  createdAt: string;
-  read: boolean;
-};
+import {
+  getContactMessages,
+  toggleContactMessageRead,
+  type ContactMessageRow,
+} from '../actions/contact';
 
 type Filter = 'all' | 'read' | 'unread';
 
-const MOCK_MESSAGES: ContactMessage[] = [
-  {
-    id: '1',
-    name: 'Andrei Popescu',
-    email: 'andrei@example.com',
-    phone: '+40 712 345 678',
-    message:
-      'Salut! Aș vrea mai multe detalii despre cursul de trading și cum se desfășoară sesiunile live.',
-    createdAt: '2026-02-20 10:15',
-    read: false,
-  },
-  {
-    id: '2',
-    name: 'Maria Ionescu',
-    email: 'maria@example.com',
-    phone: '+40 745 123 456',
-    message:
-      'Bună! Sunt interesată de colaborare pentru un webinar comun despre psihologia trading-ului.',
-    createdAt: '2026-02-18 16:42',
-    read: true,
-  },
-  {
-    id: '3',
-    name: 'Alex Dumitrescu',
-    email: 'alex@example.com',
-    message:
-      'Salut! Am o întrebare legată de firmele de prop recomandate pe site.',
-    createdAt: '2026-02-15 09:05',
-    read: false,
-  },
-];
+function formatDate(d: Date): string {
+  return new Intl.DateTimeFormat('ro-RO', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(d));
+}
 
 export default function AdminFormularPage() {
-  const [messages, setMessages] = useState<ContactMessage[]>(MOCK_MESSAGES);
+  const [messages, setMessages] = useState<ContactMessageRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>('all');
 
-  const toggleRead = (id: string) => {
+  useEffect(() => {
+    getContactMessages().then(setMessages).finally(() => setLoading(false));
+  }, []);
+
+  const toggleRead = async (id: string) => {
+    await toggleContactMessageRead(id);
     setMessages((prev) =>
       prev.map((msg) =>
         msg.id === id ? { ...msg, read: !msg.read } : msg,
@@ -161,7 +137,9 @@ export default function AdminFormularPage() {
 
       {/* Messages list */}
       <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-5 py-5 md:px-7 md:py-6 shadow-[0_18px_45px_rgba(0,0,0,0.6)] backdrop-blur-sm">
-        {filteredMessages.length === 0 ? (
+        {loading ? (
+          <p className="text-sm text-white/45">Se încarcă...</p>
+        ) : filteredMessages.length === 0 ? (
           <p className="text-sm text-white/45">
             Nu există mesaje pentru filtrul selectat.
           </p>
@@ -212,7 +190,7 @@ export default function AdminFormularPage() {
                           <span className="uppercase tracking-wide text-white/40">
                             Dată:
                           </span>
-                          <span>{msg.createdAt}</span>
+                          <span>{formatDate(msg.createdAt)}</span>
                         </div>
                       </div>
                     </div>

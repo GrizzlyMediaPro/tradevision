@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, type FormEvent, type DragEvent } from 'react';
+import { useState, useEffect, type FormEvent, type DragEvent } from 'react';
 import Link from 'next/link';
 import { FaChevronLeft, FaImage, FaPen } from 'react-icons/fa';
+import { getLinkWidget, saveLinkWidget } from '../actions/linkwidget';
 
 type LinkWidgetState = {
   badge: string;
@@ -10,6 +11,7 @@ type LinkWidgetState = {
   description: string;
   buttonText: string;
   thumbnail: string;
+  youtubeUrl?: string;
 };
 
 const DEFAULT_STATE: LinkWidgetState = {
@@ -26,6 +28,15 @@ export default function AdminLinkWidgetPage() {
   const [thumbnailPreview, setThumbnailPreview] = useState<string>(
     DEFAULT_STATE.thumbnail,
   );
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getLinkWidget().then((data) => {
+      setValues(data);
+      setThumbnailPreview(data.thumbnail || DEFAULT_STATE.thumbnail);
+    }).finally(() => setLoading(false));
+  }, []);
 
   const handleChange =
     (key: keyof LinkWidgetState) =>
@@ -44,9 +55,14 @@ export default function AdminLinkWidgetPage() {
     setThumbnailPreview(url);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Doar UI deocamdată – aici vom conecta ulterior salvarea (ex: API / UploadThing)
+    setSaving(true);
+    try {
+      await saveLinkWidget({ ...values, thumbnail: thumbnailPreview });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = () => {
@@ -80,7 +96,7 @@ export default function AdminLinkWidgetPage() {
         <div className="mt-3 h-[2px] w-[130px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
           Editează textele și thumbnail-ul pentru secțiunea de live trading de
-          pe homepage. Momentan este doar UI, fără salvare permanentă.
+          pe homepage. Modificările sunt salvate în baza de date.
         </p>
       </div>
 
@@ -160,6 +176,23 @@ export default function AdminLinkWidgetPage() {
               />
             </div>
 
+            {/* YouTube URL */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-medium uppercase tracking-wider text-white/60">
+                Link YouTube (videoclip)
+              </label>
+              <input
+                type="url"
+                value={values.youtubeUrl ?? ''}
+                onChange={handleChange('youtubeUrl')}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg-white/8 focus:ring-1 focus:ring-purple-400/30"
+              />
+              <p className="text-[11px] text-white/40">
+                Acesta este link-ul către live / videoclipul YouTube care se deschide când utilizatorii apasă pe buton.
+              </p>
+            </div>
+
             {/* Thumbnail drag & drop */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
@@ -199,15 +232,15 @@ export default function AdminLinkWidgetPage() {
               </div>
             </div>
 
-            {/* Info footer */}
-            <p className="mt-1 text-[11px] text-white/40">
-              Valorile de mai sus nu sunt încă salvate în backend. Ulterior le
-              putem conecta la componenta reală{' '}
-              <code className="rounded bg-black/40 px-1 py-0.5 text-[10px]">
-                TelegramCtaAndLive
-              </code>
-              .
-            </p>
+            <div className="mt-3 flex justify-end">
+              <button
+                type="submit"
+                disabled={saving || loading}
+                className="inline-flex items-center rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
+              >
+                {saving ? 'Se salvează...' : 'Salvează'}
+              </button>
+            </div>
           </form>
         </section>
 
@@ -225,9 +258,14 @@ export default function AdminLinkWidgetPage() {
                 {values.description}
               </p>
               {/* Desktop button */}
-              <button className="mt-2 hidden md:inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs md:text-sm font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer">
+              <a
+                href={values.youtubeUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 hidden md:inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs md:text-sm font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer"
+              >
                 {values.buttonText}
-              </button>
+              </a>
             </div>
             <div className="md:w-1/2 flex items-center justify-center">
               <div className="relative w-full max-w-xl aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-black/60">
@@ -242,9 +280,14 @@ export default function AdminLinkWidgetPage() {
           </div>
           {/* Mobile button */}
           <div className="w-full md:hidden mt-4 flex justify-center">
-            <button className="inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer">
+            <a
+              href={values.youtubeUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer"
+            >
               {values.buttonText}
-            </button>
+            </a>
           </div>
         </section>
       </div>
