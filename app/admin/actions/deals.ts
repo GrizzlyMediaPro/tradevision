@@ -11,7 +11,7 @@ export type DealForm = {
   rating: number;
   discount: string;
   code: string;
-   fundingUrl?: string;
+  fundingUrl?: string;
 };
 
 export async function getDeals() {
@@ -24,7 +24,7 @@ export async function getDeals() {
     rating: r.rating,
     discount: r.discount,
     code: r.code,
-    fundingUrl: r.fundingUrl ?? undefined,
+    fundingUrl: undefined,
   }));
 }
 
@@ -38,7 +38,6 @@ export async function createDeal(data: Omit<DealForm, "id">) {
       rating: data.rating,
       discount: data.discount,
       code: data.code,
-      fundingUrl: data.fundingUrl ?? null,
       order: count,
     },
   });
@@ -56,7 +55,6 @@ export async function updateDeal(id: string, data: Omit<DealForm, "id">) {
       rating: data.rating,
       discount: data.discount,
       code: data.code,
-      fundingUrl: data.fundingUrl ?? null,
     },
   });
   revalidatePath("/admin/deals");

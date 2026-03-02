@@ -34,6 +34,7 @@ export async function getFirms(): Promise<FirmDetail[]> {
     keyFeatures: r.keyFeatures as unknown as FirmDetail["keyFeatures"],
     challenges: r.challenges as unknown as FirmDetail["challenges"],
     payoutTimeline: r.payoutTimeline as unknown as FirmDetail["payoutTimeline"],
+    rules: r.rules as unknown as FirmDetail["rules"],
     excludedCountries: r.excludedCountries,
   }));
 }
@@ -48,7 +49,6 @@ export async function createOrUpdateFirm(
     slug,
     logo: data.logo,
     website: data.website || null,
-    fundingUrl: data.fundingUrl || null,
     description: data.description || null,
     payout: data.payout || null,
     country: data.country || null,
@@ -64,6 +64,8 @@ export async function createOrUpdateFirm(
     challenges: data.challenges as object[],
     payoutTimeline: data.payoutTimeline as object[],
     excludedCountries: data.excludedCountries,
+    // câmp necesar în Prisma, chiar dacă nu mai folosim reguli la nivel de firmă
+    rules: (data.rules as object[] | undefined) ?? [],
   };
 
   if (existingSlug) {
@@ -108,6 +110,7 @@ export async function getFirmBySlug(slug: string): Promise<FirmDetail | null> {
     keyFeatures: r.keyFeatures as unknown as FirmDetail["keyFeatures"],
     challenges: r.challenges as unknown as FirmDetail["challenges"],
     payoutTimeline: r.payoutTimeline as unknown as FirmDetail["payoutTimeline"],
+    rules: r.rules as unknown as FirmDetail["rules"],
     excludedCountries: r.excludedCountries,
   };
 }

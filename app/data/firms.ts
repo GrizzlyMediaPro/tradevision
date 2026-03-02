@@ -7,7 +7,9 @@ export const platformImages: Record<string, string> = {
   Tradovate: "/platforms/tradovate.webp",
 };
 
-export type ChallengeType = "Rapid" | "Legacy" | "Bolt";
+// Tipul de challenge este acum liber (definit per firmă),
+// nu mai este limitat la un set fix de valori.
+export type ChallengeType = string;
 
 export interface Challenge {
   accountType: string;
@@ -19,6 +21,7 @@ export interface Challenge {
   target: string;
   drawdown: string;
   type?: ChallengeType;
+  rules?: RuleTab[];
 }
 
 export interface PayoutStep {

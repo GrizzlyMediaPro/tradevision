@@ -397,7 +397,14 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                   {/* Firm Name + Logo + Payout */}
                   <div className="flex items-center gap-4">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-black/40">
-                      <Image src={firm.logo} alt={firm.name} width={48} height={48} className="h-10 w-10 object-contain" />
+                      <Image
+                        src={firm.logo}
+                        alt={firm.name}
+                        width={48}
+                        height={48}
+                        className="h-10 w-10 object-contain"
+                        unoptimized
+                      />
                     </div>
                     <div className="flex flex-col items-start">
                       <Link

@@ -221,6 +221,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                           width={80}
                           height={80}
                           className="h-16 w-16 object-contain"
+                          unoptimized
                         />
                       </div>
 

@@ -19,7 +19,6 @@ import {
 import {
   type FirmDetail,
   type Challenge,
-  type ChallengeType,
   type PayoutStep,
   type RuleTab,
   platformImages,
@@ -102,6 +101,8 @@ export default function AdminFirmePage() {
     { label: string; value: string; enabled: boolean }[]
   >([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [challengeTypes, setChallengeTypes] = useState<string[]>([]);
+  const [newChallengeType, setNewChallengeType] = useState('');
   const [payoutTimeline, setPayoutTimeline] = useState<PayoutStep[]>([]);
   const [excludedCountries, setExcludedCountries] = useState<string[]>([]);
   const [excludedInput, setExcludedInput] = useState('');
@@ -114,7 +115,6 @@ export default function AdminFirmePage() {
     features: false,
     challenges: false,
     payout: false,
-    rules: false,
     countries: false,
   });
 
@@ -157,6 +157,8 @@ export default function AdminFirmePage() {
     setPaymentMethods([]);
     setKeyFeatures([]);
     setChallenges([]);
+    setChallengeTypes([]);
+    setNewChallengeType('');
     setPayoutTimeline([]);
     setExcludedCountries([]);
     setExcludedInput('');
@@ -182,6 +184,15 @@ export default function AdminFirmePage() {
     setPaymentMethods([...firm.paymentMethods]);
     setKeyFeatures(firm.keyFeatures.map((f) => ({ ...f })));
     setChallenges(firm.challenges.map((c) => ({ ...c })));
+    const typesFromChallenges = Array.from(
+      new Set(
+        firm.challenges
+          .map((c) => (c.type ?? 'Rapid').trim())
+          .filter((t) => t.length > 0),
+      ),
+    );
+    setChallengeTypes(typesFromChallenges);
+    setNewChallengeType('');
     setPayoutTimeline(firm.payoutTimeline.map((p) => ({ ...p })));
     setExcludedCountries([...firm.excludedCountries]);
     setExcludedInput('');
@@ -193,7 +204,6 @@ export default function AdminFirmePage() {
       features: true,
       challenges: true,
       payout: true,
-      rules: true,
       countries: true,
     });
   };
@@ -272,6 +282,17 @@ export default function AdminFirmePage() {
       setExcludedCountries((prev) => [...prev, trimmed]);
     }
     setExcludedInput('');
+  };
+
+  /* ── challenge types helpers ── */
+  const addChallengeType = () => {
+    const trimmed = newChallengeType.trim();
+    if (!trimmed) return;
+    setChallengeTypes((prev) => {
+      if (prev.includes(trimmed)) return prev;
+      return [...prev, trimmed];
+    });
+    setNewChallengeType('');
   };
 
 
@@ -610,6 +631,7 @@ export default function AdminFirmePage() {
                           width={14}
                           height={14}
                           className="h-3.5 w-3.5 object-contain"
+                          unoptimized
                         />
                       )}
                       {p}
@@ -719,255 +741,367 @@ export default function AdminFirmePage() {
             count={challenges.length}
           />
           {openSections.challenges && (
-            <div className="flex flex-col gap-3 pl-1">
-              {challenges.map((ch, idx) => {
-                const rulesForChallenge = ch.rules ?? [];
+            <div className="flex flex-col gap-4 pl-1">
+              {/* Add challenge type */}
+              <div className="flex flex-col gap-2 rounded-xl border border-dashed border-white/20 bg-black/30 px-3 py-3">
+                <label className={labelCls}>Adaugă tip de challenge</label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={newChallengeType}
+                    onChange={(e) => setNewChallengeType(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addChallengeType();
+                      }
+                    }}
+                    placeholder="Ex: Rapid, Legacy, Lucid Pro, Direct..."
+                    className={`${inputCls} sm:flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={addChallengeType}
+                    disabled={!newChallengeType.trim()}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                  >
+                    <FaPlus className="h-2.5 w-2.5" /> Adaugă tip
+                  </button>
+                </div>
+                <p className="text-[10px] text-white/40">
+                  Mai întâi definești tipul de challenge, apoi poți adăuga unul sau mai multe
+                  conturi (challenges) sub acel tip.
+                </p>
+              </div>
+
+              {/* No types yet */}
+              {challengeTypes.length === 0 && (
+                <p className="text-xs text-white/45">
+                  Nu există încă niciun tip de challenge. Adaugă un tip mai sus, apoi vei putea
+                  adăuga conturi sub el.
+                </p>
+              )}
+
+              {/* Types with their challenges */}
+              {challengeTypes.map((typeName, typeIdx) => {
+                const challengesForType = challenges
+                  .map((ch, idx) => ({ ch, idx }))
+                  .filter(
+                    ({ ch }) => (ch.type ?? 'Rapid') === typeName,
+                  );
+
                 return (
-                <div
-                  key={idx}
-                  className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                      Challenge #{idx + 1}
-                    </span>
+                  <div
+                    key={typeName || typeIdx}
+                    className="flex flex-col gap-3 rounded-2xl border border-white/12 bg-white/3 px-4 py-3"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                          Tip challenge
+                        </span>
+                        <input
+                          type="text"
+                          value={typeName}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            const oldName = typeName;
+                            setChallengeTypes((prev) => {
+                              const next = [...prev];
+                              next[typeIdx] = value;
+                              return next;
+                            });
+                            const trimmed = value.trim();
+                            if (!trimmed) return;
+                            setChallenges((prev) =>
+                              prev.map((ch) =>
+                                (ch.type ?? 'Rapid') === oldName
+                                  ? { ...ch, type: trimmed }
+                                  : ch,
+                              ),
+                            );
+                          }}
+                          placeholder="Ex: Rapid"
+                          className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                        />
+                        <span className="text-[10px] text-white/40">
+                          ({challengesForType.length} conturi)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nameToRemove = typeName;
+                          setChallengeTypes((prev) =>
+                            prev.filter((_, i) => i !== typeIdx),
+                          );
+                          setChallenges((prev) =>
+                            prev.filter(
+                              (ch) => (ch.type ?? 'Rapid') !== nameToRemove,
+                            ),
+                          );
+                        }}
+                        className="inline-flex items-center gap-1 rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 text-[11px] font-medium text-red-300 hover:bg-red-500/20 transition cursor-pointer"
+                      >
+                        <FaTrash className="h-2.5 w-2.5" />
+                        Șterge tip
+                      </button>
+                    </div>
+
+                    {challengesForType.length === 0 && (
+                      <p className="text-[11px] text-white/45">
+                        Nu există încă niciun cont pentru acest tip. Adaugă un challenge mai jos.
+                      </p>
+                    )}
+
+                    {challengesForType.map(({ ch, idx }) => {
+                      const rulesForChallenge = ch.rules ?? [];
+                      return (
+                        <div
+                          key={idx}
+                          className="flex flex-col gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-3"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                              Challenge #{idx + 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setChallenges((prev) =>
+                                  prev.filter((_, i) => i !== idx),
+                                )
+                              }
+                              className="rounded-full border border-red-500/40 bg-red-500/10 p-1 text-red-300 hover:bg-red-500/20 transition cursor-pointer"
+                            >
+                              <FaTrash className="h-2.5 w-2.5" />
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                            <input
+                              type="text"
+                              value={ch.accountType}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  accountType: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="Account Type"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                            <select
+                              value={ch.accountColor}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  accountColor: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/50 cursor-pointer [&>option]:bg-zinc-900"
+                            >
+                              <option value="purple">Purple</option>
+                              <option value="emerald">Emerald</option>
+                              <option value="sky">Sky</option>
+                              <option value="yellow">Yellow</option>
+                            </select>
+                            <input
+                              type="text"
+                              value={ch.size}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  size: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="Size ($50K)"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                            <input
+                              type="text"
+                              value={ch.activation}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  activation: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="Activation"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                            <input
+                              type="text"
+                              value={ch.fee}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  fee: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="Fee"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                            <input
+                              type="text"
+                              value={ch.trueCost}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  trueCost: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="True Cost"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                            <input
+                              type="text"
+                              value={ch.target}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  target: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="Target"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                            <input
+                              type="text"
+                              value={ch.drawdown}
+                              onChange={(e) => {
+                                const updated = [...challenges];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  drawdown: e.target.value,
+                                };
+                                setChallenges(updated);
+                              }}
+                              placeholder="Drawdown"
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                            />
+                          </div>
+
+                          {/* Rules per challenge */}
+                          <div className="mt-2 flex flex-col gap-2">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                              Reguli pentru acest challenge
+                            </span>
+                            {rulesForChallenge.map((rule, rIdx) => (
+                              <div
+                                key={rIdx}
+                                className="flex flex-col gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <input
+                                    type="text"
+                                    value={rule.label}
+                                    onChange={(e) => {
+                                      const updated = [...challenges];
+                                      const current = { ...updated[idx] };
+                                      const innerRules = [
+                                        ...(current.rules ?? []),
+                                      ];
+                                      innerRules[rIdx] = {
+                                        ...innerRules[rIdx],
+                                        label: e.target.value,
+                                      };
+                                      current.rules = innerRules;
+                                      updated[idx] = current;
+                                      setChallenges(updated);
+                                    }}
+                                    placeholder="Titlu tab (ex: Evaluation Guidelines)"
+                                    className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-semibold text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const updated = [...challenges];
+                                      const current = { ...updated[idx] };
+                                      const innerRules = [
+                                        ...(current.rules ?? []),
+                                      ];
+                                      current.rules = innerRules.filter(
+                                        (_, i) => i !== rIdx,
+                                      );
+                                      updated[idx] = current;
+                                      setChallenges(updated);
+                                    }}
+                                    className="rounded-full border border-red-500/40 bg-red-500/10 p-1.5 text-red-300 hover:bg-red-500/20 transition cursor-pointer"
+                                  >
+                                    <FaTrash className="h-2.5 w-2.5" />
+                                  </button>
+                                </div>
+                                <textarea
+                                  rows={3}
+                                  value={rule.content.join('\n')}
+                                  onChange={(e) => {
+                                    const updated = [...challenges];
+                                    const current = { ...updated[idx] };
+                                    const innerRules = [
+                                      ...(current.rules ?? []),
+                                    ];
+                                    innerRules[rIdx] = {
+                                      ...innerRules[rIdx],
+                                      content: e.target.value.split('\n'),
+                                    };
+                                    current.rules = innerRules;
+                                    updated[idx] = current;
+                                    setChallenges(updated);
+                                  }}
+                                  placeholder="O regulă pe fiecare linie..."
+                                  className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-white placeholder-white/30 outline-none focus:border-sky-400/50 resize-none font-mono"
+                                />
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = [...challenges];
+                                const current = { ...updated[idx] };
+                                const innerRules = [...(current.rules ?? [])];
+                                innerRules.push({ label: '', content: [] });
+                                current.rules = innerRules;
+                                updated[idx] = current;
+                                setChallenges(updated);
+                              }}
+                              className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
+                            >
+                              <FaPlus className="h-2.5 w-2.5" /> Adaugă tab regulă
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+
                     <button
                       type="button"
                       onClick={() =>
-                        setChallenges((prev) =>
-                          prev.filter((_, i) => i !== idx),
-                        )
+                        setChallenges((prev) => [
+                          ...prev,
+                          { ...emptyChallenge, type: typeName },
+                        ])
                       }
-                      className="rounded-full border border-red-500/40 bg-red-500/10 p-1 text-red-300 hover:bg-red-500/20 transition cursor-pointer"
-                    >
-                      <FaTrash className="h-2.5 w-2.5" />
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                    <input
-                      type="text"
-                      value={ch.accountType}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          accountType: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="Account Type"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <select
-                      value={ch.type ?? 'Rapid'}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          type: e.target.value as ChallengeType,
-                        };
-                        setChallenges(updated);
-                      }}
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/50 cursor-pointer [&>option]:bg-zinc-900"
-                    >
-                      <option value="Rapid">Rapid</option>
-                      <option value="Legacy">Legacy</option>
-                      <option value="Bolt">Bolt</option>
-                    </select>
-                    <select
-                      value={ch.accountColor}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          accountColor: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/50 cursor-pointer [&>option]:bg-zinc-900"
-                    >
-                      <option value="purple">Purple</option>
-                      <option value="emerald">Emerald</option>
-                      <option value="sky">Sky</option>
-                      <option value="yellow">Yellow</option>
-                    </select>
-                    <input
-                      type="text"
-                      value={ch.size}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          size: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="Size ($50K)"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <input
-                      type="text"
-                      value={ch.activation}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          activation: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="Activation"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <input
-                      type="text"
-                      value={ch.fee}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          fee: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="Fee"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <input
-                      type="text"
-                      value={ch.trueCost}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          trueCost: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="True Cost"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <input
-                      type="text"
-                      value={ch.target}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          target: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="Target"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <input
-                      type="text"
-                      value={ch.drawdown}
-                      onChange={(e) => {
-                        const updated = [...challenges];
-                        updated[idx] = {
-                          ...updated[idx],
-                          drawdown: e.target.value,
-                        };
-                        setChallenges(updated);
-                      }}
-                      placeholder="Drawdown"
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                  </div>
-                  {/* Rules per challenge */}
-                  <div className="mt-2 flex flex-col gap-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                      Reguli pentru acest challenge
-                    </span>
-                    {rulesForChallenge.map((rule, rIdx) => (
-                      <div
-                        key={rIdx}
-                        className="flex flex-col gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <input
-                            type="text"
-                            value={rule.label}
-                            onChange={(e) => {
-                              const updated = [...challenges];
-                              const current = { ...updated[idx] };
-                              const innerRules = [...(current.rules ?? [])];
-                              innerRules[rIdx] = {
-                                ...innerRules[rIdx],
-                                label: e.target.value,
-                              };
-                              current.rules = innerRules;
-                              updated[idx] = current;
-                              setChallenges(updated);
-                            }}
-                            placeholder="Titlu tab (ex: Evaluation Guidelines)"
-                            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-semibold text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const updated = [...challenges];
-                              const current = { ...updated[idx] };
-                              const innerRules = [...(current.rules ?? [])];
-                              current.rules = innerRules.filter((_, i) => i !== rIdx);
-                              updated[idx] = current;
-                              setChallenges(updated);
-                            }}
-                            className="rounded-full border border-red-500/40 bg-red-500/10 p-1.5 text-red-300 hover:bg-red-500/20 transition cursor-pointer"
-                          >
-                            <FaTrash className="h-2.5 w-2.5" />
-                          </button>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rule.content.join('\n')}
-                          onChange={(e) => {
-                            const updated = [...challenges];
-                            const current = { ...updated[idx] };
-                            const innerRules = [...(current.rules ?? [])];
-                            innerRules[rIdx] = {
-                              ...innerRules[rIdx],
-                              content: e.target.value.split('\n'),
-                            };
-                            current.rules = innerRules;
-                            updated[idx] = current;
-                            setChallenges(updated);
-                          }}
-                          placeholder="O regulă pe fiecare linie..."
-                          className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-white placeholder-white/30 outline-none focus:border-sky-400/50 resize-none font-mono"
-                        />
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = [...challenges];
-                        const current = { ...updated[idx] };
-                        const innerRules = [...(current.rules ?? [])];
-                        innerRules.push({ label: '', content: [] });
-                        current.rules = innerRules;
-                        updated[idx] = current;
-                        setChallenges(updated);
-                      }}
                       className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
                     >
-                      <FaPlus className="h-2.5 w-2.5" /> Adaugă tab regulă
+                      <FaPlus className="h-2.5 w-2.5" /> Adaugă challenge în acest tip
                     </button>
                   </div>
-                </div>
-              );
+                );
               })}
-              <button
-                type="button"
-                onClick={() =>
-                  setChallenges((prev) => [...prev, { ...emptyChallenge }])
-                }
-                className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
-              >
-                <FaPlus className="h-2.5 w-2.5" /> Adaugă challenge
-              </button>
             </div>
           )}
 
@@ -1169,6 +1303,7 @@ export default function AdminFirmePage() {
                           width={32}
                           height={32}
                           className="h-8 w-8 object-contain"
+                          unoptimized
                         />
                       )
                     ) : (

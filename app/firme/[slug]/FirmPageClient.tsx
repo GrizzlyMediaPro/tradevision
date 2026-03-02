@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FaStar,
   FaCopy,
@@ -19,6 +19,7 @@ import type {
   FirmDetail,
   ChallengeType,
   Challenge,
+  RuleTab,
 } from "../../data/firms";
 
 function formatDollar(value: string): string {
@@ -86,10 +87,34 @@ export function FirmPageClient({
   firm: FirmDetail;
   firms: FirmDetail[];
 }) {
+  const availableChallengeTypes = useMemo<ChallengeType[]>(
+    () =>
+      Array.from(
+        new Set(
+          firm.challenges
+            .map((ch) => (ch.type ?? "Rapid").trim())
+            .filter((t) => t.length > 0),
+        ),
+      ),
+    [firm.challenges],
+  );
+
   const [activeChallengeType, setActiveChallengeType] =
-    useState<ChallengeType>("Rapid");
+    useState<ChallengeType>(
+      (availableChallengeTypes[0] as ChallengeType) || "Rapid",
+    );
+
+  useEffect(() => {
+    if (
+      availableChallengeTypes.length > 0 &&
+      !availableChallengeTypes.includes(activeChallengeType)
+    ) {
+      setActiveChallengeType(availableChallengeTypes[0] as ChallengeType);
+    }
+  }, [availableChallengeTypes, activeChallengeType]);
+
   const filteredChallenges = firm.challenges.filter((ch) => {
-    const type = ch.type ?? "Rapid";
+    const type = (ch.type ?? "Rapid") as ChallengeType;
     return type === activeChallengeType;
   });
   const [openChallenge, setOpenChallenge] = useState<Challenge | null>(null);
@@ -155,16 +180,17 @@ export function FirmPageClient({
       {/* ── Header ── */}
       <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
         <div className="flex-1">
-          <div className="flex items-start gap-5">
-            <div className="flex h-20 w-20 md:h-24 md:w-24 items-center justify-center rounded-2xl bg-black/50 border border-white/10">
-              <Image
-                src={firm.logo}
-                alt={firm.name}
-                width={80}
-                height={80}
-                className="h-14 w-14 md:h-16 md:w-16 object-contain"
-              />
-            </div>
+            <div className="flex items-start gap-5">
+              <div className="flex h-20 w-20 md:h-24 md:w-24 items-center justify-center rounded-2xl bg-black/50 border border-white/10">
+                <Image
+                  src={firm.logo}
+                  alt={firm.name}
+                  width={80}
+                  height={80}
+                  className="h-14 w-14 md:h-16 md:w-16 object-contain"
+                  unoptimized
+                />
+              </div>
             <div className="flex flex-col gap-2">
               <h1 className="text-2xl md:text-3xl font-semibold text-white">{firm.name}</h1>
               <div className="flex flex-wrap items-center gap-3">
@@ -320,7 +346,7 @@ export function FirmPageClient({
               Tip de challenge
             </span>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-1 py-1">
-              {(["Rapid", "Legacy", "Bolt"] as ChallengeType[]).map((type) => (
+              {availableChallengeTypes.map((type) => (
                 <button
                   key={type}
                   onClick={() => setActiveChallengeType(type)}
@@ -366,7 +392,7 @@ export function FirmPageClient({
               <span className="text-center">Activare</span>
               <span className="text-center">Taxă</span>
               <span className="text-center">Cost real</span>
-              <span className="text-center">Țintă</span>
+              <span className="text-center">Target</span>
               <span className="text-center">Drawdown</span>
               <span className="text-center">Acțiune</span>
             </div>
@@ -635,7 +661,7 @@ export function FirmPageClient({
             {openChallenge.rules && openChallenge.rules.length > 0 ? (
               <>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {openChallenge.rules.map((tab, idx) => (
+                  {openChallenge.rules.map((tab: RuleTab, idx: number) => (
                     <button
                       key={idx}
                       type="button"
@@ -659,7 +685,7 @@ export function FirmPageClient({
                       </h4>
                       <div className="space-y-1.5">
                         {openChallenge.rules[activeRuleIdx].content.map(
-                          (line, lineIdx) => {
+                          (line: string, lineIdx: number) => {
                             if (line === "") {
                               return <div key={lineIdx} className="h-3" />;
                             }

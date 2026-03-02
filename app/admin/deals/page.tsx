@@ -14,6 +14,7 @@ import {
   FaToggleOff,
   FaChevronLeft,
 } from 'react-icons/fa';
+import { UploadButton } from '@/lib/uploadthing';
 import {
   getDeals,
   createDeal,
@@ -312,29 +313,56 @@ export default function AdminDealsPage() {
                   onDrop={handleLogoDrop}
                   className="group rounded-xl border border-dashed border-white/20 bg-black/30 px-4 py-5 text-xs text-white/60 hover:border-purple-400/60 hover:bg-white/5 transition cursor-pointer"
                 >
-                  <div className="flex flex-col items-center justify-center gap-2 text-center">
-                    <span className="font-medium text-white/70">
-                      Drag & drop imaginea aici
-                    </span>
-                    <span className="text-[11px] text-white/40">
-                      (doar UI, upload-ul va fi conectat ulterior)
-                    </span>
-                    {form.logo && (
-                      <div className="mt-3 flex flex-col items-center gap-2">
-                        <div className="h-10 w-10 rounded-md bg-black/60 overflow-hidden flex items-center justify-center">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={form.logo}
-                            alt="Preview logo"
-                            className="h-8 w-8 object-contain"
-                          />
-                        </div>
-                        <span className="text-[11px] text-white/45">
-                          Imagine selectată
-                        </span>
+                  {!form.logo ? (
+                    <div className="flex flex-col items-center justify-center gap-2 text-center">
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          const url =
+                            res?.[0]?.serverData?.url ??
+                            res?.[0]?.ufsUrl ??
+                            res?.[0]?.url;
+                          if (url && typeof url === 'string') {
+                            setForm((prev) => ({ ...prev, logo: url }));
+                          }
+                        }}
+                        onUploadError={() => {
+                          // opțional: mesaj de eroare
+                        }}
+                        appearance={{
+                          button:
+                            'inline-flex items-center justify-center rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow hover:brightness-110 transition',
+                          container: 'flex flex-col items-center gap-2',
+                          allowedContent:
+                            'text-[11px] text-white/40 mt-1 text-center',
+                        }}
+                      />
+                      <span className="text-[11px] text-white/45 text-center">
+                        Încarcă un fișier imagine (max 4MB) <br />
+                        Poți și să tragi un fișier peste acest spațiu.
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-10 w-10 rounded-md bg-black/60 overflow-hidden flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={form.logo}
+                          alt="Preview logo"
+                          className="h-8 w-8 object-contain"
+                        />
                       </div>
-                    )}
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({ ...prev, logo: '' }))
+                        }
+                        className="text-[11px] text-red-300 hover:text-red-200 transition"
+                      >
+                        Șterge logo
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-2">
