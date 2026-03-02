@@ -1,48 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaChevronLeft, FaEnvelope, FaUserCheck } from 'react-icons/fa';
+import {
+  getNewsletterSubscribers,
+  deleteNewsletterSubscriber,
+  type SubscriberRow,
+  sendNewsletterToSubscribers,
+} from '../actions/newsletter';
 
-type Subscriber = {
-  id: string;
-  email: string;
-  subscribedAt: string;
-  source?: string;
-};
-
-const MOCK_SUBSCRIBERS: Subscriber[] = [
-  {
-    id: '1',
-    email: 'andrei@example.com',
-    subscribedAt: '2026-02-10 09:15',
-    source: 'Curs Trading',
-  },
-  {
-    id: '2',
-    email: 'maria@example.com',
-    subscribedAt: '2026-02-12 18:20',
-    source: 'Homepage CTA',
-  },
-  {
-    id: '3',
-    email: 'alex.trader@example.com',
-    subscribedAt: '2026-02-15 13:05',
-    source: 'Contact Form',
-  },
-  {
-    id: '4',
-    email: 'ioana@example.com',
-    subscribedAt: '2026-02-20 08:40',
-    source: 'Curs Trading',
-  },
-];
+function formatDate(d: Date): string {
+  return new Intl.DateTimeFormat('ro-RO', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(d));
+}
 
 export default function AdminNewsletterPage() {
-  const [subscribers] = useState<Subscriber[]>(MOCK_SUBSCRIBERS);
+  const [subscribers, setSubscribers] = useState<SubscriberRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    getNewsletterSubscribers().then(setSubscribers).finally(() => setLoading(false));
+  }, []);
 
   const allSelected =
     subscribers.length > 0 &&
@@ -73,23 +58,36 @@ export default function AdminNewsletterPage() {
     });
   };
 
-  const handleSendEmail = () => {
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteNewsletterSubscriber(id);
+      setSubscribers((prev) => prev.filter((s) => s.id !== id));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch {
+      // error
+    }
+  };
+
+  const handleSendEmail = async () => {
     if (selectedIds.size === 0) return;
     if (!subject.trim() && !body.trim()) return;
     const selectedEmails = subscribers
       .filter((s) => selectedIds.has(s.id))
       .map((s) => s.email);
-    // Doar UI deocamdată – aici vom conecta ulterior trimiterea reală de email
-    // eslint-disable-next-line no-console
-    console.log('Trimite email către:', selectedEmails, {
-      subject,
-      body,
-    });
-    alert(
-      `Simulare trimitere email cu subiect:\n"${subject}"\n\nCătre:\n${selectedEmails.join(
-        '\n',
-      )}`,
-    );
+    try {
+      setSending(true);
+      await sendNewsletterToSubscribers(selectedEmails, subject, body);
+      alert('Email trimis către abonații selectați.');
+    } catch (err) {
+      console.error(err);
+      alert('A apărut o eroare la trimiterea emailului.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -159,15 +157,17 @@ export default function AdminNewsletterPage() {
             <button
               type="button"
               onClick={handleSendEmail}
-              disabled={selectedIds.size === 0 || (!subject.trim() && !body.trim())}
+              disabled={
+                sending || selectedIds.size === 0 || (!subject.trim() && !body.trim())
+              }
               className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs md:text-sm font-semibold transition cursor-pointer ${
-                selectedIds.size === 0 || (!subject.trim() && !body.trim())
+                sending || selectedIds.size === 0 || (!subject.trim() && !body.trim())
                   ? 'border border-white/15 bg-white/5 text-white/30 cursor-not-allowed'
                   : 'bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 text-slate-900 shadow-[0_12px_30px_rgba(251,191,36,0.45)] hover:brightness-110'
               }`}
             >
               <FaEnvelope className="h-4 w-4" />
-              <span>Trimite email</span>
+              <span>{sending ? 'Se trimite...' : 'Trimite email'}</span>
             </button>
           </div>
         </div>
@@ -182,8 +182,7 @@ export default function AdminNewsletterPage() {
             </h2>
             <p className="mt-1 text-[11px] text-white/45 max-w-md">
               Scrie subiectul și mesajul pe care vrei să îl trimiți
-              abonaților selectați. Momentan este doar o simulare (nu se
-              trimit emailuri reale).
+              abonaților selectați. Emailurile vor fi trimise prin Resend.
             </p>
           </div>
           <div className="text-[11px] text-white/40">
@@ -224,7 +223,9 @@ export default function AdminNewsletterPage() {
 
       {/* Subscribers list */}
       <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-5 py-5 md:px-7 md:py-6 shadow-[0_18px_45px_rgba(0,0,0,0.6)] backdrop-blur-sm">
-        {subscribers.length === 0 ? (
+        {loading ? (
+          <p className="text-sm text-white/45">Se încarcă...</p>
+        ) : subscribers.length === 0 ? (
           <p className="text-sm text-white/45">
             Nu există abonați încă. Când utilizatorii se vor înscrie din
             site, vor apărea aici.
@@ -270,7 +271,7 @@ export default function AdminNewsletterPage() {
                         </span>
                       </div>
                       <div className="flex flex-col text-[11px] text-white/60">
-                        <span>{sub.subscribedAt}</span>
+                        <span>{formatDate(sub.subscribedAt)}</span>
                         {sub.source && (
                           <span className="text-white/40">
                             Sursă: {sub.source}
@@ -314,7 +315,7 @@ export default function AdminNewsletterPage() {
                     <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-white/60">
                       <span>
                         <span className="text-white/40">Dată: </span>
-                        {sub.subscribedAt}
+                        {formatDate(sub.subscribedAt)}
                       </span>
                       {sub.source && (
                         <span>

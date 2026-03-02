@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, type FormEvent, type DragEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -21,12 +21,12 @@ import {
   type Challenge,
   type PayoutStep,
   type RuleTab,
-  firms as defaultFirms,
   platformImages,
 } from '../../data/firms';
+import { getFirms, createOrUpdateFirm, deleteFirm } from '../actions/firms';
+import { UploadButton } from '@/lib/uploadthing';
 
 /* ─── constants ─── */
-const STORAGE_KEY = 'tradevision_firms_v1';
 
 const AVAILABLE_PLATFORMS = Object.keys(platformImages);
 const COMMON_PAYMENT_METHODS = [
@@ -44,10 +44,6 @@ function slugify(text: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
-}
-
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
 const emptyChallenge: Challenge = {
@@ -81,7 +77,9 @@ type SectionId =
 /* ─── component ─── */
 export default function AdminFirmePage() {
   /* ── firms state ── */
-  const [firmsList, setFirmsList] = useState<FirmDetail[]>(defaultFirms);
+  const [firmsList, setFirmsList] = useState<FirmDetail[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
 
   /* ── form state ── */
@@ -123,29 +121,21 @@ export default function AdminFirmePage() {
   const toggleSection = (id: SectionId) =>
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  /* ── localStorage ── */
+  /* ── load firms from DB ── */
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setFirmsList(parsed);
-      }
-    } catch {
-      /* ignore */
-    }
+    let cancelled = false;
+    getFirms()
+      .then((list) => {
+        if (!cancelled) setFirmsList(list);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(firmsList));
-    } catch {
-      /* ignore */
-    }
-  }, [firmsList]);
 
   /* ── reset form ── */
   const resetForm = () => {
@@ -209,7 +199,7 @@ export default function AdminFirmePage() {
   };
 
   /* ── submit ── */
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const trimmedName = name.trim();
     if (!trimmedName) return;
@@ -237,38 +227,27 @@ export default function AdminFirmePage() {
       excludedCountries,
     };
 
-    if (editingSlug) {
-      setFirmsList((prev) =>
-        prev.map((f) => (f.slug === editingSlug ? firm : f)),
-      );
-    } else {
-      setFirmsList((prev) => [...prev, firm]);
+    setSaving(true);
+    try {
+      await createOrUpdateFirm(firm, editingSlug);
+      const list = await getFirms();
+      setFirmsList(list);
+      resetForm();
+    } catch {
+      // error could be shown in UI
+    } finally {
+      setSaving(false);
     }
-    resetForm();
   };
 
   /* ── delete ── */
-  const handleDelete = (slug: string) => {
-    setFirmsList((prev) => prev.filter((f) => f.slug !== slug));
-    if (editingSlug === slug) resetForm();
-  };
-
-  /* ── drag & drop handlers ── */
-  const handleLogoDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setLogo(URL.createObjectURL(file));
-    }
-  };
-
-  const handleFlagDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setFlag(URL.createObjectURL(file));
+  const handleDelete = async (slug: string) => {
+    try {
+      await deleteFirm(slug);
+      setFirmsList((prev) => prev.filter((f) => f.slug !== slug));
+      if (editingSlug === slug) resetForm();
+    } catch {
+      // error could be shown in UI
     }
   };
 
@@ -293,11 +272,6 @@ export default function AdminFirmePage() {
     setExcludedInput('');
   };
 
-  /* ── reset to default ── */
-  const handleResetToDefault = () => {
-    setFirmsList(defaultFirms);
-    resetForm();
-  };
 
   /* ─── Section Header Component ─── */
   function SectionHeader({
@@ -423,24 +397,40 @@ export default function AdminFirmePage() {
                 </div>
               </div>
 
-              {/* Logo drag & drop */}
+              {/* Logo upload */}
               <div className="flex flex-col gap-2">
                 <label className={labelCls}>Logo firmă</label>
                 <div
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onDrop={handleLogoDrop}
                   className="group relative flex h-28 items-center justify-center rounded-xl border border-dashed border-white/20 bg-black/30 text-xs text-white/60 hover:border-sky-400/60 hover:bg-white/5 transition cursor-pointer"
                 >
                   {!logo ? (
-                    <span className="font-medium text-white/70 text-center">
-                      Drag &amp; drop logo-ul aici
-                      <span className="block text-[11px] text-white/40 mt-1">
-                        (doar UI – upload-ul va fi conectat ulterior)
+                    <div className="flex flex-col items-center gap-2">
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          const url =
+                            res?.[0]?.serverData?.url ??
+                            res?.[0]?.ufsUrl ??
+                            res?.[0]?.url;
+                          if (url && typeof url === 'string') {
+                            setLogo(url);
+                          }
+                        }}
+                        onUploadError={() => {
+                          // optional: show error toast
+                        }}
+                        appearance={{
+                          button:
+                            'inline-flex items-center justify-center rounded-full bg-sky-500 px-4 py-2 text-xs font-semibold text-white shadow hover:brightness-110 transition',
+                          container: 'flex flex-col items-center gap-2',
+                          allowedContent:
+                            'text-[11px] text-white/40 mt-1 text-center',
+                        }}
+                      />
+                      <span className="text-[11px] text-white/45 text-center">
+                        Încarcă un fișier imagine (max 4MB)
                       </span>
-                    </span>
+                    </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <div className="h-14 w-14 rounded-md bg-black/60 overflow-hidden flex items-center justify-center">
@@ -559,17 +549,36 @@ export default function AdminFirmePage() {
                 <div className="flex flex-col gap-2">
                   <label className={labelCls}>Steag țară</label>
                   <div
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onDrop={handleFlagDrop}
                     className="group relative flex h-20 items-center justify-center rounded-xl border border-dashed border-white/20 bg-black/30 text-xs text-white/60 hover:border-sky-400/60 hover:bg-white/5 transition cursor-pointer"
                   >
                     {!flag ? (
-                      <span className="font-medium text-white/70 text-center text-[11px]">
-                        Drag &amp; drop steagul aici
-                      </span>
+                      <div className="flex flex-col items-center gap-2">
+                        <UploadButton
+                          endpoint="imageUploader"
+                          onClientUploadComplete={(res) => {
+                            const url =
+                              res?.[0]?.serverData?.url ??
+                              res?.[0]?.ufsUrl ??
+                              res?.[0]?.url;
+                            if (url && typeof url === 'string') {
+                              setFlag(url);
+                            }
+                          }}
+                          onUploadError={() => {
+                            // optional: show error toast
+                          }}
+                          appearance={{
+                            button:
+                              'inline-flex items-center justify-center rounded-full bg-sky-500 px-4 py-1.5 text-[11px] font-semibold text-white shadow hover:brightness-110 transition',
+                            container: 'flex flex-col items-center gap-1.5',
+                            allowedContent:
+                              'text-[10px] text-white/40 mt-1 text-center',
+                          }}
+                        />
+                        <span className="text-[10px] text-white/45 text-center">
+                          Încarcă imaginea steagului (max 4MB)
+                        </span>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-3">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1076,12 +1085,11 @@ export default function AdminFirmePage() {
           {/* ── Submit ── */}
           <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
             <p className="text-[11px] text-white/40 max-w-xs">
-              Modificările sunt salvate în browser (localStorage) și vor fi
-              folosite pe site.
+              Modificările sunt salvate în baza de date și folosite pe site.
             </p>
             <button
               type="submit"
-              disabled={!name.trim()}
+              disabled={!name.trim() || saving}
               className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(14,165,233,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {editingSlug ? (
@@ -1105,16 +1113,11 @@ export default function AdminFirmePage() {
             <h2 className="text-sm md:text-base font-semibold text-white">
               Firme existente ({firmsList.length})
             </h2>
-            <button
-              type="button"
-              onClick={handleResetToDefault}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
-            >
-              Reset la default
-            </button>
           </div>
 
-          {firmsList.length === 0 ? (
+          {loading ? (
+            <p className="text-sm text-white/45">Se încarcă...</p>
+          ) : firmsList.length === 0 ? (
             <p className="text-sm text-white/45">
               Nu există încă nicio firmă. Adaugă una din formularul din stânga.
             </p>

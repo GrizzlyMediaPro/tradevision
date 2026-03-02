@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -19,13 +20,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const content = (
     <html lang="en">
-      <body className={`page-gradient ${poppins.className} antialiased`}>
-        <Navbar />
-        {children}
-        <Footer />
-      </body>
-    </html>
+        <body className={`page-gradient ${poppins.className} antialiased`}>
+          <Navbar />
+          {children}
+          <Footer />
+        </body>
+      </html>
+  );
+  return clerkKey ? (
+    <ClerkProvider publishableKey={clerkKey}>{content}</ClerkProvider>
+  ) : (
+    content
   );
 }

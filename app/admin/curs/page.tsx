@@ -14,11 +14,13 @@ import {
   FaTrash,
   FaEdit,
 } from 'react-icons/fa';
+import { type CourseChapter } from '../../data/courseChapters';
 import {
-  type CourseChapter,
-  defaultCourseChapters,
-  COURSE_CHAPTERS_STORAGE_KEY,
-} from '../../data/courseChapters';
+  getCourseChapters,
+  createCourseChapter,
+  updateCourseChapter,
+  deleteCourseChapter,
+} from '../actions/course';
 
 type FormMode = 'create' | 'edit';
 
@@ -55,9 +57,9 @@ function extractYouTubeId(input: string): string {
 }
 
 export default function AdminCursPage() {
-  const [chapters, setChapters] = useState<CourseChapter[]>(
-    defaultCourseChapters,
-  );
+  const [chapters, setChapters] = useState<CourseChapter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState<ChapterFormState>({
     mode: 'create',
@@ -67,41 +69,11 @@ export default function AdminCursPage() {
     youtubeUrl: '',
   });
 
-  // Load chapters from localStorage on mount
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = window.localStorage.getItem(COURSE_CHAPTERS_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as unknown;
-      if (!Array.isArray(parsed)) return;
-      const valid = parsed.filter(
-        (ch): ch is CourseChapter =>
-          ch &&
-          typeof ch.title === 'string' &&
-          typeof ch.description === 'string' &&
-          typeof ch.videoId === 'string',
-      );
-      if (valid.length > 0) {
-        setChapters(valid);
-      }
-    } catch {
-      // ignore invalid storage
-    }
+    getCourseChapters().then((list) => {
+      setChapters(list);
+    }).finally(() => setLoading(false));
   }, []);
-
-  // Persist chapters to localStorage whenever they change
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      window.localStorage.setItem(
-        COURSE_CHAPTERS_STORAGE_KEY,
-        JSON.stringify(chapters),
-      );
-    } catch {
-      // ignore quota / storage errors
-    }
-  }, [chapters]);
 
   const resetForm = () => {
     setForm({
@@ -119,7 +91,7 @@ export default function AdminCursPage() {
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
     };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const title = form.title.trim();
@@ -136,20 +108,24 @@ export default function AdminCursPage() {
       videoId,
     };
 
-    if (form.mode === 'create') {
-      setChapters((prev) => [...prev, newChapter]);
-    } else if (
-      form.mode === 'edit' &&
-      form.editingIndex !== null &&
-      form.editingIndex >= 0 &&
-      form.editingIndex < chapters.length
-    ) {
-      setChapters((prev) =>
-        prev.map((ch, idx) => (idx === form.editingIndex ? newChapter : ch)),
-      );
+    setSaving(true);
+    try {
+      if (form.mode === 'create') {
+        await createCourseChapter(newChapter);
+      } else if (
+        form.mode === 'edit' &&
+        form.editingIndex !== null &&
+        form.editingIndex >= 0 &&
+        form.editingIndex < chapters.length
+      ) {
+        await updateCourseChapter(form.editingIndex, newChapter);
+      }
+      const list = await getCourseChapters();
+      setChapters(list);
+      resetForm();
+    } finally {
+      setSaving(false);
     }
-
-    resetForm();
   };
 
   const handleEdit = (index: number) => {
@@ -163,16 +139,17 @@ export default function AdminCursPage() {
     });
   };
 
-  const handleDelete = (index: number) => {
-    setChapters((prev) => prev.filter((_, idx) => idx !== index));
-    if (form.mode === 'edit' && form.editingIndex === index) {
-      resetForm();
+  const handleDelete = async (index: number) => {
+    try {
+      await deleteCourseChapter(index);
+      const list = await getCourseChapters();
+      setChapters(list);
+      if (form.mode === 'edit' && form.editingIndex === index) {
+        resetForm();
+      }
+    } catch {
+      // error
     }
-  };
-
-  const handleResetToDefault = () => {
-    setChapters(defaultCourseChapters);
-    resetForm();
   };
 
   return (
@@ -222,13 +199,6 @@ export default function AdminCursPage() {
                 Setează titlul, descrierea și link-ul YouTube pentru capitol.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleResetToDefault}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
-            >
-              Reset la default
-            </button>
           </div>
 
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -281,12 +251,12 @@ export default function AdminCursPage() {
             {/* Submit */}
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-[11px] text-white/40 max-w-xs">
-                Modificările sunt salvate în browser (localStorage) și vor
-                fi folosite pe pagina <code>/curs</code>.
+                Modificările sunt salvate în baza de date și folosite pe pagina <code>/curs</code>.
               </p>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer"
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
               >
                 {form.mode === 'create' ? (
                   <>
@@ -312,7 +282,9 @@ export default function AdminCursPage() {
             </h2>
           </div>
 
-          {chapters.length === 0 ? (
+          {loading ? (
+            <p className="text-sm text-white/45">Se încarcă...</p>
+          ) : chapters.length === 0 ? (
             <p className="text-sm text-white/45">
               Nu există încă niciun capitol. Adaugă unul din formularul din
               stânga.

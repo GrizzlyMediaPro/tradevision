@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FaCopy, FaStar, FaChevronDown, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { TelegramCtaAndLive } from "./TelegramCtaAndLive";
-import { firms, platformImages } from "../data/firms";
+import { firms as defaultFirms, platformImages } from "../data/firms";
+import type { FirmDetail } from "../data/firms";
+import type { LinkWidgetState } from "../admin/actions/linkwidget";
 
 type SortKey = "name" | "country" | "trustScore" | "maxAccounts";
 type SortDir = "asc" | "desc";
@@ -30,7 +32,10 @@ const filterButtons = [
   { label: "Consistency Rule", extraClass: "min-w-[165px]" },
 ];
 
-export function Firms() {
+type FirmsProps = { firms?: FirmDetail[]; linkWidget?: LinkWidgetState };
+
+export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
+  const firms = useMemo(() => firmsProp && firmsProp.length > 0 ? firmsProp : defaultFirms, [firmsProp]);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -197,7 +202,7 @@ export function Firms() {
         </div>
 
         <div className="mt-10 w-full">
-          <TelegramCtaAndLive />
+          <TelegramCtaAndLive linkWidget={linkWidget} />
         </div>
       </div>
     </section>

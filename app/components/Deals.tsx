@@ -1,38 +1,39 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCopy } from "react-icons/fa";
 
-const partners = [
-  {
-    name: "Lucid Trading",
-    logo: "/partnersmock/My-Funded-Futures-1.webp",
-    discount: "50% Off",
-    rating: "4.7/5",
-    code: "MIKE",
-  },
-  {
-    name: "Take Profit Trader",
-    logo: "/partnersmock/My-Funded-Futures-4.webp",
-    discount: "40% Off",
-    rating: "4.4/5",
-    code: "PFM",
-  },
-  {
-    name: "Apex Trader Funding",
-    logo: "/partnersmock/My-Funded-Futures-8.webp",
-    discount: "90% Off",
-    rating: "4.4/5",
-    code: "MIKE",
-  },
+const FALLBACK_PARTNERS = [
+  { name: "Lucid Trading", logo: "/partnersmock/My-Funded-Futures-1.webp", discount: "50% Off", rating: "4.7/5", code: "MIKE" },
+  { name: "Take Profit Trader", logo: "/partnersmock/My-Funded-Futures-4.webp", discount: "40% Off", rating: "4.4/5", code: "PFM" },
+  { name: "Apex Trader Funding", logo: "/partnersmock/My-Funded-Futures-8.webp", discount: "90% Off", rating: "4.4/5", code: "MIKE" },
 ];
 
-const TOTAL = partners.length;
-const extended = [...partners, ...partners, ...partners];
+type DealItem = { name: string; logo: string; discount: string; rating: string; code: string };
+
 const GAP = 32;
 
-export function Deals() {
+type DealsProps = {
+  deals?: { id: string; logo: string; name: string; rating: number; discount: string; code: string }[];
+};
+
+export function Deals({ deals: rawDeals }: DealsProps) {
+  const partners: DealItem[] = useMemo(() => {
+    if (rawDeals && rawDeals.length > 0) {
+      return rawDeals.map((d) => ({
+        name: d.name,
+        logo: d.logo,
+        discount: d.discount,
+        rating: `${d.rating.toFixed(1)}/5`,
+        code: d.code,
+      }));
+    }
+    return FALLBACK_PARTNERS;
+  }, [rawDeals]);
+
+  const TOTAL = partners.length;
+  const extended = useMemo(() => (TOTAL > 0 ? [...partners, ...partners, ...partners] : []), [partners]);
   const [currentIndex, setCurrentIndex] = useState(TOTAL);
   const [isAnimating, setIsAnimating] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);

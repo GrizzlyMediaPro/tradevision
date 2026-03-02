@@ -1,6 +1,11 @@
 import Image from "next/image";
+import type { LinkWidgetState } from "../admin/actions/linkwidget";
 
-export function TelegramCtaAndLive() {
+type Props = {
+  linkWidget?: LinkWidgetState;
+};
+
+export function TelegramCtaAndLive({ linkWidget }: Props) {
   return (
     <div className="flex flex-col gap-10">
       {/* Telegram CTA card (copied from Firms) */}
@@ -59,28 +64,34 @@ export function TelegramCtaAndLive() {
         </div>
       </div>
 
-      {/* Live YouTube CTA card (copied from Firms) */}
+      {/* Live YouTube CTA card */}
       <div className="w-full rounded-3xl border border-white/10 bg-gradient-to-r from-white/[0.04] to-white/[0.02] px-6 py-6 md:px-10 md:py-8 flex flex-col md:flex-row items-stretch gap-8">
         <div className="md:w-1/2 flex flex-col items-start justify-center text-left gap-4">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-purple-300">
-            Live Trading
+            {linkWidget?.badge ?? "Live Trading"}
           </p>
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            Watch Us Trade Live on YouTube
+            {linkWidget?.title ?? "Watch Us Trade Live on YouTube"}
           </h3>
           <p className="text-sm md:text-base text-white/70 max-w-md">
-            Alătură-te live-urilor Trade Vision pentru sesiuni de day trading, Q&amp;A și analiză de piață în timp real.
+            {linkWidget?.description ??
+              "Alătură-te live-urilor Trade Vision pentru sesiuni de day trading, Q&A și analiză de piață în timp real."}
           </p>
           {/* Desktop button lângă text */}
-          <button className="mt-2 hidden md:inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs md:text-sm font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer">
-            Watch Stream
-          </button>
+          <a
+            href={linkWidget?.youtubeUrl || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 hidden md:inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs md:text-sm font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer"
+          >
+            {linkWidget?.buttonText ?? "Watch Stream"}
+          </a>
         </div>
         <div className="md:w-1/2 flex items-center justify-center">
           <div className="relative w-full max-w-xl aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
             <Image
-              src="/thumbnail.png"
-              alt="Trading live pe YouTube"
+              src={linkWidget?.thumbnail || "/thumbnail.png"}
+              alt={linkWidget?.title || "Trading live pe YouTube"}
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 50vw, 100vw"
@@ -90,9 +101,14 @@ export function TelegramCtaAndLive() {
         </div>
         {/* Mobile button sub thumbnail */}
         <div className="w-full md:hidden mt-4 flex justify-center">
-          <button className="inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer">
-            Watch Stream
-          </button>
+          <a
+            href={linkWidget?.youtubeUrl || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer"
+          >
+            {linkWidget?.buttonText ?? "Watch Stream"}
+          </a>
         </div>
       </div>
     </div>
