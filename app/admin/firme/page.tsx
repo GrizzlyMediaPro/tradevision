@@ -19,12 +19,14 @@ import {
 import {
   type FirmDetail,
   type Challenge,
+  type ChallengeType,
   type PayoutStep,
   type RuleTab,
   platformImages,
 } from '../../data/firms';
 import { getFirms, createOrUpdateFirm, deleteFirm } from '../actions/firms';
 import { UploadButton } from '@/lib/uploadthing';
+import Flag from 'react-world-flags';
 
 /* ─── constants ─── */
 
@@ -55,11 +57,10 @@ const emptyChallenge: Challenge = {
   trueCost: '',
   target: '',
   drawdown: '',
+  type: 'Rapid',
 };
 
 const emptyPayoutStep: PayoutStep = { title: '', description: '' };
-
-const emptyRule: RuleTab = { label: '', content: [] };
 
 const emptyFeature = { label: '', value: 'YES', enabled: true };
 
@@ -71,7 +72,6 @@ type SectionId =
   | 'features'
   | 'challenges'
   | 'payout'
-  | 'rules'
   | 'countries';
 
 /* ─── component ─── */
@@ -86,6 +86,7 @@ export default function AdminFirmePage() {
   const [name, setName] = useState('');
   const [logo, setLogo] = useState('');
   const [website, setWebsite] = useState('');
+  const [fundingUrl, setFundingUrl] = useState('');
   const [description, setDescription] = useState('');
   const [payout, setPayout] = useState('');
   const [country, setCountry] = useState('');
@@ -102,7 +103,6 @@ export default function AdminFirmePage() {
   >([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [payoutTimeline, setPayoutTimeline] = useState<PayoutStep[]>([]);
-  const [rules, setRules] = useState<RuleTab[]>([]);
   const [excludedCountries, setExcludedCountries] = useState<string[]>([]);
   const [excludedInput, setExcludedInput] = useState('');
 
@@ -143,6 +143,7 @@ export default function AdminFirmePage() {
     setName('');
     setLogo('');
     setWebsite('');
+    setFundingUrl('');
     setDescription('');
     setPayout('');
     setCountry('');
@@ -157,7 +158,6 @@ export default function AdminFirmePage() {
     setKeyFeatures([]);
     setChallenges([]);
     setPayoutTimeline([]);
-    setRules([]);
     setExcludedCountries([]);
     setExcludedInput('');
   };
@@ -168,6 +168,7 @@ export default function AdminFirmePage() {
     setName(firm.name);
     setLogo(firm.logo);
     setWebsite(firm.website);
+    setFundingUrl(firm.fundingUrl || '');
     setDescription(firm.description);
     setPayout(firm.payout);
     setCountry(firm.country);
@@ -182,7 +183,6 @@ export default function AdminFirmePage() {
     setKeyFeatures(firm.keyFeatures.map((f) => ({ ...f })));
     setChallenges(firm.challenges.map((c) => ({ ...c })));
     setPayoutTimeline(firm.payoutTimeline.map((p) => ({ ...p })));
-    setRules(firm.rules.map((r) => ({ ...r, content: [...r.content] })));
     setExcludedCountries([...firm.excludedCountries]);
     setExcludedInput('');
     // Open all sections when editing
@@ -204,13 +204,15 @@ export default function AdminFirmePage() {
     const trimmedName = name.trim();
     if (!trimmedName) return;
 
+  const countryCode = country.trim().toUpperCase();
+
     const firm: FirmDetail = {
       name: trimmedName,
       slug: editingSlug || slugify(trimmedName),
       logo,
       payout: payout.trim(),
-      country: country.trim(),
-      flag,
+      country: countryCode,
+      flag: countryCode,
       platforms,
       trustScore: parseFloat(trustScore) || 0,
       activeYears: parseInt(activeYears) || 0,
@@ -218,12 +220,12 @@ export default function AdminFirmePage() {
       code: code.trim(),
       discount: discount.trim(),
       website: website.trim(),
+      fundingUrl: fundingUrl.trim(),
       description: description.trim(),
       paymentMethods,
       keyFeatures,
       challenges,
-      payoutTimeline,
-      rules,
+    payoutTimeline,
       excludedCountries,
     };
 
@@ -334,7 +336,7 @@ export default function AdminFirmePage() {
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
           Admin Firme
         </h1>
-        <div className="mt-3 h-[2px] w-[80px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
+        <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
           Creează, editează sau șterge firmele de prop trading. Datele sunt
           folosite atât pe pagina principală (widget firme), cât și pe pagina
@@ -347,7 +349,7 @@ export default function AdminFirmePage() {
         {/* ── FORM ── */}
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm flex flex-col gap-5"
+          className="rounded-3xl border border-white/10 bg-linear-to-b from-white/7 to-white/2 px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm flex flex-col gap-5"
         >
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -392,6 +394,16 @@ export default function AdminFirmePage() {
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                     placeholder="https://..."
+                    className={inputCls}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className={labelCls}>Link Obține finanțare</label>
+                  <input
+                    type="text"
+                    value={fundingUrl}
+                    onChange={(e) => setFundingUrl(e.target.value)}
+                    placeholder="https://link-afiliat..."
                     className={inputCls}
                   />
                 </div>
@@ -525,12 +537,14 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Discount</label>
+                  <label className={labelCls}>Discount (%)</label>
                   <input
-                    type="text"
+                    type="number"
+                    min="0"
+                    max="100"
                     value={discount}
                     onChange={(e) => setDiscount(e.target.value)}
-                    placeholder="40% Off"
+                    placeholder="40"
                     className={inputCls}
                   />
                 </div>
@@ -547,54 +561,23 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Steag țară</label>
-                  <div
-                    className="group relative flex h-20 items-center justify-center rounded-xl border border-dashed border-white/20 bg-black/30 text-xs text-white/60 hover:border-sky-400/60 hover:bg-white/5 transition cursor-pointer"
-                  >
-                    {!flag ? (
-                      <div className="flex flex-col items-center gap-2">
-                        <UploadButton
-                          endpoint="imageUploader"
-                          onClientUploadComplete={(res) => {
-                            const url =
-                              res?.[0]?.serverData?.url ??
-                              res?.[0]?.ufsUrl ??
-                              res?.[0]?.url;
-                            if (url && typeof url === 'string') {
-                              setFlag(url);
-                            }
-                          }}
-                          onUploadError={() => {
-                            // optional: show error toast
-                          }}
-                          appearance={{
-                            button:
-                              'inline-flex items-center justify-center rounded-full bg-sky-500 px-4 py-1.5 text-[11px] font-semibold text-white shadow hover:brightness-110 transition',
-                            container: 'flex flex-col items-center gap-1.5',
-                            allowedContent:
-                              'text-[10px] text-white/40 mt-1 text-center',
-                          }}
+                  <label className={labelCls}>Steag țară (din cod)</label>
+                  <div className="flex items-center gap-3 rounded-xl border border-dashed border-white/20 bg-black/30 px-3 py-2.5 text-xs text-white/60">
+                    {country.trim().length === 2 ? (
+                      <>
+                        <Flag
+                          code={country.trim().toUpperCase()}
+                          style={{ width: 32, height: 20, borderRadius: 4 }}
                         />
-                        <span className="text-[10px] text-white/45 text-center">
-                          Încarcă imaginea steagului (max 4MB)
+                        <span className="text-[10px] text-white/45">
+                          Steagul este generat automat din codul țării (ex: US).
                         </span>
-                      </div>
+                      </>
                     ) : (
-                      <div className="flex items-center gap-3">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={flag}
-                          alt="Flag"
-                          className="h-8 w-12 object-cover rounded-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setFlag('')}
-                          className="text-[10px] text-red-300 hover:text-red-200"
-                        >
-                          Șterge
-                        </button>
-                      </div>
+                      <span className="text-[10px] text-white/45">
+                        Introdu un cod de țară valid (ex: US) în câmpul de mai sus pentru a vedea
+                        steagul.
+                      </span>
                     )}
                   </div>
                 </div>
@@ -667,7 +650,7 @@ export default function AdminFirmePage() {
               {keyFeatures.map((feat, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+                  className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5"
                 >
                   <input
                     type="text"
@@ -737,10 +720,12 @@ export default function AdminFirmePage() {
           />
           {openSections.challenges && (
             <div className="flex flex-col gap-3 pl-1">
-              {challenges.map((ch, idx) => (
+              {challenges.map((ch, idx) => {
+                const rulesForChallenge = ch.rules ?? [];
+                return (
                 <div
                   key={idx}
-                  className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                  className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
@@ -758,7 +743,7 @@ export default function AdminFirmePage() {
                       <FaTrash className="h-2.5 w-2.5" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                     <input
                       type="text"
                       value={ch.accountType}
@@ -773,6 +758,22 @@ export default function AdminFirmePage() {
                       placeholder="Account Type"
                       className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                     />
+                    <select
+                      value={ch.type ?? 'Rapid'}
+                      onChange={(e) => {
+                        const updated = [...challenges];
+                        updated[idx] = {
+                          ...updated[idx],
+                          type: e.target.value as ChallengeType,
+                        };
+                        setChallenges(updated);
+                      }}
+                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/50 cursor-pointer [&>option]:bg-zinc-900"
+                    >
+                      <option value="Rapid">Rapid</option>
+                      <option value="Legacy">Legacy</option>
+                      <option value="Bolt">Bolt</option>
+                    </select>
                     <select
                       value={ch.accountColor}
                       onChange={(e) => {
@@ -875,8 +876,89 @@ export default function AdminFirmePage() {
                       className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                     />
                   </div>
+                  {/* Rules per challenge */}
+                  <div className="mt-2 flex flex-col gap-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                      Reguli pentru acest challenge
+                    </span>
+                    {rulesForChallenge.map((rule, rIdx) => (
+                      <div
+                        key={rIdx}
+                        className="flex flex-col gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <input
+                            type="text"
+                            value={rule.label}
+                            onChange={(e) => {
+                              const updated = [...challenges];
+                              const current = { ...updated[idx] };
+                              const innerRules = [...(current.rules ?? [])];
+                              innerRules[rIdx] = {
+                                ...innerRules[rIdx],
+                                label: e.target.value,
+                              };
+                              current.rules = innerRules;
+                              updated[idx] = current;
+                              setChallenges(updated);
+                            }}
+                            placeholder="Titlu tab (ex: Evaluation Guidelines)"
+                            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-semibold text-white placeholder-white/30 outline-none focus:border-sky-400/50"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...challenges];
+                              const current = { ...updated[idx] };
+                              const innerRules = [...(current.rules ?? [])];
+                              current.rules = innerRules.filter((_, i) => i !== rIdx);
+                              updated[idx] = current;
+                              setChallenges(updated);
+                            }}
+                            className="rounded-full border border-red-500/40 bg-red-500/10 p-1.5 text-red-300 hover:bg-red-500/20 transition cursor-pointer"
+                          >
+                            <FaTrash className="h-2.5 w-2.5" />
+                          </button>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rule.content.join('\n')}
+                          onChange={(e) => {
+                            const updated = [...challenges];
+                            const current = { ...updated[idx] };
+                            const innerRules = [...(current.rules ?? [])];
+                            innerRules[rIdx] = {
+                              ...innerRules[rIdx],
+                              content: e.target.value.split('\n'),
+                            };
+                            current.rules = innerRules;
+                            updated[idx] = current;
+                            setChallenges(updated);
+                          }}
+                          placeholder="O regulă pe fiecare linie..."
+                          className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-white placeholder-white/30 outline-none focus:border-sky-400/50 resize-none font-mono"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = [...challenges];
+                        const current = { ...updated[idx] };
+                        const innerRules = [...(current.rules ?? [])];
+                        innerRules.push({ label: '', content: [] });
+                        current.rules = innerRules;
+                        updated[idx] = current;
+                        setChallenges(updated);
+                      }}
+                      className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
+                    >
+                      <FaPlus className="h-2.5 w-2.5" /> Adaugă tab regulă
+                    </button>
+                  </div>
                 </div>
-              ))}
+              );
+              })}
               <button
                 type="button"
                 onClick={() =>
@@ -900,9 +982,9 @@ export default function AdminFirmePage() {
               {payoutTimeline.map((step, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+                  className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5"
                 >
-                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-sky-500/15 border border-sky-400/30 text-[10px] font-bold text-sky-300 mt-1">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-sky-500/15 border border-sky-400/30 text-[10px] font-bold text-sky-300 mt-1">
                     {idx + 1}
                   </div>
                   <div className="flex flex-1 flex-col gap-1.5">
@@ -963,69 +1045,7 @@ export default function AdminFirmePage() {
             </div>
           )}
 
-          {/* ── 7. Rules ── */}
-          <SectionHeader id="rules" title="Reguli" count={rules.length} />
-          {openSections.rules && (
-            <div className="flex flex-col gap-3 pl-1">
-              {rules.map((rule, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <input
-                      type="text"
-                      value={rule.label}
-                      onChange={(e) => {
-                        const updated = [...rules];
-                        updated[idx] = {
-                          ...updated[idx],
-                          label: e.target.value,
-                        };
-                        setRules(updated);
-                      }}
-                      placeholder="Titlu tab (ex: Evaluation Guidelines)"
-                      className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white placeholder-white/30 outline-none focus:border-sky-400/50"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setRules((prev) => prev.filter((_, i) => i !== idx))
-                      }
-                      className="rounded-full border border-red-500/40 bg-red-500/10 p-1.5 text-red-300 hover:bg-red-500/20 transition cursor-pointer"
-                    >
-                      <FaTrash className="h-2.5 w-2.5" />
-                    </button>
-                  </div>
-                  <textarea
-                    rows={4}
-                    value={rule.content.join('\n')}
-                    onChange={(e) => {
-                      const updated = [...rules];
-                      updated[idx] = {
-                        ...updated[idx],
-                        content: e.target.value.split('\n'),
-                      };
-                      setRules(updated);
-                    }}
-                    placeholder="O regulă pe fiecare linie..."
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50 resize-none font-mono"
-                  />
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() =>
-                  setRules((prev) => [...prev, { ...emptyRule, content: [] }])
-                }
-                className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
-              >
-                <FaPlus className="h-2.5 w-2.5" /> Adaugă tab regulă
-              </button>
-            </div>
-          )}
-
-          {/* ── 8. Excluded Countries ── */}
+          {/* ── 7. Excluded Countries ── */}
           <SectionHeader
             id="countries"
             title="Țări excluse"
@@ -1090,7 +1110,7 @@ export default function AdminFirmePage() {
             <button
               type="submit"
               disabled={!name.trim() || saving}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(14,165,233,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(14,165,233,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {editingSlug ? (
                 <>
@@ -1108,7 +1128,7 @@ export default function AdminFirmePage() {
         </form>
 
         {/* ── FIRMS LIST ── */}
-        <section className="flex flex-col rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-6 py-6 md:px-7 md:py-7 shadow-[0_16px_40px_rgba(0,0,0,0.55)] backdrop-blur-sm">
+        <section className="flex flex-col rounded-3xl border border-white/10 bg-linear-to-b from-white/5 to-white/2 px-6 py-6 md:px-7 md:py-7 shadow-[0_16px_40px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 mb-4">
             <h2 className="text-sm md:text-base font-semibold text-white">
               Firme existente ({firmsList.length})
@@ -1126,14 +1146,14 @@ export default function AdminFirmePage() {
               {firmsList.map((firm) => (
                 <div
                   key={firm.slug}
-                  className={`flex items-start gap-4 rounded-2xl border bg-gradient-to-r from-white/[0.05] to-white/[0.02] px-4 py-3 transition ${
+                  className={`flex items-start gap-4 rounded-2xl border bg-linear-to-r from-white/5 to-white/2 px-4 py-3 transition ${
                     editingSlug === firm.slug
                       ? 'border-sky-400/50 ring-1 ring-sky-400/20'
                       : 'border-white/12'
                   }`}
                 >
                   {/* Logo */}
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/40">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black/40">
                     {firm.logo ? (
                       firm.logo.startsWith('blob:') ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
@@ -1196,13 +1216,17 @@ export default function AdminFirmePage() {
                       </span>
                       <span className="text-[9px] text-white/30">·</span>
                       <span className="text-[9px] text-white/40">
-                        {firm.rules.length} tab-uri reguli
+                        {firm.challenges.reduce(
+                          (sum, ch) => sum + ((ch.rules?.length ?? 0)),
+                          0,
+                        )}{' '}
+                        tab-uri reguli
                       </span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-col gap-1 flex-shrink-0">
+                  <div className="flex flex-col gap-1 shrink-0">
                     <button
                       type="button"
                       onClick={() => loadFirmIntoForm(firm)}

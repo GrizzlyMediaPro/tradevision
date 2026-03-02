@@ -32,6 +32,7 @@ type Deal = {
   rating: number;
   discount: string;
   code: string;
+  fundingUrl?: string;
 };
 
 type FormState = {
@@ -43,11 +44,12 @@ type FormState = {
   rating: string;
   discount: string;
   code: string;
+  fundingUrl: string;
 };
 
 export default function AdminDealsPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
-  const [firmsFromDb, setFirmsFromDb] = useState<{ name: string; slug: string; logo: string; trustScore: number; discount: string; code: string }[]>([]);
+  const [firmsFromDb, setFirmsFromDb] = useState<{ name: string; slug: string; logo: string; trustScore: number; discount: string; code: string; fundingUrl?: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -60,6 +62,7 @@ export default function AdminDealsPage() {
     rating: '4.5',
     discount: '50% Off',
     code: '',
+    fundingUrl: '',
   });
 
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
@@ -71,7 +74,17 @@ export default function AdminDealsPage() {
 
   useEffect(() => {
     getFirms().then((list) =>
-      setFirmsFromDb(list.map((f) => ({ name: f.name, slug: f.slug, logo: f.logo, trustScore: f.trustScore, discount: f.discount, code: f.code }))),
+      setFirmsFromDb(
+        list.map((f) => ({
+          name: f.name,
+          slug: f.slug,
+          logo: f.logo,
+          trustScore: f.trustScore,
+          discount: f.discount,
+          code: f.code,
+          fundingUrl: f.fundingUrl,
+        })),
+      ),
     );
   }, []);
 
@@ -97,6 +110,7 @@ export default function AdminDealsPage() {
       rating: '4.5',
       discount: '50% Off',
       code: '',
+      fundingUrl: '',
     });
   };
 
@@ -110,6 +124,7 @@ export default function AdminDealsPage() {
       rating: firm ? String(firm.trustScore.toFixed(1)) : prev.rating,
       discount: firm ? firm.discount : prev.discount,
       code: firm ? firm.code : prev.code,
+      fundingUrl: firm?.fundingUrl ?? prev.fundingUrl,
     }));
   };
 
@@ -136,6 +151,7 @@ export default function AdminDealsPage() {
         rating: ratingNum || 0,
         discount: form.discount.trim() || '0% Off',
         code: form.code.trim(),
+        fundingUrl: form.fundingUrl.trim() || undefined,
       };
       if (form.mode === 'create') {
         await createDeal(payload);
@@ -160,6 +176,7 @@ export default function AdminDealsPage() {
       rating: String(deal.rating.toFixed(1)),
       discount: deal.discount,
       code: deal.code,
+      fundingUrl: deal.fundingUrl || '',
     });
   };
 
@@ -338,7 +355,7 @@ export default function AdminDealsPage() {
             </div>
 
             {/* Rating & Discount */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
                   Rating (0 - 5 stele)
@@ -355,7 +372,7 @@ export default function AdminDealsPage() {
                   className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
               </div>
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
                   Discount
                 </label>
@@ -369,6 +386,22 @@ export default function AdminDealsPage() {
                   className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
               </div>
+            </div>
+
+            {/* Funding URL */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-medium uppercase tracking-wider text-white/60">
+                Link Obține finanțare
+              </label>
+              <input
+                type="text"
+                value={form.fundingUrl}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, fundingUrl: e.target.value }))
+                }
+                placeholder="https://link-afiliat..."
+                className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
+              />
             </div>
 
             {/* Code */}

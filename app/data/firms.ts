@@ -7,6 +7,8 @@ export const platformImages: Record<string, string> = {
   Tradovate: "/platforms/tradovate.webp",
 };
 
+export type ChallengeType = "Rapid" | "Legacy" | "Bolt";
+
 export interface Challenge {
   accountType: string;
   accountColor: string;
@@ -16,6 +18,7 @@ export interface Challenge {
   trueCost: string;
   target: string;
   drawdown: string;
+  type?: ChallengeType;
 }
 
 export interface PayoutStep {
@@ -42,12 +45,14 @@ export interface FirmDetail {
   code: string;
   discount: string;
   website: string;
+  fundingUrl?: string;
   description: string;
   paymentMethods: string[];
   keyFeatures: { label: string; value: string; enabled: boolean }[];
   challenges: Challenge[];
   payoutTimeline: PayoutStep[];
-  rules: RuleTab[];
+  // Deprecated: reguli la nivel de firmă (nu mai sunt folosite, regulile sunt per challenge)
+  rules?: RuleTab[];
   excludedCountries: string[];
 }
 

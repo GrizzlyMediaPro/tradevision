@@ -28,12 +28,12 @@ export async function getFirms(): Promise<FirmDetail[]> {
     code: r.code ?? "",
     discount: r.discount ?? "",
     website: r.website ?? "",
+    fundingUrl: r.fundingUrl ?? "",
     description: r.description ?? "",
     paymentMethods: r.paymentMethods,
     keyFeatures: r.keyFeatures as unknown as FirmDetail["keyFeatures"],
     challenges: r.challenges as unknown as FirmDetail["challenges"],
     payoutTimeline: r.payoutTimeline as unknown as FirmDetail["payoutTimeline"],
-    rules: r.rules as unknown as FirmDetail["rules"],
     excludedCountries: r.excludedCountries,
   }));
 }
@@ -48,6 +48,7 @@ export async function createOrUpdateFirm(
     slug,
     logo: data.logo,
     website: data.website || null,
+    fundingUrl: data.fundingUrl || null,
     description: data.description || null,
     payout: data.payout || null,
     country: data.country || null,
@@ -62,7 +63,6 @@ export async function createOrUpdateFirm(
     keyFeatures: data.keyFeatures as object,
     challenges: data.challenges as object[],
     payoutTimeline: data.payoutTimeline as object[],
-    rules: data.rules as object[],
     excludedCountries: data.excludedCountries,
   };
 
@@ -102,12 +102,12 @@ export async function getFirmBySlug(slug: string): Promise<FirmDetail | null> {
     code: r.code ?? "",
     discount: r.discount ?? "",
     website: r.website ?? "",
+    fundingUrl: r.fundingUrl ?? "",
     description: r.description ?? "",
     paymentMethods: r.paymentMethods,
     keyFeatures: r.keyFeatures as unknown as FirmDetail["keyFeatures"],
     challenges: r.challenges as unknown as FirmDetail["challenges"],
     payoutTimeline: r.payoutTimeline as unknown as FirmDetail["payoutTimeline"],
-    rules: r.rules as unknown as FirmDetail["rules"],
     excludedCountries: r.excludedCountries,
   };
 }

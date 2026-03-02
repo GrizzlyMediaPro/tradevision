@@ -17,6 +17,7 @@ model Firm {
   slug              String   @unique
   logo              String
   website           String?
+  fundingUrl        String?
   description       String?
   payout            String?
   country           String?
@@ -46,6 +47,7 @@ model Deal {
   rating    Float    @default(0)
   discount  String
   code      String
+  fundingUrl String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
