@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { resend } from "@/lib/resend";
+import { resend, resendFrom } from "@/lib/resend";
+import {
+  renderEmailLayout,
+  renderPlainTextBody,
+  renderSimpleBodyAsHtml,
+} from "@/lib/emailTemplates";
 
 export type SubscriberRow = {
   id: string;
@@ -50,11 +55,11 @@ export async function subscribeNewsletterAndSendWelcome(
   if (!resend) return;
 
   try {
-    await resend.emails.send({
-      from: "Trade Vision <onboarding@resend.dev>",
-      to: email.trim().toLowerCase(),
-      subject: "Bine ai venit în newsletterul Trade Vision",
-      text: [
+    const trimmedEmail = email.trim().toLowerCase();
+    const subject = "Bine ai venit în newsletterul Trade Vision";
+
+    const text = renderPlainTextBody(
+      [
         "Salut,",
         "",
         "Mulțumim că te-ai abonat la newsletterul Trade Vision.",
@@ -62,6 +67,30 @@ export async function subscribeNewsletterAndSendWelcome(
         "",
         "Dacă nu tu ai făcut această înscriere, poți ignora acest email.",
       ].join("\n"),
+    );
+
+    const contentHtml = renderSimpleBodyAsHtml(
+      [
+        "Salut,",
+        "",
+        "Mulțumim că te-ai abonat la newsletterul Trade Vision.",
+        "Vei primi periodic conținut educativ și noutăți despre trading.",
+        "",
+        "Dacă nu tu ai făcut această înscriere, poți ignora acest email.",
+      ].join("\n\n"),
+    );
+
+    await resend.emails.send({
+      from: resendFrom,
+      to: trimmedEmail,
+      subject,
+      text,
+      html: renderEmailLayout({
+        title: subject,
+        previewText:
+          "Mulțumim că te-ai abonat la newsletterul Trade Vision. Vei primi periodic conținut educativ și noutăți despre trading.",
+        contentHtml,
+      }),
     });
   } catch (err) {
     console.error("Failed to send newsletter welcome email", err);
@@ -88,11 +117,21 @@ export async function sendNewsletterToSubscribers(
   const trimmedBody = body.trim();
 
   try {
+    const text = renderPlainTextBody(trimmedBody);
+    const contentHtml = renderSimpleBodyAsHtml(
+      trimmedBody || " ",
+    );
+
     const { data, error } = await resend.emails.send({
-      from: "Trade Vision <onboarding@resend.dev>",
+      from: resendFrom,
       to: cleanedEmails,
       subject: trimmedSubject,
-      text: trimmedBody || " ",
+      text,
+      html: renderEmailLayout({
+        title: trimmedSubject,
+        previewText: trimmedBody.slice(0, 140),
+        contentHtml,
+      }),
     });
 
     if (error) {
