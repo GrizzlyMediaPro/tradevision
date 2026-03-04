@@ -127,11 +127,22 @@ export function FirmPageClient({
   const [compareDraft, setCompareDraft] =
     useState<CompareDraftSlot[]>(emptyDraftSlots);
   const [copied, setCopied] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const allFirms = useMemo(
     () => (firms && firms.length > 0 ? firms : [firm]),
     [firms, firm],
   );
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const comparedItems = useMemo(
     () =>
@@ -341,25 +352,39 @@ export function FirmPageClient({
 
         {/* Tip de challenge + Compare */}
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className={`w-full sm:w-auto flex ${isMobile && availableChallengeTypes.length > 3 ? 'flex-col' : 'items-center'} gap-3`}>
             <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
               Tip de challenge
             </span>
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-1 py-1">
-              {availableChallengeTypes.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setActiveChallengeType(type)}
-                  className={`px-4 py-1.5 text-[11px] font-semibold rounded-full transition cursor-pointer ${
-                    activeChallengeType === type
-                      ? "bg-purple-500 text-white shadow-[0_8px_18px_rgba(147,51,234,0.45)]"
-                      : "bg-transparent text-white/70 hover:bg-white/10"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
+            {isMobile && availableChallengeTypes.length > 3 ? (
+              <select
+                value={activeChallengeType}
+                onChange={(e) => setActiveChallengeType(e.target.value as ChallengeType)}
+                className="w-full rounded-full bg-white/5 border border-white/10 px-4 py-1.5 text-[11px] font-semibold text-white outline-none focus:border-purple-400/60 cursor-pointer [&>option]:bg-zinc-900"
+              >
+                {availableChallengeTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-1 py-1">
+                {availableChallengeTypes.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setActiveChallengeType(type)}
+                    className={`px-4 py-1.5 text-[11px] font-semibold rounded-full transition cursor-pointer ${
+                      activeChallengeType === type
+                        ? "bg-purple-500 text-white shadow-[0_8px_18px_rgba(147,51,234,0.45)]"
+                        : "bg-transparent text-white/70 hover:bg-white/10"
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <button
             type="button"
@@ -455,7 +480,7 @@ export function FirmPageClient({
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-white/40 md:hidden">Țintă</span>
+                  <span className="text-[10px] text-white/40 md:hidden">Target</span>
                   <span className="text-sm text-white/70">
                     {formatDollar(ch.target)}
                   </span>
@@ -557,7 +582,7 @@ export function FirmPageClient({
                       formatDollar(challenge.trueCost),
                   },
                   {
-                    label: "Țintă",
+                    label: "Target",
                     get: ({ challenge }: any) => formatDollar(challenge.target),
                   },
                   {

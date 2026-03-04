@@ -78,6 +78,12 @@ export async function createOrUpdateFirm(
   }
   revalidatePath("/admin/firme");
   revalidatePath("/");
+  revalidatePath("/firme");
+  revalidatePath(`/firme/${slug}`, "page");
+  // Revalidate old slug if it changed
+  if (existingSlug && existingSlug !== slug) {
+    revalidatePath(`/firme/${existingSlug}`, "page");
+  }
   return { slug };
 }
 
@@ -85,6 +91,8 @@ export async function deleteFirm(slug: string) {
   await prisma.firm.delete({ where: { slug } });
   revalidatePath("/admin/firme");
   revalidatePath("/");
+  revalidatePath("/firme");
+  revalidatePath(`/firme/${slug}`, "page");
 }
 
 export async function getFirmBySlug(slug: string): Promise<FirmDetail | null> {

@@ -85,7 +85,12 @@ export function Deals({ deals: rawDeals }: DealsProps) {
   }, [rawDeals]);
 
   const TOTAL = partners.length;
-  const isCarousel = TOTAL >= 3;
+  const [isMobile, setIsMobile] = useState(false);
+  const isCarousel = useMemo(() => {
+    // On mobile, enable carousel if we have 2 or more deals
+    // On desktop, enable carousel if we have 3 or more deals
+    return isMobile ? TOTAL >= 2 : TOTAL >= 3;
+  }, [isMobile, TOTAL]);
   const extended = useMemo(
     () => (TOTAL > 0 ? (isCarousel ? [...partners, ...partners, ...partners] : partners) : []),
     [partners, TOTAL, isCarousel],
@@ -96,16 +101,24 @@ export function Deals({ deals: rawDeals }: DealsProps) {
   const [cardWidth, setCardWidth] = useState(0);
   const [copied, setCopied] = useState(false);
 
-  // Measure card width based on full container width
+  // Update currentIndex when isCarousel changes
+  useEffect(() => {
+    setCurrentIndex(isCarousel ? TOTAL : 0);
+  }, [isCarousel, TOTAL]);
+
+  // Measure card width based on full container width and detect mobile
   useEffect(() => {
     const measure = () => {
+      const viewport =
+        typeof window !== "undefined" ? window.innerWidth : 1024;
+      const mobile = viewport < 768;
+      setIsMobile(mobile);
+
       if (containerRef.current) {
         const w = containerRef.current.offsetWidth;
-        const viewport =
-          typeof window !== "undefined" ? window.innerWidth : 1024;
 
         // On mobile, show a single full-width card per view.
-        if (viewport < 768) {
+        if (mobile) {
           setCardWidth(w);
         } else {
           // On tablet/desktop, show three cards per view.

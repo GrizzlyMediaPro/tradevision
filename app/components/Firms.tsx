@@ -551,7 +551,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                       formatDollar(challenge.trueCost),
                   },
                   {
-                    label: "Țintă",
+                    label: "Target",
                     get: ({ challenge }: any) => formatDollar(challenge.target),
                   },
                   {
