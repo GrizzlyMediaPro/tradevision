@@ -225,6 +225,24 @@ export default function CursPage() {
               <FaChevronRight className="h-3 w-3" />
             </button>
           </div>
+
+          {/* Telegram CTA */}
+          {isUnlocked && (
+            <div className="mt-8 flex flex-col items-center gap-3 pt-6 border-t border-white/10">
+              <p className="text-sm md:text-base text-white/70 text-center">
+                Afla mai multe pe grupul nostru de Telegram
+              </p>
+              <a
+                href="https://t.me/tradevisionromania"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.45)] hover:brightness-110 transition cursor-pointer"
+              >
+                <FaTelegramPlane className="h-4 w-4" />
+                <span>Alătură-te pe Telegram</span>
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Newsletter overlay (when locked) */}
@@ -301,22 +319,6 @@ export default function CursPage() {
                 width: `${(watchedChapters.size / chapters.length) * 100}%`,
               }}
             />
-          </div>
-          
-          {/* Telegram CTA */}
-          <div className="mt-6 flex flex-col items-center gap-3">
-            <p className="text-sm md:text-base text-white/70 text-center">
-              Afla mai multe pe grupul nostru de Telegram
-            </p>
-            <a
-              href="https://t.me/tradevisionromania"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.45)] hover:brightness-110 transition cursor-pointer"
-            >
-              <FaTelegramPlane className="h-4 w-4" />
-              <span>Alătură-te pe Telegram</span>
-            </a>
           </div>
         </div>
       )}
