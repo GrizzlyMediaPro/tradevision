@@ -8,6 +8,7 @@ import {
   FaChevronRight,
   FaEnvelope,
   FaPlay,
+  FaTelegramPlane,
 } from "react-icons/fa";
 import { type CourseChapter, defaultCourseChapters } from "../data/courseChapters";
 import { getCourseChapters } from "../admin/actions/course";
@@ -300,6 +301,22 @@ export default function CursPage() {
                 width: `${(watchedChapters.size / chapters.length) * 100}%`,
               }}
             />
+          </div>
+          
+          {/* Telegram CTA */}
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <p className="text-sm md:text-base text-white/70 text-center">
+              Afla mai multe pe grupul nostru de Telegram
+            </p>
+            <a
+              href="https://t.me/tradevisionromania"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.45)] hover:brightness-110 transition cursor-pointer"
+            >
+              <FaTelegramPlane className="h-4 w-4" />
+              <span>Alătură-te pe Telegram</span>
+            </a>
           </div>
         </div>
       )}
