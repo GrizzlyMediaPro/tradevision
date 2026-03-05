@@ -41,7 +41,7 @@ export function renderSimpleBodyAsHtml(plainText: string): string {
   );
 
   return paragraphs
-    .map((p) => `<p style="margin: 0 0 12px; line-height: 1.6; font-size: 14px; color: #111827;">${p}</p>`)
+    .map((p) => `<p style="margin: 0 0 12px; line-height: 1.6; font-size: 14px; color: #e5e7eb;">${p}</p>`)
     .join("");
 }
 

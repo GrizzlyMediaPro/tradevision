@@ -50,12 +50,19 @@ export async function subscribeNewsletterAndSendWelcome(
   email: string,
   source?: string,
 ) {
+  const trimmedEmail = email.trim().toLowerCase();
+
+  // Check if already subscribed — if so, just upsert (no-op) and skip the email
+  const existing = await prisma.newsletterSubscriber.findUnique({
+    where: { email: trimmedEmail },
+  });
+
   await subscribeNewsletter(email, source);
 
+  if (existing) return; // already subscribed, don't email again
   if (!resend) return;
 
   try {
-    const trimmedEmail = email.trim().toLowerCase();
     const subject = "Bine ai venit în newsletterul Trade Vision";
 
     const text = renderPlainTextBody(
