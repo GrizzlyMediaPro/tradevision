@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, type FormEvent, type DragEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
-import { FaChevronLeft, FaImage, FaPen } from 'react-icons/fa';
+import { FaChevronLeft, FaPen } from 'react-icons/fa';
 import { getLinkWidget, saveLinkWidget } from '../actions/linkwidget';
+import { UploadDropzone } from '@/lib/uploadthing';
 
 type LinkWidgetState = {
   badge: string;
@@ -34,7 +35,11 @@ export default function AdminLinkWidgetPage() {
   useEffect(() => {
     getLinkWidget().then((data) => {
       setValues(data);
-      setThumbnailPreview(data.thumbnail || DEFAULT_STATE.thumbnail);
+      // Nu salva URL-uri blob în DB – nu funcționează pe homepage; folosim default dacă e blob
+      const thumb = data.thumbnail || DEFAULT_STATE.thumbnail;
+      setThumbnailPreview(
+        thumb.startsWith('blob:') ? DEFAULT_STATE.thumbnail : thumb,
+      );
     }).finally(() => setLoading(false));
   }, []);
 
@@ -45,21 +50,15 @@ export default function AdminLinkWidgetPage() {
       setValues(next);
     };
 
-  const handleThumbnailDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const file = e.dataTransfer.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
-
-    const url = URL.createObjectURL(file);
-    setThumbnailPreview(url);
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await saveLinkWidget({ ...values, thumbnail: thumbnailPreview });
+      // Trimite doar URL-uri reale (nu blob:) ca pe homepage să se vadă thumbnail-ul
+      const thumbnailToSave = thumbnailPreview.startsWith('blob:')
+        ? DEFAULT_STATE.thumbnail
+        : thumbnailPreview;
+      await saveLinkWidget({ ...values, thumbnail: thumbnailToSave });
     } finally {
       setSaving(false);
     }
@@ -193,43 +192,69 @@ export default function AdminLinkWidgetPage() {
               </p>
             </div>
 
-            {/* Thumbnail drag & drop */}
+            {/* Thumbnail upload (UploadThing – URL permanent, nu blob) */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
                 Thumbnail YouTube
               </label>
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onDrop={handleThumbnailDrop}
-                className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/20 bg-black/30 px-4 py-6 text-xs text-white/60 hover:border-purple-400/60 hover:bg-white/5 transition cursor-pointer"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-                  <FaImage className="h-5 w-5 text-white/70" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium text-white/80">
-                    Drag & drop thumbnail-ul aici
-                  </p>
-                  <p className="text-[11px] text-white/40">
-                    Doar UI – upload-ul real va fi conectat ulterior (UploadThing).
-                  </p>
-                </div>
-                {thumbnailPreview && (
-                  <div className="mt-3 w-full max-w-md">
-                    <div className="relative w-full aspect-[16/9] overflow-hidden rounded-xl border border-white/15 bg-black/60">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={thumbnailPreview}
-                        alt="Preview thumbnail"
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
+              {thumbnailPreview && !thumbnailPreview.startsWith('blob:') ? (
+                <div className="flex flex-col gap-3">
+                  <div className="relative w-full max-w-md aspect-[16/9] overflow-hidden rounded-xl border border-white/15 bg-black/60">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={thumbnailPreview}
+                      alt="Preview thumbnail"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
-                )}
-              </div>
+                  <UploadDropzone
+                    endpoint="imageUploader"
+                    onClientUploadComplete={(res) => {
+                      const url =
+                        res?.[0]?.serverData?.url ??
+                        res?.[0]?.ufsUrl ??
+                        (res?.[0] as { url?: string })?.url;
+                      if (url && typeof url === 'string') {
+                        setThumbnailPreview(url);
+                      }
+                    }}
+                    onUploadError={() => {}}
+                    appearance={{
+                      container:
+                        'rounded-2xl border border-dashed border-white/20 bg-black/30 ut-uploading:border-purple-400/60',
+                      label: 'text-white/80',
+                      allowedContent: 'text-white/40 text-[11px]',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setThumbnailPreview(DEFAULT_STATE.thumbnail)}
+                    className="text-[11px] text-white/50 hover:text-white/80"
+                  >
+                    Resetează la thumbnail implicit
+                  </button>
+                </div>
+              ) : (
+                <UploadDropzone
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res) => {
+                    const url =
+                      res?.[0]?.serverData?.url ??
+                      res?.[0]?.ufsUrl ??
+                      (res?.[0] as { url?: string })?.url;
+                    if (url && typeof url === 'string') {
+                      setThumbnailPreview(url);
+                    }
+                  }}
+                  onUploadError={() => {}}
+                  appearance={{
+                    container:
+                      'rounded-2xl border border-dashed border-white/20 bg-black/30 flex flex-col items-center justify-center gap-3 py-6 px-4 ut-uploading:border-purple-400/60',
+                    label: 'text-white/80',
+                    allowedContent: 'text-white/40 text-[11px]',
+                  }}
+                />
+              )}
             </div>
 
             <div className="mt-3 flex justify-end">

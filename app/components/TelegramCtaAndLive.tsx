@@ -100,7 +100,11 @@ export function TelegramCtaAndLive({ linkWidget }: Props) {
         <div className="md:w-1/2 flex items-center justify-center">
           <div className="relative w-full max-w-xl aspect-video overflow-hidden rounded-2xl border border-white/10 shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
             <Image
-              src={linkWidget?.thumbnail || "/thumbnail.png"}
+              src={
+                linkWidget?.thumbnail?.startsWith("blob:")
+                  ? "/thumbnail.png"
+                  : (linkWidget?.thumbnail || "/thumbnail.png")
+              }
               alt={linkWidget?.title || "Trading live pe YouTube"}
               fill
               className="object-cover"
