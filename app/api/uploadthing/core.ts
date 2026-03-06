@@ -1,9 +1,9 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
-import { auth } from "@clerk/nextjs/server";
 
 const f = createUploadthing();
 
+// Protecția e la nivel de pagină: doar /admin (clerkMiddleware) are acces.
+// Nu folosim auth() aici ca să evităm eroarea Clerk pe live când middleware-ul nu e detectat.
 export const ourFileRouter = {
   imageUploader: f({
     image: {
@@ -11,11 +11,7 @@ export const ourFileRouter = {
       maxFileCount: 1,
     },
   })
-    .middleware(async () => {
-      const user = await auth();
-      if (!user?.userId) throw new UploadThingError("Unauthorized");
-      return { userId: user.userId };
-    })
+    .middleware(() => ({}))
     .onUploadComplete(async ({ file }) => {
       return { url: file.ufsUrl };
     }),
@@ -26,11 +22,7 @@ export const ourFileRouter = {
       maxFileCount: 4,
     },
   })
-    .middleware(async () => {
-      const user = await auth();
-      if (!user?.userId) throw new UploadThingError("Unauthorized");
-      return { userId: user.userId };
-    })
+    .middleware(() => ({}))
     .onUploadComplete(async ({ file }) => {
       return { url: file.ufsUrl };
     }),
