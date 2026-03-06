@@ -92,7 +92,7 @@ export default function AdminLinkWidgetPage() {
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
           Admin Link Widget
         </h1>
-        <div className="mt-3 h-[2px] w-[130px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
+        <div className="mt-3 h-[2px] w-[130px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
           Editează textele și thumbnail-ul pentru secțiunea de live trading de
           pe homepage. Modificările sunt salvate în baza de date.
@@ -102,7 +102,7 @@ export default function AdminLinkWidgetPage() {
       {/* Layout: left = form, right = live preview */}
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.1fr)] gap-6 md:gap-8 items-start">
         {/* Form card */}
-        <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm">
+        <section className="rounded-3xl border border-white/10 bg-linear-to-b from-white/[0.07] to-white/2 px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 mb-5">
             <div>
               <h2 className="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
@@ -199,7 +199,7 @@ export default function AdminLinkWidgetPage() {
               </label>
               {thumbnailPreview && !thumbnailPreview.startsWith('blob:') ? (
                 <div className="flex flex-col gap-3">
-                  <div className="relative w-full max-w-md aspect-[16/9] overflow-hidden rounded-xl border border-white/15 bg-black/60">
+                  <div className="relative w-full max-w-md aspect-video overflow-hidden rounded-xl border border-white/15 bg-black/60">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={thumbnailPreview}
@@ -261,7 +261,7 @@ export default function AdminLinkWidgetPage() {
               <button
                 type="submit"
                 disabled={saving || loading}
-                className="inline-flex items-center rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
               >
                 {saving ? 'Se salvează...' : 'Salvează'}
               </button>
@@ -270,7 +270,7 @@ export default function AdminLinkWidgetPage() {
         </section>
 
         {/* Live preview card */}
-        <section className="flex flex-col rounded-3xl border border-white/10 bg-gradient-to-r from-white/[0.04] to-white/[0.02] px-6 py-6 md:px-10 md:py-8 shadow-[0_18px_45px_rgba(0,0,0,0.65)] backdrop-blur-sm">
+        <section className="flex flex-col rounded-3xl border border-white/10 bg-linear-to-r from-white/4 to-white/2 px-6 py-6 md:px-10 md:py-8 shadow-[0_18px_45px_rgba(0,0,0,0.65)] backdrop-blur-sm">
           <div className="md:w-full flex flex-col md:flex-row items-stretch gap-8">
             <div className="md:w-1/2 flex flex-col items-start justify-center text-left gap-4">
               <p className="text-sm font-medium uppercase tracking-[0.2em] text-purple-300">
@@ -293,7 +293,7 @@ export default function AdminLinkWidgetPage() {
               </a>
             </div>
             <div className="md:w-1/2 flex items-center justify-center">
-              <div className="relative w-full max-w-xl aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-black/60">
+              <div className="relative w-full max-w-xl aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black/60">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={thumbnailPreview}
