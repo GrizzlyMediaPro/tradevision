@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export type ContactMessageRow = {
   id: string;
@@ -29,6 +30,7 @@ export async function getContactMessages(): Promise<ContactMessageRow[]> {
 }
 
 export async function toggleContactMessageRead(id: string) {
+  await requireAdmin();
   const msg = await prisma.contactMessage.findUnique({ where: { id } });
   if (!msg) return;
   await prisma.contactMessage.update({
@@ -39,6 +41,7 @@ export async function toggleContactMessageRead(id: string) {
 }
 
 export async function deleteContactMessage(id: string) {
+  await requireAdmin();
   await prisma.contactMessage.delete({ where: { id } });
   revalidatePath("/admin/formular");
 }

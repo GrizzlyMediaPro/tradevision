@@ -9,6 +9,7 @@ import {
   FaEnvelope,
   FaPlay,
   FaTelegramPlane,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import { type CourseChapter, defaultCourseChapters } from "../data/courseChapters";
 import { getCourseChapters } from "../admin/actions/course";
@@ -16,6 +17,7 @@ import { getCourseChapters } from "../admin/actions/course";
 export default function CursPage() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [email, setEmail] = useState("");
+  const [unlockError, setUnlockError] = useState(false);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [watchedChapters, setWatchedChapters] = useState<Set<number>>(
     new Set()
@@ -34,6 +36,7 @@ export default function CursPage() {
       const trimmed = email.trim();
       if (!trimmed) return;
 
+      setUnlockError(false);
       try {
         const res = await fetch("/api/newsletter", {
           method: "POST",
@@ -44,15 +47,14 @@ export default function CursPage() {
         });
 
         if (!res.ok) {
-          // opțional poți afișa un mesaj de eroare în UI mai târziu
-          console.error("Eroare la abonarea la newsletter", await res.text());
+          setUnlockError(true);
           return;
         }
 
         setIsUnlocked(true);
         setWatchedChapters(new Set([0]));
-      } catch (err) {
-        console.error("Eroare rețea la newsletter", err);
+      } catch {
+        setUnlockError(true);
       }
     },
     [email]
@@ -90,12 +92,18 @@ export default function CursPage() {
 
   return (
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-16">
+      {isUnlocked && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-5 py-2 text-xs font-medium text-emerald-200 shadow-lg animate-fade-in flex items-center gap-2">
+          <FaCheckCircle className="h-3.5 w-3.5" />
+          Cursul a fost deblocat cu succes!
+        </div>
+      )}
       {/* Heading */}
       <div className="text-center mb-10 md:mb-14">
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
           Curs Trading
         </h1>
-        <div className="mt-3 h-[2px] w-[80px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
+        <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-lg mx-auto">
           Învață trading de la zero cu cursul nostru gratuit. Parcurge fiecare
           capitol în ordine și construiește-ți fundația de care ai nevoie pentru
@@ -142,7 +150,7 @@ export default function CursPage() {
       <div className="relative w-full">
         {/* The actual chapter content */}
         <div
-          className={`w-full rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] px-6 py-8 md:px-10 md:py-12 shadow-[0_18px_45px_rgba(0,0,0,0.5)] transition-all duration-500 ${
+          className={`w-full rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 px-6 py-8 md:px-10 md:py-12 shadow-[0_18px_45px_rgba(0,0,0,0.5)] transition-all duration-500 ${
             !isUnlocked ? "blur-md select-none pointer-events-none" : ""
           }`}
         >
@@ -217,7 +225,7 @@ export default function CursPage() {
                   currentChapter === chapters.length - 1 ||
                   currentChapter + 1 > maxAccessible
                     ? "border border-white/10 bg-white/3 text-white/30 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-[0_8px_20px_rgba(147,51,234,0.35)] hover:brightness-110"
+                    : "bg-linear-to-r from-purple-500 to-purple-600 text-white shadow-[0_8px_20px_rgba(147,51,234,0.35)] hover:brightness-110"
                 }
               `}
             >
@@ -236,7 +244,7 @@ export default function CursPage() {
                 href="https://t.me/tradevisionromania"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.45)] hover:brightness-110 transition cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.45)] hover:brightness-110 transition cursor-pointer"
               >
                 <FaTelegramPlane className="h-4 w-4" />
                 <span>Alătură-te pe Telegram</span>
@@ -252,7 +260,7 @@ export default function CursPage() {
             <div className="absolute inset-0 bg-black/40 rounded-3xl backdrop-blur-sm" />
 
             {/* Newsletter form card */}
-            <div className="relative z-20 mx-4 w-full max-w-md rounded-2xl border border-yellow-300/30 bg-gradient-to-b from-[#0d0f1a]/95 to-[#0a0c16]/95 px-6 py-8 md:px-8 md:py-10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-md">
+            <div className="relative z-20 mx-4 w-full max-w-md rounded-2xl border border-yellow-300/30 bg-linear-to-b from-[#0d0f1a]/95 to-[#0a0c16]/95 px-6 py-8 md:px-8 md:py-10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-md">
               <div className="flex flex-col items-center text-center gap-4">
                 {/* Lock icon */}
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400/15 border border-yellow-300/30">
@@ -286,11 +294,17 @@ export default function CursPage() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer"
+                    className="w-full rounded-xl bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer"
                   >
                     Deblochează cursul
                   </button>
                 </form>
+
+                {unlockError && (
+                  <p className="text-xs text-red-400 mt-1">
+                    A apărut o eroare. Încearcă din nou.
+                  </p>
+                )}
 
                 <p className="text-[11px] text-white/35 mt-1">
                   Nu trimitem spam. Doar conținut valoros.
@@ -314,7 +328,7 @@ export default function CursPage() {
           </div>
           <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"
+              className="h-full rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"
               style={{
                 width: `${(watchedChapters.size / chapters.length) * 100}%`,
               }}

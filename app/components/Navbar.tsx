@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { FaTelegramPlane, FaBars, FaTimes } from "react-icons/fa";
+import { FaTelegramPlane, FaBars, FaTimes, FaArrowRight } from "react-icons/fa";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +12,19 @@ export function Navbar() {
 
   return (
     <nav className="w-full border-b border-transparent bg-transparent relative z-40">
+      {/* Announcement bar */}
+      <Link
+        href="/curs"
+        className="block w-full bg-purple-600 hover:bg-purple-500 transition"
+      >
+        <div className="w-full max-w-[1250px] mx-auto flex items-center justify-center gap-2 px-4 py-2 text-[11px] sm:text-xs font-medium text-white">
+          <span className="text-center">
+            Cursul gratuit e disponibil acum — înscrie-te și primești instant accesul
+          </span>
+          <FaArrowRight className="h-3 w-3 shrink-0" />
+        </div>
+      </Link>
+
       <div className="w-full max-w-[1250px] mx-auto flex items-center justify-between gap-7 px-4 py-4">
         {/* Stânga - Logo */}
         <Link href="/" className="flex items-center">
@@ -115,9 +128,9 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile dropdown menu (overlay on top of page) */}
+      {/* Mobile dropdown menu (positioned below entire nav) */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[72px] border-t border-white/10 bg-black/80 backdrop-blur-md transform origin-top transition-all duration-200 ${
+        className={`md:hidden absolute left-0 right-0 top-full border-t border-white/10 bg-black/80 backdrop-blur-md transform origin-top transition-all duration-200 z-50 ${
           menuOpen
             ? "opacity-100 translate-y-0 scale-y-100 pointer-events-auto"
             : "opacity-0 -translate-y-2 scale-y-95 pointer-events-none"

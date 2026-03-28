@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export type LinkWidgetState = {
   badge: string;
@@ -36,6 +37,7 @@ export async function getLinkWidget(): Promise<LinkWidgetState> {
 }
 
 export async function saveLinkWidget(data: LinkWidgetState) {
+  await requireAdmin();
   const existing = await prisma.linkWidget.findFirst();
   const payload = {
     badge: data.badge,
