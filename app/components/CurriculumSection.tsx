@@ -5,51 +5,51 @@ import { FaClock } from "react-icons/fa";
 
 const lessons = [
   {
-    title: "Introducere în trading",
+    title: "Ce este trading-ul?",
     description:
       "Ce e tradingul, cum funcționează piețele, ce instrumente se tranzacționează și de ce majoritatea pierd bani.",
     duration: "~20 min",
   },
   {
-    title: "Cum citești un grafic",
+    title: "Cum tratezi trading-ul ca pe un business?",
     description:
-      "Lumânările japoneze, timeframe-uri și cum interpretezi mișcarea prețului fără indicatori complicați.",
+      "Cum îți construiești un plan clar de lucru, obiective realiste, reguli de risc și o rutină zilnică de trader profesionist.",
     duration: "~25 min",
   },
   {
-    title: "Structura pieței și trend-uri",
+    title: "Abordarea corectă",
     description:
-      "Cum identifici dacă piața urcă, coboară sau merge lateral. Higher highs, lower lows și ce contează.",
+      "Mindset-ul potrivit înainte de intrare: răbdare, selecția setup-urilor bune și evitarea overtrading-ului.",
     duration: "~25 min",
   },
   {
-    title: "Lichidități și zone de interes",
+    title: "Tutorial platforme",
     description:
-      "Unde se acumulează ordinele mari, ce sunt lichiditățile și cum le folosești în avantajul tău.",
+      "Setările esențiale în platforme, cum configurezi graficele și cum lucrezi corect cu cont demo și cont finanțat.",
     duration: "~30 min",
   },
   {
-    title: "Managementul riscului",
+    title: "Cum formez strategia corectă?",
     description:
-      "Cât riști per tranzacție, cum calculezi lot size-ul, stop loss și take profit. Regula nr. 1: protejează-ți capitalul.",
+      "Cum îți definești regulile de intrare/ieșire, ce validezi într-un setup și cum testezi strategia înainte să riști bani reali.",
     duration: "~25 min",
   },
   {
-    title: "Platforme și instrumente",
+    title: "Order Flow și cum mă ajută?",
     description:
-      "Setup TradingView, cum configurezi graficele, platforma de cont demo și platforma de finanțare.",
+      "Ce este Order Flow, cum citești intenția participanților mari și cum folosești aceste informații pentru intrări mai bune.",
     duration: "~20 min",
   },
   {
-    title: "Psihologia traderului",
+    title: "Cum integrez strategia în Prop Trading?",
     description:
-      "De ce iei decizii proaste sub presiune, cum gestionezi pierderile și ce înseamnă disciplina reală în trading.",
+      "Adaptarea strategiei la regulile firmelor de finanțare: limite zilnice, consistență, protejarea contului și execuție disciplinată.",
     duration: "~20 min",
   },
   {
-    title: "Prop firms: cum obții finanțare",
+    title: "Roadmap pentru Payout",
     description:
-      "Ce sunt firmele de finanțare, cum funcționează testele, cum alegi firma potrivită și cum crești capital fără bani proprii.",
+      "Pașii exacți de la challenge la primul payout: ce urmărești în fiecare etapă, ce greșeli eviți și cum scalezi pe termen lung.",
     duration: "~30 min",
   },
 ];

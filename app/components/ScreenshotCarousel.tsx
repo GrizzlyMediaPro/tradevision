@@ -14,6 +14,7 @@ type ScreenshotCarouselProps = {
 export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarouselProps) {
   const TOTAL = images.length;
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const isCarousel = useMemo(() => (isMobile ? TOTAL >= 2 : TOTAL >= 3), [isMobile, TOTAL]);
   const extended = useMemo(
     () => (TOTAL > 0 ? (isCarousel ? [...images, ...images, ...images] : images) : []),
@@ -70,6 +71,19 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
     return () => clearInterval(id);
   }, [handleNext, isCarousel]);
 
+  useEffect(() => {
+    if (!selectedImage) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedImage(null);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedImage]);
+
   const handleTransitionEnd = useCallback(() => {
     if (!isCarousel) return;
     if (currentIndex >= TOTAL * 2) {
@@ -120,7 +134,12 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                     }}
                   >
                     {src ? (
-                      <div className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedImage(src)}
+                        className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30 cursor-zoom-in"
+                        aria-label={`Vezi imaginea ${((idx % TOTAL) + 1).toString()} mărită`}
+                      >
                         <Image
                           src={src}
                           alt={`Screenshot ${(idx % TOTAL) + 1}`}
@@ -128,7 +147,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                           className="object-cover"
                           sizes="(min-width: 768px) 33vw, 100vw"
                         />
-                      </div>
+                      </button>
                     ) : (
                       <div className="w-full aspect-4/3 rounded-2xl bg-black/30 border border-white/5 flex items-center justify-center">
                         <span className="text-xs text-white/20">Screenshot</span>
@@ -178,7 +197,12 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                 className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] rounded-3xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 p-3 shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
               >
                 {src ? (
-                  <div className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedImage(src)}
+                    className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30 cursor-zoom-in"
+                    aria-label={`Vezi imaginea ${(idx + 1).toString()} mărită`}
+                  >
                     <Image
                       src={src}
                       alt={`Screenshot ${idx + 1}`}
@@ -186,7 +210,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                       className="object-cover"
                       sizes="(min-width: 768px) 33vw, 100vw"
                     />
-                  </div>
+                  </button>
                 ) : (
                   <div className="w-full aspect-4/3 rounded-2xl bg-black/30 border border-white/5 flex items-center justify-center">
                     <span className="text-xs text-white/20">Screenshot</span>
@@ -197,6 +221,38 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
           </div>
         )}
       </div>
+
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 p-4 md:p-8"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 md:top-6 md:right-6 h-10 w-10 rounded-full border border-white/30 bg-black/40 text-xl text-white/90 hover:bg-white/10 transition cursor-pointer"
+            aria-label="Închide imaginea"
+          >
+            ×
+          </button>
+
+          <div
+            className="relative w-full h-full max-w-6xl mx-auto"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Image
+              src={selectedImage}
+              alt="Screenshot mărit"
+              fill
+              className="object-contain"
+              sizes="100vw"
+              priority
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

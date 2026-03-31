@@ -31,15 +31,13 @@ export function Hero() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] text-white">
             Învață să citești piața{" "}
             <span className="bg-linear-to-r from-purple-400 via-purple-300 to-yellow-300 bg-clip-text text-transparent">
-              ca un trader real
+              ca un trader profesionist
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-sm md:text-base text-white/60 max-w-lg leading-relaxed">
-            8 lecții video de la un trader activ care tranzacționează zilnic, nu
-            de la un teoretician. Fără promisiuni, fără bla-bla. Doar ce
-            funcționează, explicat pe grafice reale.
+            8 lecții video de la un trader cu o experiență de 6 ani în tranzacționare. Fără promisiuni, doar lucruri testate și care funcționează pe grafice.
           </p>
 
           {/* CTA button */}

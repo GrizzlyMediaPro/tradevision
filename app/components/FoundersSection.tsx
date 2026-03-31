@@ -4,11 +4,10 @@ import Image from "next/image";
 import { FaChartLine, FaYoutube, FaUsers } from "react-icons/fa";
 import { TbTrendingUp } from "react-icons/tb";
 
-const founderPhotoSrc = "/poza-cristi-barbu.jpeg";
-
 const founders = [
   {
     name: "Cristi Barbu",
+    photoSrc: "/poza-cristi-barbu.jpeg",
     role: "Co-fondator Trade Vision / Trader pe futures",
     bio: 'Tranzacționez zilnic pe piețele futures și documentez tot procesul — câștigurile, pierderile, deciziile bune și greșelile. Am construit Trade Vision pentru că atunci când am început eu, nu exista un loc unde să înveți corect, în română, fără să plătești mii de euro.',
     bio2: "Fac sesiuni live pe YouTube unde mă vezi tranzacționând în timp real. Arăt exact cum arată o zi normală de trading, cu tot ce presupune.",
@@ -20,6 +19,7 @@ const founders = [
   },
   {
     name: "Cristi Pașatu",
+    photoSrc: "/poza-cristi-pasatu.jpeg",
     role: "Co-fondator Trade Vision / Trader pe futures",
     bio: "Abordez piața cu disciplină și un sistem clar testat în timp real. Cred că tradingul se învață prin practică, nu prin teorie, și de aceea pun accent pe exemple concrete și pe management riguros al riscului.",
     bio2: "Împreună cu Cristi Barbu am creat Trade Vision ca să oferim comunității un ghid structurat, onest și accesibil — exact ce ne-ar fi ajutat pe noi la început.",
@@ -57,7 +57,7 @@ export function FoundersSection() {
                 <div className="md:w-[280px] shrink-0 flex items-center justify-center p-8 md:p-10">
                   <div className="relative h-44 w-44 md:h-52 md:w-52 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
                     <Image
-                      src={founderPhotoSrc}
+                      src={founder.photoSrc}
                       alt={founder.name}
                       fill
                       className="object-cover"

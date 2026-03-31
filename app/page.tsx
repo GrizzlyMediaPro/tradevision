@@ -11,21 +11,33 @@ import { FaqSection } from "./components/FaqSection";
 import { FinalCta } from "./components/FinalCta";
 import { TelegramCtaAndLive } from "./components/TelegramCtaAndLive";
 
-// Replace these with real screenshot paths when available
 const ourResults = [
-  "", // /rezultate/rezultat-1.png
-  "", // /rezultate/rezultat-2.png
-  "", // /rezultate/rezultat-3.png
-  "", // /rezultate/rezultat-4.png
-  "", // /rezultate/rezultat-5.png
+  "/WhatsApp Image 2026-03-30 at 20.04.54.jpeg",
+  "/WhatsApp Image 2026-03-30 at 20.04.54 (1).jpeg",
+  "/WhatsApp Image 2026-03-30 at 20.04.54 (2).jpeg",
+  "/WhatsApp Image 2026-03-30 at 20.04.54 (3).jpeg",
+  "/WhatsApp Image 2026-03-30 at 20.04.54 (4).jpeg",
+  "/WhatsApp Image 2026-03-30 at 20.04.55.jpeg",
+  "/WhatsApp Image 2026-03-30 at 20.05.24.jpeg",
 ];
 
 const communityResults = [
-  "", // /comunitate/rezultat-1.png
-  "", // /comunitate/rezultat-2.png
-  "", // /comunitate/rezultat-3.png
-  "", // /comunitate/rezultat-4.png
-  "", // /comunitate/rezultat-5.png
+  "/poza1.jpeg",
+  "/poza2.jpeg",
+  "/poza3.jpeg",
+  "/poza4.jpeg",
+  "/poza5.jpeg",
+  "/poza6.jpeg",
+  "/poza7.jpeg",
+  "/poza8.jpeg",
+  "/poza9.jpeg",
+  "/poza10.jpeg",
+  "/poza11.jpeg",
+  "/poza12.jpeg",
+  "/poza13.jpeg",
+  "/poza14.jpeg",
+  "/poza15.jpeg",
+  "/poza16.jpeg",
 ];
 import { getLinkWidget } from "./admin/actions/linkwidget";
 
