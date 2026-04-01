@@ -8,49 +8,49 @@ const lessons = [
     title: "Ce este trading-ul?",
     description:
       "Ce e tradingul, cum funcționează piețele, ce instrumente se tranzacționează și de ce majoritatea pierd bani.",
-    duration: "~20 min",
+    duration: "~17 min",
   },
   {
     title: "Cum tratezi trading-ul ca pe un business?",
     description:
       "Cum îți construiești un plan clar de lucru, obiective realiste, reguli de risc și o rutină zilnică de trader profesionist.",
-    duration: "~25 min",
+    duration: "~36 min",
   },
   {
     title: "Abordarea corectă",
     description:
       "Mindset-ul potrivit înainte de intrare: răbdare, selecția setup-urilor bune și evitarea overtrading-ului.",
-    duration: "~25 min",
+    duration: "~50 min",
   },
   {
     title: "Tutorial platforme",
     description:
       "Setările esențiale în platforme, cum configurezi graficele și cum lucrezi corect cu cont demo și cont finanțat.",
-    duration: "~30 min",
+    duration: "~26 min",
   },
   {
     title: "Cum formez strategia corectă?",
     description:
       "Cum îți definești regulile de intrare/ieșire, ce validezi într-un setup și cum testezi strategia înainte să riști bani reali.",
-    duration: "~25 min",
+    duration: "~20 min",
   },
   {
     title: "Order Flow și cum mă ajută?",
     description:
       "Ce este Order Flow, cum citești intenția participanților mari și cum folosești aceste informații pentru intrări mai bune.",
-    duration: "~20 min",
+    duration: "~12 min",
   },
   {
     title: "Cum integrez strategia în Prop Trading?",
     description:
       "Adaptarea strategiei la regulile firmelor de finanțare: limite zilnice, consistență, protejarea contului și execuție disciplinată.",
-    duration: "~20 min",
+    duration: "~6 min",
   },
   {
     title: "Roadmap pentru Payout",
     description:
       "Pașii exacți de la challenge la primul payout: ce urmărești în fiecare etapă, ce greșeli eviți și cum scalezi pe termen lung.",
-    duration: "~30 min",
+    duration: "~10 min",
   },
 ];
 

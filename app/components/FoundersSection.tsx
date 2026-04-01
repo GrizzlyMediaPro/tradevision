@@ -6,11 +6,11 @@ import { TbTrendingUp } from "react-icons/tb";
 
 const founders = [
   {
-    name: "Cristi Barbu",
-    photoSrc: "/poza-cristi-barbu.jpeg",
-    role: "Co-fondator Trade Vision / Trader pe futures",
-    bio: 'Tranzacționez zilnic pe piețele futures și documentez tot procesul — câștigurile, pierderile, deciziile bune și greșelile. Am construit Trade Vision pentru că atunci când am început eu, nu exista un loc unde să înveți corect, în română, fără să plătești mii de euro.',
-    bio2: "Fac sesiuni live pe YouTube unde mă vezi tranzacționând în timp real. Arăt exact cum arată o zi normală de trading, cu tot ce presupune.",
+    name: "Cristi Pașatu",
+    photoSrc: "/poza-cristi-pasatu.jpeg",
+    role: "Co-Founder TradeVision",
+    bio: "Abordez piața cu disciplină și un sistem clar testat în timp real. Cred că tradingul se învață prin practică, nu prin teorie, și de aceea pun accent pe exemple concrete și pe management riguros al riscului.",
+    bio2: "Împreună cu Cristi Barbu am creat Trade Vision ca să oferim comunității un ghid structurat, onest și accesibil — exact ce ne-ar fi ajutat pe noi la început.",
     stats: [
       { value: "Zilnic", label: "Trading activ", icon: FaChartLine },
       { value: "Live", label: "Sesiuni YouTube", icon: FaYoutube },
@@ -18,11 +18,11 @@ const founders = [
     ],
   },
   {
-    name: "Cristi Pașatu",
-    photoSrc: "/poza-cristi-pasatu.jpeg",
-    role: "Co-fondator Trade Vision / Trader pe futures",
-    bio: "Abordez piața cu disciplină și un sistem clar testat în timp real. Cred că tradingul se învață prin practică, nu prin teorie, și de aceea pun accent pe exemple concrete și pe management riguros al riscului.",
-    bio2: "Împreună cu Cristi Barbu am creat Trade Vision ca să oferim comunității un ghid structurat, onest și accesibil — exact ce ne-ar fi ajutat pe noi la început.",
+    name: "Cristi Barbu",
+    photoSrc: "/poza-cristi-barbu.jpeg",
+    role: "Co-Founder TradeVision",
+    bio: 'Tranzacționez zilnic pe piețele futures și documentez tot procesul — câștigurile, pierderile, deciziile bune și greșelile. Am construit Trade Vision pentru că atunci când am început eu, nu exista un loc unde să înveți corect, în română, fără să plătești mii de euro.',
+    bio2: "Fac sesiuni live pe YouTube unde mă vezi tranzacționând în timp real. Arăt exact cum arată o zi normală de trading, cu tot ce presupune.",
     stats: [
       { value: "Zilnic", label: "Trading activ", icon: FaChartLine },
       { value: "Live", label: "Sesiuni YouTube", icon: FaYoutube },
@@ -37,7 +37,7 @@ export function FoundersSection() {
       <div className="w-full flex flex-col items-center text-center gap-10">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Cine predă
+            Cine suntem
           </h2>
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-5 text-sm md:text-base text-white/55 max-w-lg mx-auto">

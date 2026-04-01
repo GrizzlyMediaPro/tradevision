@@ -69,8 +69,8 @@ export function Hero() {
           <div className="relative rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
               <iframe
-                src="https://www.youtube.com/embed/mgkCLkhJY3k"
-                title="Trade Vision Live"
+                src="https://www.youtube.com/embed/EfMrp8MdvDw"
+                title="Video prezentare Trade Vision"
                 className="absolute inset-0 h-full w-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

@@ -4,18 +4,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { FaTelegramPlane, FaBars, FaTimes, FaArrowRight } from "react-icons/fa";
+import {
+  FaTelegramPlane,
+  FaInstagram,
+  FaBars,
+  FaTimes,
+  FaArrowRight,
+} from "react-icons/fa";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <nav className="w-full border-b border-transparent bg-transparent relative z-40">
-      {/* Announcement bar */}
+    <>
+      {/* Announcement bar — sticky la scroll */}
       <Link
         href="/curs"
-        className="block w-full bg-purple-600 hover:bg-purple-500 transition"
+        className="sticky top-0 z-[60] block w-full bg-purple-600 hover:bg-purple-500 transition"
       >
         <div className="w-full max-w-[1250px] mx-auto flex items-center justify-center gap-2 px-4 py-2 text-[11px] sm:text-xs font-medium text-white">
           <span className="text-center">
@@ -25,6 +31,7 @@ export function Navbar() {
         </div>
       </Link>
 
+    <nav className="w-full border-b border-transparent bg-transparent relative z-40">
       <div className="w-full max-w-[1250px] mx-auto flex items-center justify-between gap-7 px-4 py-4">
         {/* Stânga - Logo */}
         <Link href="/" className="flex items-center">
@@ -78,6 +85,16 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           {/* Mobile only */}
           <div className="flex items-center gap-3 md:hidden">
+            {/* Instagram icon */}
+            <a
+              href="https://www.instagram.com/tradevision.ro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition cursor-pointer"
+              aria-label="Deschide profilul Trade Vision pe Instagram"
+            >
+              <FaInstagram className="h-4 w-4" />
+            </a>
             {/* Telegram icon */}
             <a
               href="https://t.me/tradevisionromania"
@@ -115,16 +132,27 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Desktop button */}
-          <a
-            href="https://t.me/tradevisionromania"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:inline-flex items-center gap-2.5 rounded-full bg-sky-500 px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-md shadow-sky-500/40 transition hover:bg-sky-600 cursor-pointer"
-          >
-            <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
-            <span className="uppercase">Alătură-te echipei</span>
-          </a>
+          {/* Desktop: Instagram + Telegram */}
+          <div className="hidden md:flex items-center gap-2.5">
+            <a
+              href="https://www.instagram.com/tradevision.ro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition cursor-pointer"
+              aria-label="Deschide profilul Trade Vision pe Instagram"
+            >
+              <FaInstagram className="h-5 w-5" />
+            </a>
+            <a
+              href="https://t.me/tradevisionromania"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 rounded-full bg-sky-500 px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-md shadow-sky-500/40 transition hover:bg-sky-600 cursor-pointer"
+            >
+              <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
+              <span className="uppercase">Alătură-te comunității</span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -168,6 +196,7 @@ export function Navbar() {
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

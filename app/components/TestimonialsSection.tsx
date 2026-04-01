@@ -4,21 +4,10 @@ import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 
 const testimonials = [
-  {
-    videoId: "0lX7Sfb4FTk",
-    label: "Testimonial #1",
-    duration: "30-40 sec.",
-  },
-  {
-    videoId: "yheveA1s4_8",
-    label: "Testimonial #2",
-    duration: "30-40 sec.",
-  },
-  {
-    videoId: "ptkAhyYU8TI",
-    label: "Testimonial #3",
-    duration: "30-40 sec.",
-  },
+  { videoId: "rouZMXnAUnU" },
+  { videoId: "WqdyFD0Uoi0" },
+  { videoId: "JkgdPLh_2xI" },
+  { videoId: "7w8Ytkka9JI" },
 ];
 
 function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
@@ -29,7 +18,7 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
       <div className="relative w-full aspect-9/16">
         <iframe
           src={`https://www.youtube.com/embed/${item.videoId}${playing ? "?autoplay=1" : ""}`}
-          title={item.label}
+          title={`Testimonial video comunitate (${item.videoId})`}
           className="absolute inset-0 h-full w-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -37,15 +26,13 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
 
         {!playing && (
           <button
+            type="button"
             onClick={() => setPlaying(true)}
-            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black/50 cursor-pointer transition hover:bg-black/40"
+            aria-label="Redă testimonial video"
+            className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 cursor-pointer transition hover:bg-black/40"
           >
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-yellow-400 via-amber-300 to-yellow-500 shadow-[0_12px_30px_rgba(250,204,21,0.4)] hover:brightness-110 transition">
               <FaPlay className="h-6 w-6 text-slate-900 ml-0.5" />
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-semibold text-white">{item.label}</p>
-              <p className="mt-1 text-[11px] text-white/45">{item.duration}</p>
             </div>
           </button>
         )}
@@ -69,7 +56,7 @@ export function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {testimonials.map((item) => (
             <TestimonialCard key={item.videoId} item={item} />
           ))}

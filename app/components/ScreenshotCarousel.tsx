@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaCompress, FaSearchPlus } from "react-icons/fa";
 
 const GAP = 32;
 
@@ -14,7 +15,8 @@ type ScreenshotCarouselProps = {
 export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarouselProps) {
   const TOTAL = images.length;
   const [isMobile, setIsMobile] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [lightboxZoom, setLightboxZoom] = useState(false);
   const isCarousel = useMemo(() => (isMobile ? TOTAL >= 2 : TOTAL >= 3), [isMobile, TOTAL]);
   const extended = useMemo(
     () => (TOTAL > 0 ? (isCarousel ? [...images, ...images, ...images] : images) : []),
@@ -72,17 +74,37 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
   }, [handleNext, isCarousel]);
 
   useEffect(() => {
-    if (!selectedImage) return;
+    if (lightboxIndex === null) return;
+    setLightboxZoom(false);
+  }, [lightboxIndex]);
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+
+    document.body.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setSelectedImage(null);
+        setLightboxIndex(null);
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setLightboxIndex((i) =>
+          i === null ? null : (i - 1 + TOTAL) % TOTAL,
+        );
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setLightboxIndex((i) =>
+          i === null ? null : (i + 1) % TOTAL,
+        );
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedImage]);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [lightboxIndex, TOTAL]);
 
   const handleTransitionEnd = useCallback(() => {
     if (!isCarousel) return;
@@ -136,7 +158,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                     {src ? (
                       <button
                         type="button"
-                        onClick={() => setSelectedImage(src)}
+                        onClick={() => setLightboxIndex(idx % TOTAL)}
                         className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30 cursor-zoom-in"
                         aria-label={`Vezi imaginea ${((idx % TOTAL) + 1).toString()} mărită`}
                       >
@@ -199,7 +221,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                 {src ? (
                   <button
                     type="button"
-                    onClick={() => setSelectedImage(src)}
+                    onClick={() => setLightboxIndex(idx)}
                     className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30 cursor-zoom-in"
                     aria-label={`Vezi imaginea ${(idx + 1).toString()} mărită`}
                   >
@@ -222,34 +244,95 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
         )}
       </div>
 
-      {selectedImage && (
+      {lightboxIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 p-4 md:p-8"
+          className="fixed inset-0 z-50 flex flex-col bg-black/92"
           role="dialog"
           aria-modal="true"
-          onClick={() => setSelectedImage(null)}
+          aria-label="Vizualizare screenshot"
+          onClick={() => setLightboxIndex(null)}
         >
-          <button
-            type="button"
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 md:top-6 md:right-6 h-10 w-10 rounded-full border border-white/30 bg-black/40 text-xl text-white/90 hover:bg-white/10 transition cursor-pointer"
-            aria-label="Închide imaginea"
+          <div
+            className="flex min-h-0 flex-1 items-center justify-center overflow-auto p-3 md:p-6"
+            onClick={() => setLightboxIndex(null)}
           >
-            ×
-          </button>
+            <div
+              className={`relative transition-transform duration-300 ease-out ${
+                lightboxZoom ? "scale-[2] cursor-default" : "scale-100"
+              }`}
+              style={{
+                width: "min(92vw, 72rem)",
+                height: "min(78vh, calc(min(92vw, 72rem) * 0.75))",
+                maxHeight: "85vh",
+              }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <Image
+                src={images[lightboxIndex]}
+                alt={`Screenshot ${lightboxIndex + 1} mărit`}
+                fill
+                className="object-contain select-none pointer-events-none"
+                sizes="100vw"
+                priority
+              />
+            </div>
+          </div>
 
           <div
-            className="relative w-full h-full max-w-6xl mx-auto"
+            className="flex shrink-0 flex-wrap items-center justify-center gap-2 border-t border-white/10 px-3 py-3 md:px-5 md:py-4"
             onClick={(event) => event.stopPropagation()}
           >
-            <Image
-              src={selectedImage}
-              alt="Screenshot mărit"
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority
-            />
+            <button
+              type="button"
+              onClick={() => setLightboxZoom((z) => !z)}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 text-sm font-medium text-white hover:bg-white/15 transition cursor-pointer"
+              aria-pressed={lightboxZoom}
+              aria-label={lightboxZoom ? "Potrivește în ecran" : "Mărește imaginea"}
+            >
+              {lightboxZoom ? (
+                <FaCompress className="h-4 w-4" />
+              ) : (
+                <FaSearchPlus className="h-4 w-4" />
+              )}
+              <span className="hidden sm:inline">
+                {lightboxZoom ? "Potrivește" : "Zoom"}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setLightboxIndex((i) =>
+                  i === null ? null : (i - 1 + TOTAL) % TOTAL,
+                )
+              }
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-lg text-white/90 hover:bg-white/10 transition cursor-pointer"
+              aria-label="Imaginea anterioară"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setLightboxIndex((i) =>
+                  i === null ? null : (i + 1) % TOTAL,
+                )
+              }
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-lg text-white/90 hover:bg-white/10 transition cursor-pointer"
+              aria-label="Imaginea următoare"
+            >
+              ›
+            </button>
+            <span className="text-xs text-white/45 tabular-nums">
+              {lightboxIndex + 1} / {TOTAL}
+            </span>
+            <button
+              type="button"
+              onClick={() => setLightboxIndex(null)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-xl text-white/90 hover:bg-white/10 transition cursor-pointer"
+              aria-label="Închide imaginea"
+            >
+              ×
+            </button>
           </div>
         </div>
       )}

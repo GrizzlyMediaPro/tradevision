@@ -7,7 +7,7 @@ const faqs = [
   {
     question: "Chiar e gratuit? Care e treaba?",
     answer:
-      "Da, 100% gratuit. Fără card, fără trial, fără condiții. Îți cer doar emailul. De ce? Trade Vision câștigă din parteneriatele cu firmele de finanțare (prop firms), nu din cursanți. Tu primești educație, noi primim recomandări. Win-win.",
+      "Da, 100% gratuit. Fără card, fără trial, fără condiții. Un curs complet pentru care alții ți-ar fi cerut mii de euro noi îl oferim complet gratis pentru a-ți face o imagine clară despre ce înseamnă să fii trader.",
   },
   {
     question: "Am nevoie de experiență anterioară?",

@@ -58,13 +58,15 @@ export default async function Home() {
 
       <FoundersSection />
 
-      <TestimonialsSection />
-
       <ScreenshotCarousel
         title="Rezultatele noastre"
         subtitle="Rezultate reale din conturile noastre de trading, documentate transparent."
         images={ourResults}
       />
+
+      <TestimonialsSection />
+
+      
 
       <ScreenshotCarousel
         title="Rezultate din comunitate"
