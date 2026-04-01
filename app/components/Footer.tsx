@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaTelegramPlane, FaHeart } from "react-icons/fa";
+import { FaTelegramPlane, FaInstagram, FaHeart } from "react-icons/fa";
 
 export function Footer() {
   return (
     <footer className="mt-16 border-t border-white/10">
-      {/* Top row: logo, menu, telegram icon */}
+      {/* Top row: logo, menu, social icons */}
       <div className="w-full max-w-[1250px] mx-auto px-4 py-8 flex flex-col items-center gap-6">
         <div className="flex items-center justify-center">
           <Image
@@ -29,6 +29,15 @@ export function Footer() {
           <Link href="/contact" className="hover:text-white transition">
             Contact
           </Link>
+          <a
+            href="https://www.instagram.com/tradevision.ro/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram — Trade Vision"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition"
+          >
+            <FaInstagram className="h-4 w-4" />
+          </a>
           <a
             href="https://t.me/tradevisionromania"
             target="_blank"

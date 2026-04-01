@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export type DealForm = {
   id?: string;
@@ -29,6 +30,7 @@ export async function getDeals() {
 }
 
 export async function createDeal(data: Omit<DealForm, "id">) {
+  await requireAdmin();
   const count = await prisma.deal.count();
   await prisma.deal.create({
     data: {
@@ -46,6 +48,7 @@ export async function createDeal(data: Omit<DealForm, "id">) {
 }
 
 export async function updateDeal(id: string, data: Omit<DealForm, "id">) {
+  await requireAdmin();
   await prisma.deal.update({
     where: { id },
     data: {
@@ -62,6 +65,7 @@ export async function updateDeal(id: string, data: Omit<DealForm, "id">) {
 }
 
 export async function deleteDeal(id: string) {
+  await requireAdmin();
   await prisma.deal.delete({ where: { id } });
   revalidatePath("/admin/deals");
   revalidatePath("/");
@@ -81,6 +85,7 @@ export async function setCarouselSettings(
   autoPlayEnabled: boolean,
   autoPlayInterval: number,
 ) {
+  await requireAdmin();
   const existing = await prisma.dealCarouselSettings.findFirst();
   if (existing) {
     await prisma.dealCarouselSettings.update({

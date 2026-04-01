@@ -4,13 +4,33 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { FaTelegramPlane, FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaTelegramPlane,
+  FaInstagram,
+  FaBars,
+  FaTimes,
+  FaArrowRight,
+} from "react-icons/fa";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   return (
+    <>
+      {/* Announcement bar — sticky la scroll */}
+      <Link
+        href="/curs"
+        className="sticky top-0 z-[60] block w-full bg-purple-600 hover:bg-purple-500 transition"
+      >
+        <div className="w-full max-w-[1250px] mx-auto flex items-center justify-center gap-2 px-4 py-2 text-[11px] sm:text-xs font-medium text-white">
+          <span className="text-center">
+            Cursul gratuit e disponibil acum — înscrie-te și primești instant accesul
+          </span>
+          <FaArrowRight className="h-3 w-3 shrink-0" />
+        </div>
+      </Link>
+
     <nav className="w-full border-b border-transparent bg-transparent relative z-40">
       <div className="w-full max-w-[1250px] mx-auto flex items-center justify-between gap-7 px-4 py-4">
         {/* Stânga - Logo */}
@@ -65,6 +85,16 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           {/* Mobile only */}
           <div className="flex items-center gap-3 md:hidden">
+            {/* Instagram icon */}
+            <a
+              href="https://www.instagram.com/tradevision.ro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition cursor-pointer"
+              aria-label="Deschide profilul Trade Vision pe Instagram"
+            >
+              <FaInstagram className="h-4 w-4" />
+            </a>
             {/* Telegram icon */}
             <a
               href="https://t.me/tradevisionromania"
@@ -102,22 +132,33 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Desktop button */}
-          <a
-            href="https://t.me/tradevisionromania"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:inline-flex items-center gap-2.5 rounded-full bg-sky-500 px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-md shadow-sky-500/40 transition hover:bg-sky-600 cursor-pointer"
-          >
-            <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
-            <span className="uppercase">Alătură-te echipei</span>
-          </a>
+          {/* Desktop: Instagram + Telegram */}
+          <div className="hidden md:flex items-center gap-2.5">
+            <a
+              href="https://www.instagram.com/tradevision.ro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition cursor-pointer"
+              aria-label="Deschide profilul Trade Vision pe Instagram"
+            >
+              <FaInstagram className="h-5 w-5" />
+            </a>
+            <a
+              href="https://t.me/tradevisionromania"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 rounded-full bg-sky-500 px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-md shadow-sky-500/40 transition hover:bg-sky-600 cursor-pointer"
+            >
+              <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
+              <span className="uppercase">Alătură-te comunității</span>
+            </a>
+          </div>
         </div>
       </div>
 
-      {/* Mobile dropdown menu (overlay on top of page) */}
+      {/* Mobile dropdown menu (positioned below entire nav) */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[72px] border-t border-white/10 bg-black/80 backdrop-blur-md transform origin-top transition-all duration-200 ${
+        className={`md:hidden absolute left-0 right-0 top-full border-t border-white/10 bg-black/80 backdrop-blur-md transform origin-top transition-all duration-200 z-50 ${
           menuOpen
             ? "opacity-100 translate-y-0 scale-y-100 pointer-events-auto"
             : "opacity-0 -translate-y-2 scale-y-95 pointer-events-none"
@@ -155,6 +196,7 @@ export function Navbar() {
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

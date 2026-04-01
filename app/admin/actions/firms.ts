@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 import type { FirmDetail } from "@/app/data/firms";
 
 function slugify(text: string) {
@@ -43,6 +44,7 @@ export async function createOrUpdateFirm(
   data: FirmDetail,
   existingSlug: string | null,
 ) {
+  await requireAdmin();
   const slug = existingSlug ?? slugify(data.name);
   const payload = {
     name: data.name,
@@ -88,6 +90,7 @@ export async function createOrUpdateFirm(
 }
 
 export async function deleteFirm(slug: string) {
+  await requireAdmin();
   await prisma.firm.delete({ where: { slug } });
   revalidatePath("/admin/firme");
   revalidatePath("/");

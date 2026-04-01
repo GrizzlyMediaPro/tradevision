@@ -49,8 +49,10 @@ export function renderEmailLayout(options: {
   title: string;
   previewText?: string;
   contentHtml: string;
+  recipientEmail?: string;
+  unsubscribeToken?: string;
 }): string {
-  const { title, previewText, contentHtml } = options;
+  const { title, previewText, contentHtml, recipientEmail, unsubscribeToken } = options;
 
   const preview = previewText
     ? escapeHtml(previewText)
@@ -122,6 +124,9 @@ export function renderEmailLayout(options: {
                 <p style="margin:4px 0 0;font-size:10px;line-height:1.5;color:#4b5563;">
                   Te rugăm să nu răspunzi direct la acest mesaj dacă nu este specificat altfel în conținut.
                 </p>
+                ${recipientEmail && unsubscribeToken ? `<p style="margin:8px 0 0;font-size:10px;line-height:1.5;color:#4b5563;">
+                  Nu mai dorești să primești emailuri? <a href="${BRAND.siteUrl}/dezabonare?email=${encodeURIComponent(recipientEmail)}&token=${unsubscribeToken}" style="color:${BRAND.primaryColor};text-decoration:underline;">Dezabonează-te</a>.
+                </p>` : ""}
               </td>
             </tr>
           </table>
