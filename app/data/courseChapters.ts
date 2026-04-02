@@ -2,6 +2,7 @@ export type CourseChapter = {
   title: string;
   description: string;
   videoId: string;
+  lessonLabel?: string;
 };
 
 export const defaultCourseChapters: CourseChapter[] = [

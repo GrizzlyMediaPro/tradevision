@@ -13,6 +13,7 @@ export async function getCourseChapters(): Promise<CourseChapter[]> {
     title: r.title,
     description: r.description ?? "",
     videoId: r.videoId,
+    lessonLabel: r.lessonLabel ?? undefined,
   }));
 }
 
@@ -24,6 +25,7 @@ export async function createCourseChapter(data: CourseChapter) {
       title: data.title,
       description: data.description || null,
       videoId: data.videoId,
+      lessonLabel: data.lessonLabel || null,
       order: count,
     },
   });
@@ -47,6 +49,7 @@ export async function updateCourseChapter(
       title: data.title,
       description: data.description || null,
       videoId: data.videoId,
+      lessonLabel: data.lessonLabel || null,
     },
   });
   revalidatePath("/admin/curs");
@@ -63,4 +66,36 @@ export async function deleteCourseChapter(index: number) {
   await prisma.courseChapter.delete({ where: { id: row.id } });
   revalidatePath("/admin/curs");
   revalidatePath("/curs");
+}
+
+// —— Persoane înscrise la curs ——
+
+export type CourseEnrollmentData = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  createdAt: Date;
+};
+
+export async function getCourseEnrollments(): Promise<CourseEnrollmentData[]> {
+  await requireAdmin();
+  const rows = await prisma.courseEnrollment.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    firstName: r.firstName,
+    lastName: r.lastName,
+    email: r.email,
+    phone: r.phone,
+    createdAt: r.createdAt,
+  }));
+}
+
+export async function deleteCourseEnrollment(id: string) {
+  await requireAdmin();
+  await prisma.courseEnrollment.delete({ where: { id } });
+  revalidatePath("/admin/curs");
 }
