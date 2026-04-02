@@ -67,9 +67,20 @@ model CourseChapter {
   title       String
   description String?
   videoId     String
+  lessonLabel String?
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// —— Persoane înscrise la curs ——
+model CourseEnrollment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  createdAt DateTime @default(now())
 }
 
 // —— Link widget YouTube (singleton) ——
