@@ -12,8 +12,8 @@ import {
   FaUser,
   FaPhone,
 } from "react-icons/fa";
-import { type CourseChapter, defaultCourseChapters } from "../data/courseChapters";
-import { getCourseChapters } from "../admin/actions/course";
+import { type CourseChapter, defaultCourseChapters } from "@/app/data/courseChapters";
+import { getCourseChapters } from "@/app/admin/actions/course";
 
 type UnlockCourseFormProps = {
   firstName: string;

@@ -1,15 +1,15 @@
-import { Hero } from "./components/Hero";
-import { StatsBar } from "./components/StatsBar";
-import { ProblemSection } from "./components/ProblemSection";
-import { BenefitsSection } from "./components/BenefitsSection";
-import { CurriculumSection } from "./components/CurriculumSection";
-import { FoundersSection } from "./components/FoundersSection";
-import { TestimonialsSection } from "./components/TestimonialsSection";
-import { ScreenshotCarousel } from "./components/ScreenshotCarousel";
-import { BonusesSection } from "./components/BonusesSection";
-import { FaqSection } from "./components/FaqSection";
-import { FinalCta } from "./components/FinalCta";
-import { TelegramCtaAndLive } from "./components/TelegramCtaAndLive";
+import { Hero } from "@/app/components/Hero";
+import { StatsBar } from "@/app/components/StatsBar";
+import { ProblemSection } from "@/app/components/ProblemSection";
+import { BenefitsSection } from "@/app/components/BenefitsSection";
+import { CurriculumSection } from "@/app/components/CurriculumSection";
+import { FoundersSection } from "@/app/components/FoundersSection";
+import { TestimonialsSection } from "@/app/components/TestimonialsSection";
+import { ScreenshotCarousel } from "@/app/components/ScreenshotCarousel";
+import { BonusesSection } from "@/app/components/BonusesSection";
+import { FaqSection } from "@/app/components/FaqSection";
+import { FinalCta } from "@/app/components/FinalCta";
+import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
 
 const ourResults = [
   "/WhatsApp Image 2026-03-30 at 20.04.54.jpeg",
@@ -39,7 +39,7 @@ const communityResults = [
   "/poza15.jpeg",
   "/poza16.jpeg",
 ];
-import { getLinkWidget } from "./admin/actions/linkwidget";
+import { getLinkWidget } from "@/app/admin/actions/linkwidget";
 
 export default async function Home() {
   const linkWidget = await getLinkWidget();

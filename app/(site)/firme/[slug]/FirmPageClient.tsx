@@ -14,13 +14,13 @@ import {
   FaKey,
 } from "react-icons/fa";
 import Flag from "react-world-flags";
-import { platformImages } from "../../data/firms";
+import { platformImages } from "@/app/data/firms";
 import type {
   FirmDetail,
   ChallengeType,
   Challenge,
   RuleTab,
-} from "../../data/firms";
+} from "@/app/data/firms";
 
 function formatDollar(value: string): string {
   if (!value) return value;

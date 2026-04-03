@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendContactEmail } from "@/app/contact/actions";
+import { sendContactEmail } from "@/app/(site)/contact/actions";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
