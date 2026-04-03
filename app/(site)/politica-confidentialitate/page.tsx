@@ -78,11 +78,12 @@ export default function PoliticaConfidentialitatePage() {
         </p>
         <p>
           <strong>Date stocate local pe dispozitiv</strong> (ex.:{" "}
-          <strong>localStorage</strong> pentru progres la cursuri gratuite sau
-          preferințe în browser): în mod normal rămân pe dispozitivul
-          dumneavoastră; nu constituie în sine o transmisie către noi decât
-          dacă combinați utilizarea cu alte servicii care trimit date către
-          serverele noastre (ex.: autentificare, formulare).
+          <strong>localStorage</strong> pentru progres la cursuri gratuite): le
+          folosim doar dacă ați ales în bannerul de cookie-uri opțiunea{" "}
+          <strong>Doar necesare</strong> sau <strong>Acceptă tot</strong>, nu
+          dacă ați ales <strong>Deloc</strong>. Aceste date rămân în browser;
+          nu sunt trimise automat serverelor noastre, cu excepția cazului în
+          care folosiți și formulare sau cont (date transmise separat).
         </p>
       </LegalSection>
 

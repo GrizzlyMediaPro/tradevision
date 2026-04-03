@@ -107,6 +107,16 @@ export default function PoliticaCookiesPage() {
 
       <LegalSection title="5. Cum vă puteți gestiona preferințele">
         <p>
+          La prima vizită, un banner vă permite să alegeți:{" "}
+          <strong>Deloc</strong> — nu folosim localStorage pentru progres la
+          curs și nu încărcăm Google Tag Manager sau Meta Pixel;{" "}
+          <strong>Doar necesare</strong> — putem salva progresul cursului în
+          browser, fără module de analiză și marketing;{" "}
+          <strong>Acceptă tot</strong> — include și analiză / marketing. Alegerea
+          este memorată local (o cheie dedicată) ca să nu vi se afișeze mereu
+          bannerul.
+        </p>
+        <p>
           Puteți controla sau șterge cookie-urile din setările browserului.
           Dezactivarea anumitor cookie-uri poate afecta funcționalitatea
           Site-ului.

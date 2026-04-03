@@ -4,21 +4,19 @@ import Script from "next/script";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FaCookie } from "react-icons/fa";
+import {
+  COOKIE_CONSENT_STORAGE_KEY,
+  clearFunctionalLocalStorage,
+  readConsentFromStorage,
+  type StoredConsent,
+} from "@/lib/cookieConsent";
 
-export const COOKIE_CONSENT_STORAGE_KEY = "tradevision-cookie-consent-v1";
+type ConsentMode = "pending" | StoredConsent;
 
-type ConsentMode = "pending" | "all" | "essential";
-
-function readStoredConsent(): ConsentMode {
-  if (typeof window === "undefined") return "pending";
-  try {
-    const v = localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
-    if (v === "all") return "all";
-    if (v === "essential") return "essential";
-  } catch {
-    /* private mode / quota */
-  }
-  return "pending";
+function readStoredConsentMode(): ConsentMode {
+  const v = readConsentFromStorage();
+  if (v === null) return "pending";
+  return v;
 }
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-T3LZD5RX";
@@ -34,7 +32,7 @@ export function CookieConsentGate({
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setConsent(readStoredConsent());
+    setConsent(readStoredConsentMode());
     setReady(true);
   }, []);
 
@@ -63,6 +61,16 @@ export function CookieConsentGate({
       /* ignore */
     }
     setConsent("essential");
+  }, []);
+
+  const refuseOptional = useCallback(() => {
+    try {
+      localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, "none");
+    } catch {
+      /* ignore */
+    }
+    clearFunctionalLocalStorage();
+    setConsent("none");
   }, []);
 
   return (
@@ -139,10 +147,15 @@ fbq('track','PageView');`}
                   id="cookie-consent-desc"
                   className="mt-2 text-sm text-white/65 leading-relaxed"
                 >
-                  Folosim cookie-uri esențiale pentru funcționarea site-ului și,
-                  dacă ești de acord, cookie-uri pentru analiză și marketing
-                  (Google Tag Manager, Meta Pixel). Poți alege doar cele
-                  esențiale sau poți accepta toate. Detalii în{" "}
+                  Alege ce îți permiți să stocăm pe dispozitiv:{" "}
+                  <strong className="text-white/85">Deloc</strong> — nu folosim
+                  localStorage pentru progres la curs și nu încărcăm analiză /
+                  marketing; <strong className="text-white/85">Doar necesare</strong>{" "}
+                  — putem salva progresul cursului în browser, fără Google Tag
+                  Manager sau Meta Pixel; <strong className="text-white/85">
+                    Acceptă tot
+                  </strong>{" "}
+                  — include și modulele de analiză și marketing. Detalii în{" "}
                   <Link
                     href="/politica-cookies"
                     className="text-purple-400 underline-offset-2 hover:underline"
@@ -160,20 +173,27 @@ fbq('track','PageView');`}
                 </p>
               </div>
             </div>
-            <div className="mt-6 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end sm:gap-3">
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:justify-stretch sm:gap-3">
+              <button
+                type="button"
+                onClick={refuseOptional}
+                className="w-full sm:min-w-0 sm:flex-1 rounded-xl border border-white/20 bg-transparent px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white cursor-pointer"
+              >
+                Deloc
+              </button>
               <button
                 type="button"
                 onClick={essentialOnly}
-                className="w-full sm:w-auto rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10 cursor-pointer"
+                className="w-full sm:min-w-0 sm:flex-1 rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm font-semibold text-white/95 transition hover:bg-white/10 cursor-pointer"
               >
-                Doar esențiale
+                Doar necesare
               </button>
               <button
                 type="button"
                 onClick={acceptAll}
-                className="w-full sm:w-auto rounded-xl bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_10px_28px_rgba(250,204,21,0.35)] transition hover:brightness-110 cursor-pointer"
+                className="w-full sm:min-w-0 sm:flex-1 rounded-xl bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-4 py-3 text-sm font-semibold text-slate-900 shadow-[0_10px_28px_rgba(250,204,21,0.35)] transition hover:brightness-110 cursor-pointer"
               >
-                Acceptă toate
+                Acceptă tot
               </button>
             </div>
           </div>

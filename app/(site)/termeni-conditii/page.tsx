@@ -92,20 +92,24 @@ export default function TermeniConditiiPage() {
 
       <LegalSection title="5. Stocare locală în browser (localStorage)">
         <p>
-          Pentru anumite funcții (de exemplu progres la cursuri gratuite sau
-          preferințe afișate pe dispozitivul dumneavoastră), Site-ul poate
-          salva date în <strong>localStorage</strong> al browserului. Aceste
-          informații rămân pe dispozitivul dumneavoastră și nu sunt transmise
-          automat către serverele Operatorului, cu excepția cazurilor în care
-          utilizați și alte servicii care colectează date conform{" "}
+          Pentru progres la cursuri gratuite, Site-ul poate salva date în{" "}
+          <strong>localStorage</strong> doar dacă ați selectat în bannerul de
+          cookie-uri <strong>Doar necesare</strong> sau{" "}
+          <strong>Acceptă tot</strong>. Dacă alegeți <strong>Deloc</strong>, nu
+          stocăm aceste date în browser; progresul nu va fi păstrat după
+          închiderea sesiunii sau reîncărcarea paginii.
+        </p>
+        <p>
+          Aceste informații rămân pe dispozitiv și nu sunt transmise automat
+          către serverele Operatorului, în afara cazurilor prevăzute în{" "}
           <Link href="/politica-confidentialitate">
-            Politicii de confidențialitate
+            Politica de confidențialitate
           </Link>
           .
         </p>
         <p>
-          Puteți șterge aceste date din setările browserului; unele funcții
-          ale Site-ului s-ar putea reseta sau deveni indisponibile.
+          Puteți șterge datele din setările browserului; unele funcții s-ar
+          putea reseta sau deveni indisponibile.
         </p>
       </LegalSection>
 

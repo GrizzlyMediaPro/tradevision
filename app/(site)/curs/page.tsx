@@ -15,8 +15,12 @@ import {
 import { type CourseChapter, defaultCourseChapters } from "@/app/data/courseChapters";
 import { getCourseChapters } from "@/app/admin/actions/course";
 import { trackMetaPixelEvent } from "@/lib/metaPixel";
-
-const FREE_COURSE_STORAGE_KEY = "tradevision-free-course-v1";
+import {
+  FREE_COURSE_STORAGE_KEY,
+  allowsAnalytics,
+  allowsFunctionalLocalStorage,
+  readConsentFromStorage,
+} from "@/lib/cookieConsent";
 
 type FreeCourseStored = {
   v: 1;
@@ -31,6 +35,7 @@ type FreeCourseStored = {
 
 function readFreeCourseFromStorage(): FreeCourseStored | null {
   if (typeof window === "undefined") return null;
+  if (!allowsFunctionalLocalStorage(readConsentFromStorage())) return null;
   try {
     const raw = localStorage.getItem(FREE_COURSE_STORAGE_KEY);
     if (!raw) return null;
@@ -234,10 +239,11 @@ export default function CursPage() {
     setWatchedChapters(nextWatched);
   }, [chapters.length]);
 
-  // Persistă deblocarea și progresul pe dispozitiv.
+  // Persistă deblocarea și progresul pe dispozitiv doar dacă utilizatorul a acceptat stocarea funcțională.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!isUnlocked) return;
+    if (!allowsFunctionalLocalStorage(readConsentFromStorage())) return;
     try {
       const payload: FreeCourseStored = {
         v: 1,
@@ -293,7 +299,9 @@ export default function CursPage() {
         setIsUnlocked(true);
         setWatchedChapters(new Set([0]));
         setShowUnlockToast(true);
-        trackMetaPixelEvent("SubmitApplication");
+        if (allowsAnalytics(readConsentFromStorage())) {
+          trackMetaPixelEvent("SubmitApplication");
+        }
       } catch {
         setUnlockError(true);
       }
