@@ -210,6 +210,7 @@ export default function CursPage() {
     new Set()
   );
   const [chapters, setChapters] = useState<CourseChapter[]>(defaultCourseChapters);
+  const [showUnlockToast, setShowUnlockToast] = useState(false);
 
   useEffect(() => {
     getCourseChapters().then((list) => {
@@ -254,6 +255,12 @@ export default function CursPage() {
     }
   }, [isUnlocked, firstName, lastName, email, phone, currentChapter, watchedChapters]);
 
+  useEffect(() => {
+    if (!showUnlockToast) return;
+    const t = window.setTimeout(() => setShowUnlockToast(false), 4500);
+    return () => window.clearTimeout(t);
+  }, [showUnlockToast]);
+
   const handleUnlock = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -285,6 +292,7 @@ export default function CursPage() {
 
         setIsUnlocked(true);
         setWatchedChapters(new Set([0]));
+        setShowUnlockToast(true);
         trackMetaPixelEvent("SubmitApplication");
       } catch {
         setUnlockError(true);
@@ -325,9 +333,9 @@ export default function CursPage() {
 
   return (
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-16">
-      {isUnlocked && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-5 py-2 text-xs font-medium text-emerald-200 shadow-lg animate-fade-in flex items-center gap-2">
-          <FaCheckCircle className="h-3.5 w-3.5" />
+      {showUnlockToast && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-5 py-2 text-xs font-medium text-emerald-200 shadow-lg flex items-center gap-2">
+          <FaCheckCircle className="h-3.5 w-3.5 shrink-0" />
           Cursul a fost deblocat cu succes!
         </div>
       )}
