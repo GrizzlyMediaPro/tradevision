@@ -14,6 +14,75 @@ import {
 } from "react-icons/fa";
 import { type CourseChapter, defaultCourseChapters } from "@/app/data/courseChapters";
 import { getCourseChapters } from "@/app/admin/actions/course";
+import { trackMetaPixelEvent } from "@/lib/metaPixel";
+
+const FREE_COURSE_STORAGE_KEY = "tradevision-free-course-v1";
+
+type FreeCourseStored = {
+  v: 1;
+  isUnlocked: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  currentChapter: number;
+  watchedChapters: number[];
+};
+
+function readFreeCourseFromStorage(): FreeCourseStored | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(FREE_COURSE_STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as Partial<FreeCourseStored>;
+    if (data.v !== 1 || !data.isUnlocked) return null;
+    return {
+      v: 1,
+      isUnlocked: true,
+      firstName: typeof data.firstName === "string" ? data.firstName : "",
+      lastName: typeof data.lastName === "string" ? data.lastName : "",
+      email: typeof data.email === "string" ? data.email : "",
+      phone: typeof data.phone === "string" ? data.phone : "",
+      currentChapter:
+        typeof data.currentChapter === "number" && Number.isFinite(data.currentChapter)
+          ? data.currentChapter
+          : 0,
+      watchedChapters: Array.isArray(data.watchedChapters)
+        ? data.watchedChapters.filter(
+            (n): n is number =>
+              typeof n === "number" && Number.isInteger(n) && n >= 0
+          )
+        : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function clampCourseStateToChapters(
+  stored: FreeCourseStored,
+  chapterCount: number
+): {
+  currentChapter: number;
+  watchedChapters: Set<number>;
+} {
+  if (chapterCount <= 0) {
+    return { currentChapter: 0, watchedChapters: new Set() };
+  }
+  const maxIdx = chapterCount - 1;
+  const watched = new Set(
+    stored.watchedChapters.filter((i) => i >= 0 && i <= maxIdx)
+  );
+  if (watched.size === 0) watched.add(0);
+  const current = Math.max(
+    0,
+    Math.min(
+      Number.isFinite(stored.currentChapter) ? stored.currentChapter : 0,
+      maxIdx
+    )
+  );
+  return { currentChapter: current, watchedChapters: watched };
+}
 
 type UnlockCourseFormProps = {
   firstName: string;
@@ -148,6 +217,43 @@ export default function CursPage() {
     });
   }, []);
 
+  // Reîncarcă deblocarea și progresul din localStorage (inclusiv după ce lista de capitole își stabilește lungimea reală).
+  useEffect(() => {
+    if (chapters.length === 0) return;
+    const stored = readFreeCourseFromStorage();
+    if (!stored) return;
+    const { currentChapter: nextChapter, watchedChapters: nextWatched } =
+      clampCourseStateToChapters(stored, chapters.length);
+    setIsUnlocked(true);
+    setFirstName(stored.firstName);
+    setLastName(stored.lastName);
+    setEmail(stored.email);
+    setPhone(stored.phone);
+    setCurrentChapter(nextChapter);
+    setWatchedChapters(nextWatched);
+  }, [chapters.length]);
+
+  // Persistă deblocarea și progresul pe dispozitiv.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isUnlocked) return;
+    try {
+      const payload: FreeCourseStored = {
+        v: 1,
+        isUnlocked: true,
+        firstName,
+        lastName,
+        email,
+        phone,
+        currentChapter,
+        watchedChapters: [...watchedChapters].sort((a, b) => a - b),
+      };
+      localStorage.setItem(FREE_COURSE_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [isUnlocked, firstName, lastName, email, phone, currentChapter, watchedChapters]);
+
   const handleUnlock = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -179,6 +285,7 @@ export default function CursPage() {
 
         setIsUnlocked(true);
         setWatchedChapters(new Set([0]));
+        trackMetaPixelEvent("SubmitApplication");
       } catch {
         setUnlockError(true);
       }
