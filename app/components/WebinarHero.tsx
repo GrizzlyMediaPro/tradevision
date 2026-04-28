@@ -6,14 +6,19 @@ import Link from "next/link";
 
 import {
   formatCountdownUnit,
-  getWebinarCountdownTarget,
 } from "../lib/webinarCountdown";
 
-export function WebinarHero() {
-  const targetDate = useMemo(() => getWebinarCountdownTarget(), []);
-  const [timeLeft, setTimeLeft] = useState(targetDate - Date.now());
+type WebinarHeroProps = {
+  targetTimestamp: number;
+};
+
+export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
+  const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
+    setTimeLeft(Math.max(targetDate - Date.now(), 0));
+
     const timer = setInterval(() => {
       setTimeLeft(Math.max(targetDate - Date.now(), 0));
     }, 1000);
@@ -137,7 +142,7 @@ export function WebinarHero() {
           </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute bottom-6 left-1/2 z-20 -translate-x-1/2 animate-bounce text-white/70">
+      <div className="pointer-events-none absolute bottom-1 left-1/2 z-20 -translate-x-1/2 animate-bounce text-white/70">
         <div className="flex flex-col items-center gap-1">
           <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">
             Scroll

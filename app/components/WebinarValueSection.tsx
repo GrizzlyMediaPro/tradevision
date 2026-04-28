@@ -6,14 +6,19 @@ import { FaImage } from "react-icons/fa";
 
 import {
   formatCountdownUnit,
-  getWebinarCountdownTarget,
 } from "../lib/webinarCountdown";
 
-export function WebinarValueSection() {
-  const targetDate = useMemo(() => getWebinarCountdownTarget(), []);
-  const [timeLeft, setTimeLeft] = useState(targetDate - Date.now());
+type WebinarValueSectionProps = {
+  targetTimestamp: number;
+};
+
+export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProps) {
+  const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
+    setTimeLeft(Math.max(targetDate - Date.now(), 0));
+
     const timer = setInterval(() => {
       setTimeLeft(Math.max(targetDate - Date.now(), 0));
     }, 1000);

@@ -5,14 +5,21 @@ import Link from "next/link";
 
 import {
   formatCountdownUnit,
-  getWebinarCountdownTarget,
+  formatWebinarLiveLabel,
 } from "../lib/webinarCountdown";
 
-export function WebinarNextSection() {
-  const targetDate = useMemo(() => getWebinarCountdownTarget(), []);
-  const [timeLeft, setTimeLeft] = useState(targetDate - Date.now());
+type WebinarNextSectionProps = {
+  targetTimestamp: number;
+};
+
+export function WebinarNextSection({ targetTimestamp }: WebinarNextSectionProps) {
+  const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const liveLabel = useMemo(() => formatWebinarLiveLabel(targetDate), [targetDate]);
 
   useEffect(() => {
+    setTimeLeft(Math.max(targetDate - Date.now(), 0));
+
     const timer = setInterval(() => {
       setTimeLeft(Math.max(targetDate - Date.now(), 0));
     }, 1000);
@@ -51,7 +58,7 @@ export function WebinarNextSection() {
 
           <div>
             <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-              Live luni, 4 Mai la ora 19:00
+              {liveLabel}
             </h2>
             <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
             <p className="mt-5 text-sm md:text-base text-white/55 max-w-lg mx-auto">

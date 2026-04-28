@@ -95,6 +95,13 @@ model LinkWidget {
   updatedAt   DateTime @updatedAt
 }
 
+// —— Setari webinar (singleton) ——
+model WebinarSettings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  webinarAt DateTime
+  updatedAt DateTime @updatedAt
+}
+
 // —— Mesaje formular contact ——
 model ContactMessage {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId

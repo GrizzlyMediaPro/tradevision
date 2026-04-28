@@ -5,14 +5,23 @@ import Link from "next/link";
 
 import {
   formatCountdownUnit,
-  getWebinarCountdownTarget,
+  formatWebinarLiveLabel,
 } from "../lib/webinarCountdown";
 
-export function WebinarFinalCtaSection() {
-  const targetDate = useMemo(() => getWebinarCountdownTarget(), []);
-  const [timeLeft, setTimeLeft] = useState(targetDate - Date.now());
+type WebinarFinalCtaSectionProps = {
+  targetTimestamp: number;
+};
+
+export function WebinarFinalCtaSection({
+  targetTimestamp,
+}: WebinarFinalCtaSectionProps) {
+  const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const liveLabel = useMemo(() => formatWebinarLiveLabel(targetDate), [targetDate]);
 
   useEffect(() => {
+    setTimeLeft(Math.max(targetDate - Date.now(), 0));
+
     const timer = setInterval(() => {
       setTimeLeft(Math.max(targetDate - Date.now(), 0));
     }, 1000);
@@ -49,7 +58,7 @@ export function WebinarFinalCtaSection() {
 
           <div>
             <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-              Live luni, 4 Mai la ora 19:00
+              {liveLabel}
             </h2>
             <p className="mt-4 text-sm md:text-base text-white/55 max-w-lg mx-auto">
               Workshop live pentru traderii care vor un sistem clar și rezultate

@@ -8,19 +8,24 @@ import { FoundersSection } from "../components/FoundersSection";
 import { WebinarFaqSection } from "../components/WebinarFaqSection";
 import { WebinarFinalCtaSection } from "../components/WebinarFinalCtaSection";
 import { Footer } from "../components/Footer";
+import { getWebinarSettings } from "../admin/actions/webinar";
+import { getWebinarCountdownTarget } from "../lib/webinarCountdown";
 
-export default function WebinarPage() {
+export default async function WebinarPage() {
+  const settings = await getWebinarSettings();
+  const targetTimestamp = getWebinarCountdownTarget(settings.webinarAt);
+
   return (
     <main className="w-full">
-      <WebinarHero />
-      <WebinarNextSection />
-      <WebinarValueSection />
+      <WebinarHero targetTimestamp={targetTimestamp} />
+      <WebinarNextSection targetTimestamp={targetTimestamp} />
+      <WebinarValueSection targetTimestamp={targetTimestamp} />
       <WebinarTransformationSection />
       <WebinarAudienceSection />
       <WebinarNotForYouSection />
       <FoundersSection />
       <WebinarFaqSection />
-      <WebinarFinalCtaSection />
+      <WebinarFinalCtaSection targetTimestamp={targetTimestamp} />
       <Footer />
     </main>
   );
