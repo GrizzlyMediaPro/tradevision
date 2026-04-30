@@ -9,6 +9,7 @@ import {
   FaEnvelope,
   FaPaperPlane,
   FaCog,
+  FaClock,
 } from "react-icons/fa";
 
 const menuItems = [
@@ -44,6 +45,17 @@ const menuItems = [
     iconBg: "bg-red-500/15 border-red-400/30",
     iconColor: "text-red-300",
     shadow: "shadow-red-500/20",
+  },
+  {
+    title: "Webinar Countdown",
+    description:
+      "Setează data și ora webinarului; countdown-urile din pagina webinar se actualizează automat.",
+    icon: FaClock,
+    href: "/admin/webinar",
+    color: "from-indigo-500 to-indigo-600",
+    iconBg: "bg-indigo-500/15 border-indigo-400/30",
+    iconColor: "text-indigo-300",
+    shadow: "shadow-indigo-500/20",
   },
   {
     title: "Curs",

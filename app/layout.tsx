@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
-import { Navbar } from "./components/Navbar";
-import { Footer } from "./components/Footer";
+import { SiteChrome } from "./components/SiteChrome";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -70,9 +69,7 @@ export default function RootLayout({
   const content = (
     <html lang="ro">
       <body className={`page-gradient ${poppins.className} antialiased`}>
-        <Navbar />
-        {children}
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

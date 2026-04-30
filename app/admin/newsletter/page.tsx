@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { FaChevronLeft, FaEnvelope, FaUserCheck } from 'react-icons/fa';
 import {
   getNewsletterSubscribers,
-  deleteNewsletterSubscriber,
   type SubscriberRow,
   sendNewsletterToSubscribers,
 } from '../actions/newsletter';
+import NewsletterRichEditor from './NewsletterRichEditor';
 
 function formatDate(d: Date): string {
   return new Intl.DateTimeFormat('ro-RO', {
@@ -22,7 +22,9 @@ export default function AdminNewsletterPage() {
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
+  const [bodyHtml, setBodyHtml] = useState('');
+  const [bodyText, setBodyText] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
@@ -32,6 +34,12 @@ export default function AdminNewsletterPage() {
   const allSelected =
     subscribers.length > 0 &&
     subscribers.every((s) => selectedIds.has(s.id));
+
+  const filteredSubscribers = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return subscribers;
+    return subscribers.filter((s) => s.email.toLowerCase().includes(query));
+  }, [subscribers, searchTerm]);
 
   const toggleOne = (id: string) => {
     setSelectedIds((prev) => {
@@ -58,29 +66,15 @@ export default function AdminNewsletterPage() {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteNewsletterSubscriber(id);
-      setSubscribers((prev) => prev.filter((s) => s.id !== id));
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-    } catch {
-      // error
-    }
-  };
-
   const handleSendEmail = async () => {
     if (selectedIds.size === 0) return;
-    if (!subject.trim() && !body.trim()) return;
+    if (!subject.trim() && !bodyText.trim()) return;
     const selectedEmails = subscribers
       .filter((s) => selectedIds.has(s.id))
       .map((s) => s.email);
     try {
       setSending(true);
-      await sendNewsletterToSubscribers(selectedEmails, subject, body);
+      await sendNewsletterToSubscribers(selectedEmails, subject, bodyHtml);
       alert('Email trimis către abonații selectați.');
     } catch (err) {
       console.error(err);
@@ -158,10 +152,10 @@ export default function AdminNewsletterPage() {
               type="button"
               onClick={handleSendEmail}
               disabled={
-                sending || selectedIds.size === 0 || (!subject.trim() && !body.trim())
+                sending || selectedIds.size === 0 || (!subject.trim() && !bodyText.trim())
               }
               className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs md:text-sm font-semibold transition cursor-pointer ${
-                sending || selectedIds.size === 0 || (!subject.trim() && !body.trim())
+                sending || selectedIds.size === 0 || (!subject.trim() && !bodyText.trim())
                   ? 'border border-white/15 bg-white/5 text-white/30 cursor-not-allowed'
                   : 'bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400 text-slate-900 shadow-[0_12px_30px_rgba(251,191,36,0.45)] hover:brightness-110'
               }`}
@@ -181,8 +175,8 @@ export default function AdminNewsletterPage() {
               Conținut email
             </h2>
             <p className="mt-1 text-[11px] text-white/45 max-w-md">
-              Scrie subiectul și mesajul pe care vrei să îl trimiți
-              abonaților selectați. Emailurile vor fi trimise prin Resend.
+              Scrie subiectul și mesajul cu formatări, imagini și linkuri.
+              Emailurile vor fi trimise prin Resend.
             </p>
           </div>
           <div className="text-[11px] text-white/40">
@@ -210,25 +204,44 @@ export default function AdminNewsletterPage() {
             <label className="text-[11px] font-medium uppercase tracking-wider text-white/60">
               Mesaj
             </label>
-            <textarea
-              rows={5}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Scrie aici conținutul emailului..."
-              className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-orange-300/70 focus:bg-white/8 focus:ring-1 focus:ring-orange-300/40 resize-none"
+            <NewsletterRichEditor
+              value={bodyHtml}
+              onChange={(nextHtml, nextText) => {
+                setBodyHtml(nextHtml);
+                setBodyText(nextText);
+              }}
             />
+            <p className="text-[11px] text-white/40">
+              Poți folosi stiluri de text, liste, linkuri și imagini.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Subscribers list */}
       <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-5 py-5 md:px-7 md:py-6 shadow-[0_18px_45px_rgba(0,0,0,0.6)] backdrop-blur-sm">
+        <div className="mb-4 flex flex-col gap-1.5">
+          <label className="text-[11px] font-medium uppercase tracking-wider text-white/60">
+            Caută după email
+          </label>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Ex: nume@email.com"
+            className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-orange-300/70 focus:bg-white/8 focus:ring-1 focus:ring-orange-300/40"
+          />
+        </div>
         {loading ? (
           <p className="text-sm text-white/45">Se încarcă...</p>
         ) : subscribers.length === 0 ? (
           <p className="text-sm text-white/45">
             Nu există abonați încă. Când utilizatorii se vor înscrie din
             site, vor apărea aici.
+          </p>
+        ) : filteredSubscribers.length === 0 ? (
+          <p className="text-sm text-white/45">
+            Nu există rezultate pentru căutarea introdusă.
           </p>
         ) : (
           <>
@@ -250,7 +263,7 @@ export default function AdminNewsletterPage() {
               </div>
 
               <div className="mt-2 flex flex-col divide-y divide-white/5">
-                {subscribers.map((sub) => {
+                {filteredSubscribers.map((sub) => {
                   const checked = selectedIds.has(sub.id);
                   return (
                     <div
@@ -286,7 +299,7 @@ export default function AdminNewsletterPage() {
 
             {/* Mobile cards */}
             <div className="md:hidden flex flex-col gap-3">
-              {subscribers.map((sub) => {
+              {filteredSubscribers.map((sub) => {
                 const checked = selectedIds.has(sub.id);
                 return (
                   <button

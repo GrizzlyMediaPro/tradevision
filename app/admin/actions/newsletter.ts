@@ -6,6 +6,8 @@ import { resend, resendFrom } from "@/lib/resend";
 import {
   renderEmailLayout,
   renderPlainTextBody,
+  renderPlainTextFromHtml,
+  sanitizeNewsletterHtml,
   renderSimpleBodyAsHtml,
 } from "@/lib/emailTemplates";
 import { generateUnsubscribeToken } from "@/lib/unsubscribe";
@@ -112,7 +114,7 @@ export async function subscribeNewsletterAndSendWelcome(
 export async function sendNewsletterToSubscribers(
   emails: string[],
   subject: string,
-  body: string,
+  bodyHtml: string,
 ) {
   await requireAdmin();
   const cleanedEmails = emails
@@ -127,10 +129,11 @@ export async function sendNewsletterToSubscribers(
   }
 
   const trimmedSubject = subject.trim() || "Trade Vision Newsletter";
-  const trimmedBody = body.trim();
+  const sanitizedBodyHtml = sanitizeNewsletterHtml(bodyHtml);
+  const plainTextBody = renderPlainTextFromHtml(sanitizedBodyHtml);
 
-  const text = renderPlainTextBody(trimmedBody);
-  const contentHtml = renderSimpleBodyAsHtml(trimmedBody || " ");
+  const text = renderPlainTextBody(plainTextBody);
+  const contentHtml = sanitizedBodyHtml;
   const errors: string[] = [];
 
   for (const recipientEmail of cleanedEmails) {
@@ -142,7 +145,7 @@ export async function sendNewsletterToSubscribers(
         text,
         html: renderEmailLayout({
           title: trimmedSubject,
-          previewText: trimmedBody.slice(0, 140),
+          previewText: plainTextBody.slice(0, 140),
           contentHtml,
           recipientEmail,
           unsubscribeToken: generateUnsubscribeToken(recipientEmail),
