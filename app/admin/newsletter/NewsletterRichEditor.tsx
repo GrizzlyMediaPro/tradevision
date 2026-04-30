@@ -153,7 +153,7 @@ export default function NewsletterRichEditor({ value, onChange }: Props) {
     if (!editor) return;
     const current = normalizeEditorHtml(editor.getHTML());
     if (value !== current) {
-      editor.commands.setContent(value || '<p></p>', false);
+      editor.commands.setContent(value || '<p></p>', { emitUpdate: false });
     }
   }, [editor, value]);
 
