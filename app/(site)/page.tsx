@@ -41,6 +41,8 @@ export default async function Home() {
 
       <TestimonialsSection />
 
+      
+
       <ScreenshotCarousel
         title="Rezultate din comunitate"
         subtitle="Screenshot-uri trimise de membrii comunității Trade Vision care au aplicat ce au învățat."
