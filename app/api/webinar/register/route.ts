@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { rateLimit } from "@/lib/rateLimit";
+import {
+  createWebinarConfirmToken,
+  WEBINAR_CONFIRM_COOKIE_NAME,
+  WEBINAR_CONFIRM_MAX_AGE_SEC,
+} from "@/lib/webinarConfirmCookie";
 import { sendWebinarRegistrationConfirmationEmail } from "@/lib/webinarConfirmationEmail";
 
 function isValidEmail(value: string) {
@@ -64,14 +70,43 @@ export async function POST(req: Request) {
       );
     }
 
-    await prisma.webinarRegistration.create({
-      data: {
-        firstName,
-        email,
-        phone,
-        acceptedTerms: true,
-      },
+    const existing = await prisma.webinarRegistration.findUnique({
+      where: { email },
     });
+    if (existing) {
+      return NextResponse.json(
+        {
+          error:
+            "Acest email este deja înscris la webinar. Verifică inboxul sau folosește altă adresă.",
+        },
+        { status: 409 },
+      );
+    }
+
+    try {
+      await prisma.webinarRegistration.create({
+        data: {
+          firstName,
+          email,
+          phone,
+          acceptedTerms: true,
+        },
+      });
+    } catch (createErr) {
+      if (
+        createErr instanceof Prisma.PrismaClientKnownRequestError &&
+        createErr.code === "P2002"
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Acest email este deja înscris la webinar. Verifică inboxul sau folosește altă adresă.",
+          },
+          { status: 409 },
+        );
+      }
+      throw createErr;
+    }
 
     try {
       await prisma.newsletterSubscriber.upsert({
@@ -88,7 +123,16 @@ export async function POST(req: Request) {
     revalidatePath("/admin/webinar");
     revalidatePath("/admin/newsletter");
 
-    return NextResponse.json({ ok: true });
+    const token = await createWebinarConfirmToken(firstName);
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set(WEBINAR_CONFIRM_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: WEBINAR_CONFIRM_MAX_AGE_SEC,
+    });
+    return res;
   } catch (err) {
     console.error("Eroare la înscrierea webinar", err);
     return NextResponse.json(

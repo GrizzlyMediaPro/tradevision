@@ -106,7 +106,7 @@ model WebinarSettings {
 model WebinarRegistration {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName      String
-  email          String
+  email          String   @unique
   phone          String
   acceptedTerms  Boolean
   createdAt      DateTime @default(now())

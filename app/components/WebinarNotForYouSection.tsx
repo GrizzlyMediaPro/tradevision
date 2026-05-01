@@ -34,7 +34,7 @@ export function WebinarNotForYouSection() {
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-5 text-sm md:text-base text-white/55 max-w-2xl mx-auto leading-relaxed">
             Acest workshop este dedicat celor care vor să învețe trading serios,
-            cu o strategie reală, disciplină și mindset corect.{" "}
+            cu o strategie reală, disciplină și mentalitate corectă.{" "}
             <span className="text-white/80">
               Nu este pentru tine dacă te regăsești în una dintre situațiile de
               mai jos:
