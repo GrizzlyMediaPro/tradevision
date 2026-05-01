@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa6";
+import { trackMetaPixelCustomEvent } from "@/lib/metaPixel";
 
 /** Link invitație grup WhatsApp după înscriere webinar */
 export const WEBINAR_WHATSAPP_INVITE_URL =
@@ -63,6 +66,7 @@ export function WebinarConfirmationContent({
             href={WEBINAR_WHATSAPP_INVITE_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackMetaPixelCustomEvent("whatsapp_click")}
             className="mt-4 inline-flex w-full max-w-md items-center justify-center gap-3 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-4 text-sm font-bold uppercase tracking-wider text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 sm:text-base"
           >
             <FaWhatsapp className="h-5 w-5" />

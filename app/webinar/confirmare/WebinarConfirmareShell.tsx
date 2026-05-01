@@ -2,14 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { WebinarConfirmationContent } from "../../components/WebinarConfirmationContent";
+import { trackMetaPixelEvent } from "@/lib/metaPixel";
 
 type Props = {
   firstName: string;
 };
 
 export function WebinarConfirmareShell({ firstName }: Props) {
+  useEffect(() => {
+    trackMetaPixelEvent("CompleteRegistration");
+  }, []);
+
   return (
     <main className="relative isolate flex min-h-screen w-full flex-col overflow-hidden bg-[#020312] text-white">
       <div

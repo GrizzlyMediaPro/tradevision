@@ -11,7 +11,9 @@ type SiteChromeProps = {
 export function SiteChrome({ children }: SiteChromeProps) {
   const pathname = usePathname();
   const hideChrome =
-    pathname === "/webinar" || pathname?.startsWith("/webinar/formular");
+    pathname === "/webinar" ||
+    pathname?.startsWith("/webinar/formular") ||
+    pathname?.startsWith("/webinar/confirmare");
 
   if (hideChrome) {
     return <>{children}</>;
