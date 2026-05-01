@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { FaImage } from "react-icons/fa";
 
 import {
   formatCountdownUnit,
@@ -114,12 +113,25 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
             </div>
           </div>
 
-          <div className="flex items-center justify-center">
-            <div className="relative aspect-4/3 w-full max-w-[520px] overflow-hidden rounded-2xl border border-dashed border-white/15 bg-black/30">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                  <FaImage className="h-6 w-6 text-white/45" />
+          <div className="flex w-full items-center justify-center md:justify-end">
+            <div className="relative w-full max-w-[520px]">
+              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
+                  <iframe
+                    src="https://www.youtube.com/embed/EfMrp8MdvDw"
+                    title="Video prezentare Trade Vision"
+                    className="absolute inset-0 h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
+                <div className="mb-1 mt-3 flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-3.5 py-1.5 text-[11px] font-semibold text-yellow-300">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-400" />
+                    Sesiuni live săptămânal
+                  </span>
+                </div>
+                <div className="pointer-events-none absolute -inset-px rounded-3xl bg-linear-to-b from-purple-500/20 via-transparent to-transparent opacity-40" />
               </div>
             </div>
           </div>

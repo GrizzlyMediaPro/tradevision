@@ -47,9 +47,9 @@ const menuItems = [
     shadow: "shadow-red-500/20",
   },
   {
-    title: "Webinar Countdown",
+    title: "Webinar",
     description:
-      "Setează data și ora webinarului; countdown-urile din pagina webinar se actualizează automat.",
+      "Data și ora webinarului live, înscrierile din formular și sincronizarea cu pagina publică.",
     icon: FaClock,
     href: "/admin/webinar",
     color: "from-indigo-500 to-indigo-600",

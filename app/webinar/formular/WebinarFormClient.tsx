@@ -35,6 +35,7 @@ export function WebinarFormClient() {
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     "idle"
   );
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const canContinue = useMemo(() => {
     if (step === 0) return form.firstName.trim().length >= 2;
@@ -58,11 +59,29 @@ export function WebinarFormClient() {
   const handleSubmit = async () => {
     if (!canContinue || status === "loading") return;
     setStatus("loading");
+    setSubmitError(null);
     try {
-      // Hook this up to your real endpoint when ready.
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      const res = await fetch("/api/webinar/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          acceptedTerms: form.acceptedTerms,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (!res.ok) {
+        setSubmitError(data.error || "Eroare la trimitere. Încearcă din nou.");
+        setStatus("error");
+        return;
+      }
       setStatus("done");
     } catch {
+      setSubmitError("Nu am putut trimite datele. Verifică conexiunea și încearcă din nou.");
       setStatus("error");
     }
   };
@@ -255,13 +274,25 @@ export function WebinarFormClient() {
                     </span>
                     <span className="text-xs leading-relaxed text-white/70 sm:text-sm">
                       Te rugăm să accepți{" "}
-                      <span className="text-white">
+                      <Link
+                        href="/termeni-conditii"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-white underline decoration-white/40 underline-offset-2 transition hover:text-yellow-300 hover:decoration-yellow-300"
+                      >
                         termenii și condițiile
-                      </span>
+                      </Link>
                       ,{" "}
-                      <span className="text-white">
+                      <Link
+                        href="/politica-confidentialitate"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-white underline decoration-white/40 underline-offset-2 transition hover:text-yellow-300 hover:decoration-yellow-300"
+                      >
                         politica de confidențialitate
-                      </span>{" "}
+                      </Link>{" "}
                       și transmiterea de mesaje de marketing cu privire la
                       serviciile și produsele noastre afișate pe site.
                       <span className="text-yellow-300">*</span>
@@ -272,7 +303,8 @@ export function WebinarFormClient() {
 
               {status === "error" && (
                 <p className="mt-4 text-center text-xs text-red-400">
-                  A apărut o eroare. Te rugăm să încerci din nou.
+                  {submitError ||
+                    "A apărut o eroare. Te rugăm să încerci din nou."}
                 </p>
               )}
 
@@ -423,10 +455,10 @@ function SuccessScreen({ firstName }: SuccessScreenProps) {
             <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 p-2 shadow-[0_14px_40px_rgba(0,0,0,0.55)]">
               <div className="relative w-full aspect-video overflow-hidden rounded-xl">
                 <iframe
-                  src="https://www.youtube.com/embed/EfMrp8MdvDw"
+                  src="https://www.youtube.com/embed/ktyLHWVnFUY?autoplay=1&playsinline=1&rel=0"
                   title="Felicitări pentru înscriere"
                   className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
               </div>

@@ -102,6 +102,18 @@ model WebinarSettings {
   updatedAt DateTime @updatedAt
 }
 
+// —— Înscrieri formular webinar ——
+model WebinarRegistration {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName      String
+  email          String
+  phone          String
+  acceptedTerms  Boolean
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+}
+
 // —— Mesaje formular contact ——
 model ContactMessage {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
