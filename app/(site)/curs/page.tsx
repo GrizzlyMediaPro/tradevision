@@ -12,8 +12,82 @@ import {
   FaUser,
   FaPhone,
 } from "react-icons/fa";
-import { type CourseChapter, defaultCourseChapters } from "../data/courseChapters";
-import { getCourseChapters } from "../admin/actions/course";
+import { type CourseChapter, defaultCourseChapters } from "@/app/data/courseChapters";
+import { getCourseChapters } from "@/app/admin/actions/course";
+import { trackMetaPixelEvent } from "@/lib/metaPixel";
+import {
+  FREE_COURSE_STORAGE_KEY,
+  allowsAnalytics,
+  allowsFunctionalLocalStorage,
+  readConsentFromStorage,
+} from "@/lib/cookieConsent";
+
+type FreeCourseStored = {
+  v: 1;
+  isUnlocked: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  currentChapter: number;
+  watchedChapters: number[];
+};
+
+function readFreeCourseFromStorage(): FreeCourseStored | null {
+  if (typeof window === "undefined") return null;
+  if (!allowsFunctionalLocalStorage(readConsentFromStorage())) return null;
+  try {
+    const raw = localStorage.getItem(FREE_COURSE_STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as Partial<FreeCourseStored>;
+    if (data.v !== 1 || !data.isUnlocked) return null;
+    return {
+      v: 1,
+      isUnlocked: true,
+      firstName: typeof data.firstName === "string" ? data.firstName : "",
+      lastName: typeof data.lastName === "string" ? data.lastName : "",
+      email: typeof data.email === "string" ? data.email : "",
+      phone: typeof data.phone === "string" ? data.phone : "",
+      currentChapter:
+        typeof data.currentChapter === "number" && Number.isFinite(data.currentChapter)
+          ? data.currentChapter
+          : 0,
+      watchedChapters: Array.isArray(data.watchedChapters)
+        ? data.watchedChapters.filter(
+            (n): n is number =>
+              typeof n === "number" && Number.isInteger(n) && n >= 0
+          )
+        : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function clampCourseStateToChapters(
+  stored: FreeCourseStored,
+  chapterCount: number
+): {
+  currentChapter: number;
+  watchedChapters: Set<number>;
+} {
+  if (chapterCount <= 0) {
+    return { currentChapter: 0, watchedChapters: new Set() };
+  }
+  const maxIdx = chapterCount - 1;
+  const watched = new Set(
+    stored.watchedChapters.filter((i) => i >= 0 && i <= maxIdx)
+  );
+  if (watched.size === 0) watched.add(0);
+  const current = Math.max(
+    0,
+    Math.min(
+      Number.isFinite(stored.currentChapter) ? stored.currentChapter : 0,
+      maxIdx
+    )
+  );
+  return { currentChapter: current, watchedChapters: watched };
+}
 
 type UnlockCourseFormProps = {
   firstName: string;
@@ -141,12 +215,57 @@ export default function CursPage() {
     new Set()
   );
   const [chapters, setChapters] = useState<CourseChapter[]>(defaultCourseChapters);
+  const [showUnlockToast, setShowUnlockToast] = useState(false);
 
   useEffect(() => {
     getCourseChapters().then((list) => {
       if (list.length > 0) setChapters(list);
     });
   }, []);
+
+  // Reîncarcă deblocarea și progresul din localStorage (inclusiv după ce lista de capitole își stabilește lungimea reală).
+  useEffect(() => {
+    if (chapters.length === 0) return;
+    const stored = readFreeCourseFromStorage();
+    if (!stored) return;
+    const { currentChapter: nextChapter, watchedChapters: nextWatched } =
+      clampCourseStateToChapters(stored, chapters.length);
+    setIsUnlocked(true);
+    setFirstName(stored.firstName);
+    setLastName(stored.lastName);
+    setEmail(stored.email);
+    setPhone(stored.phone);
+    setCurrentChapter(nextChapter);
+    setWatchedChapters(nextWatched);
+  }, [chapters.length]);
+
+  // Persistă deblocarea și progresul pe dispozitiv doar dacă utilizatorul a acceptat stocarea funcțională.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isUnlocked) return;
+    if (!allowsFunctionalLocalStorage(readConsentFromStorage())) return;
+    try {
+      const payload: FreeCourseStored = {
+        v: 1,
+        isUnlocked: true,
+        firstName,
+        lastName,
+        email,
+        phone,
+        currentChapter,
+        watchedChapters: [...watchedChapters].sort((a, b) => a - b),
+      };
+      localStorage.setItem(FREE_COURSE_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [isUnlocked, firstName, lastName, email, phone, currentChapter, watchedChapters]);
+
+  useEffect(() => {
+    if (!showUnlockToast) return;
+    const t = window.setTimeout(() => setShowUnlockToast(false), 4500);
+    return () => window.clearTimeout(t);
+  }, [showUnlockToast]);
 
   const handleUnlock = useCallback(
     async (e: React.FormEvent) => {
@@ -179,6 +298,10 @@ export default function CursPage() {
 
         setIsUnlocked(true);
         setWatchedChapters(new Set([0]));
+        setShowUnlockToast(true);
+        if (allowsAnalytics(readConsentFromStorage())) {
+          trackMetaPixelEvent("SubmitApplication");
+        }
       } catch {
         setUnlockError(true);
       }
@@ -218,9 +341,9 @@ export default function CursPage() {
 
   return (
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-16">
-      {isUnlocked && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-5 py-2 text-xs font-medium text-emerald-200 shadow-lg animate-fade-in flex items-center gap-2">
-          <FaCheckCircle className="h-3.5 w-3.5" />
+      {showUnlockToast && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-5 py-2 text-xs font-medium text-emerald-200 shadow-lg flex items-center gap-2">
+          <FaCheckCircle className="h-3.5 w-3.5 shrink-0" />
           Cursul a fost deblocat cu succes!
         </div>
       )}

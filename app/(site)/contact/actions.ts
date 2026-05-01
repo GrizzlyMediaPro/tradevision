@@ -1,7 +1,7 @@
  "use server";
 
 import { resend, resendFrom } from "@/lib/resend";
-import { submitContactMessage } from "../admin/actions/contact";
+import { submitContactMessage } from "@/app/admin/actions/contact";
 import {
   escapeHtml,
   renderEmailLayout,

@@ -9,8 +9,9 @@ const founders = [
     name: "Cristi Pașatu",
     photoSrc: "/poza-cristi-pasatu.jpeg",
     role: "Co-Founder TradeVision",
-    bio: "Abordez piața cu disciplină și un sistem clar testat în timp real. Cred că tradingul se învață prin practică, nu prin teorie, și de aceea pun accent pe exemple concrete și pe management riguros al riscului.",
-    bio2: "Împreună cu Cristi Barbu am creat Trade Vision ca să oferim comunității un ghid structurat, onest și accesibil — exact ce ne-ar fi ajutat pe noi la început.",
+    bio: "Sunt Cristi Pasatu, cu 8 ani experiență în trading și 5 ani în prop trading. Am testat sute de strategii și am învățat să tratez acest domeniu ca pe un business, nu ca pe un joc de noroc.",
+    bio2: "În 2025 am retras peste 200.000$ din conturi de prop firm, folosind un sistem clar de risk management și execuție bazată pe order flow.",
+    bio3: "Prin Trade Vision, ajut traderii să abordeze piața structurat și să devină profitabili și disciplinați.",
     stats: [
       { value: "Zilnic", label: "Trading activ", icon: FaChartLine },
       { value: "Live", label: "Sesiuni YouTube", icon: FaYoutube },
@@ -21,8 +22,9 @@ const founders = [
     name: "Cristi Barbu",
     photoSrc: "/poza-cristi-barbu.jpeg",
     role: "Co-Founder TradeVision",
-    bio: 'Tranzacționez zilnic pe piețele futures și documentez tot procesul — câștigurile, pierderile, deciziile bune și greșelile. Am construit Trade Vision pentru că atunci când am început eu, nu exista un loc unde să înveți corect, în română, fără să plătești mii de euro.',
-    bio2: "Fac sesiuni live pe YouTube unde mă vezi tranzacționând în timp real. Arăt exact cum arată o zi normală de trading, cu tot ce presupune.",
+    bio: "Am descoperit trading-ul acum 2 ani și am decis să îl aprofundez serios, pentru a înțelege cum funcționează piețele financiare. Un moment cheie a fost participarea la cursul lui Cristi Pașatu, care mi-a schimbat perspectiva asupra acestui domeniu.",
+    bio2: "După sute de ore de studiu și practică, în 2025 am retras peste 150.000$ din conturi de prop firm, demonstrând că trading-ul poate deveni profitabil atunci când este abordat structurat.",
+    bio3: "Prin Trade Vision, îmi propun să ajut traderii la început de drum să își găsească direcția și să abordeze piața cu mai multă claritate, disciplină și încredere.",
     stats: [
       { value: "Zilnic", label: "Trading activ", icon: FaChartLine },
       { value: "Live", label: "Sesiuni YouTube", icon: FaYoutube },
@@ -80,6 +82,9 @@ export function FoundersSection() {
                   </p>
                   <p className="mt-3 text-sm md:text-base text-white/55 leading-relaxed">
                     {founder.bio2}
+                  </p>
+                  <p className="mt-3 text-sm md:text-base text-white/55 leading-relaxed">
+                    {founder.bio3}
                   </p>
 
                   {/* Mini stats */}

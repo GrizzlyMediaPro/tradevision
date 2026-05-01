@@ -1,8 +1,8 @@
-import { Deals } from "../components/Deals";
-import { Firms } from "../components/Firms";
-import { getDeals } from "../admin/actions/deals";
-import { getFirms } from "../admin/actions/firms";
-import { getLinkWidget } from "../admin/actions/linkwidget";
+import { Deals } from "@/app/components/Deals";
+import { Firms } from "@/app/components/Firms";
+import { getDeals } from "@/app/admin/actions/deals";
+import { getFirms } from "@/app/admin/actions/firms";
+import { getLinkWidget } from "@/app/admin/actions/linkwidget";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

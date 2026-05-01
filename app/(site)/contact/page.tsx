@@ -1,5 +1,5 @@
-import { TelegramCtaAndLive } from "../components/TelegramCtaAndLive";
-import { getLinkWidget } from "../admin/actions/linkwidget";
+import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
+import { getLinkWidget } from "@/app/admin/actions/linkwidget";
 import { ContactForm } from "./ContactForm";
 
 export default async function ContactPage() {

@@ -66,21 +66,46 @@ export function Footer() {
 
       {/* Bottom strip: copyright + made by */}
       <div className="w-full bg-black/60 border-t border-white/10 backdrop-blur-sm">
-        <div className="max-w-[1250px] mx-auto px-4 py-3 text-center text-[11px] md:text-xs text-white/70 flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3">
-          <span>© 2026 TradeVision. All Rights Reserved.</span>
-          <span className="hidden md:inline-block">|</span>
-          <div className="inline-flex items-center gap-1.5">
-            <span>Făcut cu</span>
-            <FaHeart className="h-3 w-3 text-red-500" aria-hidden="true" />
-            <span>de</span>
-            <a
-              href="https://www.grizzlymediapro.ro/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-yellow-300 hover:text-yellow-200 transition underline-offset-2 hover:underline"
+        <div className="max-w-[1250px] mx-auto px-4 py-3 flex flex-col items-center gap-2">
+          <nav
+            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] md:text-xs text-white/55"
+            aria-label="Legal"
+          >
+            <Link
+              href="/termeni-conditii"
+              className="hover:text-white/90 transition underline-offset-2 hover:underline"
             >
-              GrizzlyMediaPro
-            </a>
+              Termeni și condiții
+            </Link>
+            <Link
+              href="/politica-cookies"
+              className="hover:text-white/90 transition underline-offset-2 hover:underline"
+            >
+              Politica de cookies
+            </Link>
+            <Link
+              href="/politica-confidentialitate"
+              className="hover:text-white/90 transition underline-offset-2 hover:underline"
+            >
+              Confidențialitate
+            </Link>
+          </nav>
+          <div className="text-center text-[11px] md:text-xs text-white/70 flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3">
+            <span>© 2026 TradeVision. All Rights Reserved.</span>
+            <span className="hidden md:inline-block">|</span>
+            <div className="inline-flex items-center gap-1.5">
+              <span>Făcut cu</span>
+              <FaHeart className="h-3 w-3 text-red-500" aria-hidden="true" />
+              <span>de</span>
+              <a
+                href="https://www.grizzlymediapro.ro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-yellow-300 hover:text-yellow-200 transition underline-offset-2 hover:underline"
+              >
+                GrizzlyMediaPro
+              </a>
+            </div>
           </div>
         </div>
       </div>
