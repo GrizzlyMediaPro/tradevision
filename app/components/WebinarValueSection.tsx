@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import {
@@ -55,14 +56,9 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
             <div className="h-[2px] w-[80px] rounded-full bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500" />
 
             <p className="max-w-lg text-sm md:text-base text-white/65 leading-relaxed">
-              Vei primi acces la{" "}
-              <span className="font-semibold text-white">
-                Curs Level 1
-              </span>{" "}
-              –{" "}
-              <span className="font-semibold text-white">Învață</span> cum
-              poți deveni trader profitabil pe{" "}
-              <span className="font-semibold text-white">Nasdaq</span>.
+              Vei primi acces la un{" "}
+              <span className="font-semibold text-white">curs gratuit</span>{" "}
+              cu tot ce ai nevoie pentru a face primul payout.
             </p>
 
             <Link
@@ -73,7 +69,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                 ÎNSCRIE-TE ACUM
               </span>
               <span className="text-[11px] font-medium text-slate-900/80 sm:text-xs">
-                Curs live exclusiv
+                Înscriere la webinar live
               </span>
             </Link>
 
@@ -116,13 +112,13 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
           <div className="flex w-full items-center justify-center md:justify-end">
             <div className="relative w-full max-w-[520px]">
               <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-                <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
-                  <iframe
-                    src="https://www.youtube.com/embed/EfMrp8MdvDw"
-                    title="Video prezentare Trade Vision"
-                    className="absolute inset-0 h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+                <div className="relative mx-auto aspect-[3/4] w-full max-w-[220px] overflow-hidden rounded-2xl sm:max-w-[240px] md:max-w-[260px]">
+                  <Image
+                    src="/ChatGPT Image May 1, 2026, 01_20_56 PM.png"
+                    alt="Participanți la sesiune Trade Vision"
+                    fill
+                    className="object-cover object-center"
+                    sizes="260px"
                   />
                 </div>
                 <div className="mb-1 mt-3 flex justify-center">

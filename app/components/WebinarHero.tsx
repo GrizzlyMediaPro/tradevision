@@ -64,7 +64,8 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
             </span>
           </h1>
           <p className="mt-3 max-w-3xl px-2 text-sm text-white/80 sm:mt-4 sm:text-base md:text-xl">
-            Îți vom arăta o strategie simplă, aplicată cu disciplină zi de zi.
+            Îți vom arăta întregul nostru sistem de tranzacționare, de la strategie
+            până la risk management.
           </p>
           <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
             <div className="flex -space-x-3">
@@ -96,7 +97,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
             </div>
           </div>
           <p className="mt-2 text-xs font-medium text-white/85 sm:text-sm md:text-base">
-            Peste 100 de participanți în ultimii 2 ani
+            Peste 100 de participanți în ultimul an
           </p>
           <Link
             href="/webinar/formular"
