@@ -5,7 +5,7 @@ import { FaChevronDown } from "react-icons/fa";
 
 const faqs = [
   {
-    question: "Chiar e gratuit? Care e treaba?",
+    question: "Chiar e gratuit? Care e treabă?",
     answer:
       "Da, participarea la webinar este gratuită. Ne concentrăm pe valoare practică și pe claritate, ca să înțelegi exact dacă abordarea noastră ți se potrivește.",
   },
@@ -32,7 +32,7 @@ const faqs = [
   {
     question: "Ce piețe acoperiți?",
     answer:
-      "În webinar ne uităm în principal la piețe de indici (ex. Nasdaq), dar principiile de structură, execuție și risk management se aplică și în alte piețe.",
+      "În webinar ne uităm în principal la piețe de indici (ex. Nasdaq), dar principiile de structură, execuție și managementul riscului se aplică și în alte piețe.",
   },
 ];
 

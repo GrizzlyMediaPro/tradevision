@@ -36,7 +36,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
     <section className="relative isolate w-full min-h-screen overflow-hidden">
       <Image
         src="/webinarhero.png"
-        alt="Webinar Hero"
+        alt="Banner webinar Trade Vision"
         width={1920}
         height={1080}
         priority
@@ -57,14 +57,14 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
             Webinar LIVE gratuit
           </div>
           <h1 className="mt-4 max-w-4xl text-2xl font-bold leading-tight text-white sm:text-3xl md:text-5xl">
-            Pentru incepatori si traderi
+            Pentru începători și traderi
             <span className="bg-linear-to-r from-purple-300 via-purple-200 to-yellow-300 bg-clip-text text-transparent">
               {" "}
               neprofitabili
             </span>
           </h1>
           <p className="mt-3 max-w-3xl px-2 text-sm text-white/80 sm:mt-4 sm:text-base md:text-xl">
-            Iti vom arata o strategie simpla, aplicata cu disciplina zi de zi.
+            Îți vom arăta o strategie simplă, aplicată cu disciplină zi de zi.
           </p>
           <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
             <div className="flex -space-x-3">
@@ -96,13 +96,13 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
             </div>
           </div>
           <p className="mt-2 text-xs font-medium text-white/85 sm:text-sm md:text-base">
-            peste 100 participanti in ultimii 2 ani
+            Peste 100 de participanți în ultimii 2 ani
           </p>
           <Link
             href="/webinar/formular"
             className="mt-6 inline-flex w-full max-w-[340px] items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 sm:px-8 sm:py-3.5 md:max-w-none md:w-auto md:px-10 md:py-4 md:text-base"
           >
-            REZERV LOCUL GRATUIT!
+            REZERVĂ LOCUL GRATUIT!
           </Link>
           <div className="mt-10 w-full max-w-[520px]">
             <div className="grid grid-cols-4 gap-3">

@@ -128,7 +128,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                 <div className="mb-1 mt-3 flex justify-center">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-3.5 py-1.5 text-[11px] font-semibold text-yellow-300">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-400" />
-                    Sesiuni live săptămânal
+                    Sesiuni live săptămânale
                   </span>
                 </div>
                 <div className="pointer-events-none absolute -inset-px rounded-3xl bg-linear-to-b from-purple-500/20 via-transparent to-transparent opacity-40" />
