@@ -48,6 +48,20 @@ export function Footer() {
             <FaTelegramPlane className="h-4 w-4" />
           </a>
         </div>
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] md:text-xs text-white/70">
+          <Link href="/termeni-conditii" className="hover:text-white transition">
+            Termeni și Condiții
+          </Link>
+          <Link href="/politica-cookies" className="hover:text-white transition">
+            Politică de Cookies
+          </Link>
+          <Link
+            href="/politica-confidentialitate"
+            className="hover:text-white transition"
+          >
+            Politică de Confidențialitate
+          </Link>
+        </div>
       </div>
 
       {/* Bottom strip: copyright + made by */}

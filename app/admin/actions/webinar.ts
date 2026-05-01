@@ -9,6 +9,15 @@ export type WebinarSettingsState = {
   webinarAt: string;
 };
 
+export type WebinarRegistrationRow = {
+  id: string;
+  firstName: string;
+  email: string;
+  phone: string;
+  acceptedTerms: boolean;
+  createdAt: string;
+};
+
 function getDefaultWebinarDateIso() {
   return new Date(getDefaultWebinarCountdownTarget()).toISOString();
 }
@@ -46,4 +55,21 @@ export async function saveWebinarSettings(payload: WebinarSettingsState) {
 
   revalidatePath("/admin/webinar");
   revalidatePath("/webinar");
+}
+
+export async function getWebinarRegistrations(): Promise<WebinarRegistrationRow[]> {
+  await requireAdmin();
+
+  const rows = await prisma.webinarRegistration.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return rows.map((r) => ({
+    id: r.id,
+    firstName: r.firstName,
+    email: r.email,
+    phone: r.phone,
+    acceptedTerms: r.acceptedTerms,
+    createdAt: r.createdAt.toISOString(),
+  }));
 }
