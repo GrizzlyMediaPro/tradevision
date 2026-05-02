@@ -21,7 +21,7 @@ function readStoredConsentMode(): ConsentMode {
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-T3LZD5RX";
 const META_PIXEL_ID =
-  process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "1222795692957799";
+  process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || "1222795692957799";
 
 export function CookieConsentGate({
   children,

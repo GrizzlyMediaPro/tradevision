@@ -1,4 +1,6 @@
-const DELAYS_MS = [0, 50, 150, 400];
+const FBQ_POLL_MS = 80;
+/** GTM + next/script pot întârzia `fbq` cu mult peste primul frame; PageView poate apărea după ce renunțam la retry-uri scurte. */
+const FBQ_MAX_WAIT_MS = 20_000;
 
 type FbqFn = (...args: unknown[]) => void;
 
@@ -8,40 +10,31 @@ function getFbq(): FbqFn | undefined {
   return typeof fbq === "function" ? (fbq as FbqFn) : undefined;
 }
 
-/** Trimite un eveniment standard Meta Pixel; reîncearcă dacă `fbq` nu e încă injectat. */
-export function trackMetaPixelEvent(eventName: string): void {
+function runWhenFbqReady(run: (fbq: FbqFn) => void): void {
   if (typeof window === "undefined") return;
-
-  let i = 0;
-  const schedule = () => {
+  const start = Date.now();
+  const tick = () => {
     const fbq = getFbq();
     if (fbq) {
-      fbq("track", eventName);
+      run(fbq);
       return;
     }
-    if (i >= DELAYS_MS.length) return;
-    const delay = DELAYS_MS[i]!;
-    i += 1;
-    window.setTimeout(schedule, delay);
+    if (Date.now() - start >= FBQ_MAX_WAIT_MS) return;
+    window.setTimeout(tick, FBQ_POLL_MS);
   };
-  schedule();
+  tick();
+}
+
+/** Trimite un eveniment standard Meta Pixel; așteaptă până la `fbq` e disponibil (script / GTM). */
+export function trackMetaPixelEvent(eventName: string): void {
+  runWhenFbqReady((fbq) => {
+    fbq("track", eventName);
+  });
 }
 
 /** Eveniment custom Meta Pixel (`fbq('trackCustom', ...)`). */
 export function trackMetaPixelCustomEvent(customEventName: string): void {
-  if (typeof window === "undefined") return;
-
-  let i = 0;
-  const schedule = () => {
-    const fbq = getFbq();
-    if (fbq) {
-      fbq("trackCustom", customEventName);
-      return;
-    }
-    if (i >= DELAYS_MS.length) return;
-    const delay = DELAYS_MS[i]!;
-    i += 1;
-    window.setTimeout(schedule, delay);
-  };
-  schedule();
+  runWhenFbqReady((fbq) => {
+    fbq("trackCustom", customEventName);
+  });
 }
