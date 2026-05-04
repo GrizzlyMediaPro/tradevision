@@ -87,7 +87,7 @@ export function Navbar() {
           <div className="flex items-center gap-3 md:hidden">
             {/* Instagram icon */}
             <a
-              href="https://www.instagram.com/tradevision.ro/"
+              href="https://www.instagram.com/tradevisionro/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition cursor-pointer"
@@ -135,7 +135,7 @@ export function Navbar() {
           {/* Desktop: Instagram + Telegram */}
           <div className="hidden md:flex items-center gap-2.5">
             <a
-              href="https://www.instagram.com/tradevision.ro/"
+              href="https://www.instagram.com/tradevisionro/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white shadow-md shadow-pink-500/30 hover:opacity-90 transition cursor-pointer"

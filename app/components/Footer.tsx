@@ -30,7 +30,7 @@ export function Footer() {
             Contact
           </Link>
           <a
-            href="https://www.instagram.com/tradevision.ro/"
+            href="https://www.instagram.com/tradevisionro/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram — Trade Vision"

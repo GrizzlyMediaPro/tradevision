@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa6";
 import { trackMetaPixelCustomEvent } from "@/lib/metaPixel";
-
-/** Link invitație grup WhatsApp după înscriere webinar */
-export const WEBINAR_WHATSAPP_INVITE_URL =
-  "https://chat.whatsapp.com/CvqMTOoXVnyESciYMtdQra";
+import { WEBINAR_WHATSAPP_INVITE_URL } from "@/lib/webinarWhatsAppInvite";
 
 /** ID YouTube pentru mesajul video post-înscriere */
 export const WEBINAR_CONFIRMATION_YOUTUBE_ID = "ktyLHWVnFUY";

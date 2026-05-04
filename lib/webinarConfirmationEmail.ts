@@ -5,6 +5,7 @@ import {
   renderSimpleBodyAsHtml,
 } from "@/lib/emailTemplates";
 import { generateUnsubscribeToken } from "@/lib/unsubscribe";
+import { WEBINAR_WHATSAPP_INVITE_URL } from "@/lib/webinarWhatsAppInvite";
 
 const SITE_URL = "https://trade-vision.ro";
 
@@ -23,6 +24,9 @@ export async function sendWebinarRegistrationConfirmationEmail(
     "",
     "Îți confirmăm înscrierea la webinarul Trade Vision.",
     "Vei primi pe acest email reminder-uri și materiale utile înainte de eveniment.",
+    "",
+    "Ca să primești reminder-urile și materialele promise, intră acum în comunitatea noastră de WhatsApp:",
+    WEBINAR_WHATSAPP_INVITE_URL,
     "",
     `Te-am adăugat și la newsletterul nostru, ca să primești noutăți și conținut educativ despre trading. Poți oricând să te dezabonezi din orice email.`,
     "",
@@ -43,7 +47,7 @@ export async function sendWebinarRegistrationConfirmationEmail(
       html: renderEmailLayout({
         title: subject,
         previewText:
-          "Înscrierea la webinar este confirmată. Vei primi reminder-uri pe email.",
+          "Înscrierea la webinar este confirmată. Intră în grupul de WhatsApp pentru reminder-uri și materiale.",
         contentHtml,
         recipientEmail: trimmed,
         unsubscribeToken: generateUnsubscribeToken(trimmed),
