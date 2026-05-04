@@ -9,6 +9,10 @@ import {
   WEBINAR_CONFIRM_MAX_AGE_SEC,
 } from "@/lib/webinarConfirmCookie";
 import { sendWebinarRegistrationConfirmationEmail } from "@/lib/webinarConfirmationEmail";
+import {
+  isWebinarJamConfigured,
+  registerAttendeeWithWebinarJam,
+} from "@/lib/webinarJam";
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -81,6 +85,24 @@ export async function POST(req: Request) {
         },
         { status: 409 },
       );
+    }
+
+    if (isWebinarJamConfigured()) {
+      const wj = await registerAttendeeWithWebinarJam({
+        firstName,
+        email,
+        phone,
+        clientIp: ip !== "unknown" ? ip : undefined,
+      });
+      if (!wj.ok) {
+        if (wj.logDetail) {
+          console.error("WebinarJam register:", wj.logDetail);
+        }
+        return NextResponse.json(
+          { error: wj.userMessage },
+          { status: wj.alreadyRegistered ? 409 : 502 },
+        );
+      }
     }
 
     try {
