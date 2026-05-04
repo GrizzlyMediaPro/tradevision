@@ -1,5 +1,6 @@
 import { resend, resendFrom } from "@/lib/resend";
 import {
+  escapeHtml,
   renderEmailLayout,
   renderPlainTextBody,
   renderSimpleBodyAsHtml,
@@ -36,7 +37,17 @@ export async function sendWebinarRegistrationConfirmationEmail(
   ];
 
   const text = renderPlainTextBody(lines.join("\n"));
-  const contentHtml = renderSimpleBodyAsHtml(lines.join("\n\n"));
+
+  const waIdx = lines.indexOf(WEBINAR_WHATSAPP_INVITE_URL);
+  const introHtml = renderSimpleBodyAsHtml(
+    lines.slice(0, waIdx).join("\n\n"),
+  );
+  const waHref = escapeHtml(WEBINAR_WHATSAPP_INVITE_URL);
+  const waParagraph = `<p style="margin: 0 0 12px; line-height: 1.6; font-size: 14px; color: #000000;"><a href="${waHref}" target="_blank" rel="noopener noreferrer" style="color: #783dff; font-weight: 600; word-break: break-all;">${waHref}</a></p>`;
+  const tailHtml = renderSimpleBodyAsHtml(
+    lines.slice(waIdx + 1).join("\n\n"),
+  );
+  const contentHtml = introHtml + waParagraph + tailHtml;
 
   try {
     await resend.emails.send({
