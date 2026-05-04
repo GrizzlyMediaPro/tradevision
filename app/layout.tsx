@@ -13,7 +13,12 @@ const defaultTitle = "TradeVision România - Comparații prop firms & oferte";
 const defaultDescription =
   "Comparații detaliate între prop firms, oferte cu discount și prezentări de firme pentru traderi români, realizate de TradeVision România.";
 
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://trade-vision.ro"
+).replace(/\/$/, "");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: defaultTitle,
     template: "%s | TradeVision România",
