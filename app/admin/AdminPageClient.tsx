@@ -69,6 +69,28 @@ const menuItems = [
     shadow: "shadow-yellow-500/20",
   },
   {
+    title: "Reduceri curs practic",
+    description:
+      "Coduri de discount pentru achiziția cursului practic plătit.",
+    icon: FaGraduationCap,
+    href: "/admin/curs-practic/reduceri",
+    color: "from-orange-500 to-amber-600",
+    iconBg: "bg-orange-500/15 border-orange-400/30",
+    iconColor: "text-orange-300",
+    shadow: "shadow-orange-500/20",
+  },
+  {
+    title: "Clienți curs practic",
+    description:
+      "Listă clienți care au finalizat plata pentru cursul practic.",
+    icon: FaGraduationCap,
+    href: "/admin/curs-practic/clienti",
+    color: "from-amber-500 to-yellow-600",
+    iconBg: "bg-amber-500/15 border-amber-400/30",
+    iconColor: "text-amber-300",
+    shadow: "shadow-amber-500/20",
+  },
+  {
     title: "Formular Contact",
     description: "Vizualizează mesajele primite prin formularul de contact.",
     icon: FaEnvelope,

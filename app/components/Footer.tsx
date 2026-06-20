@@ -26,6 +26,9 @@ export function Footer() {
           <Link href="/curs" className="hover:text-white transition">
             Curs
           </Link>
+          <Link href="/curs-practic" className="hover:text-white transition">
+            Curs practic
+          </Link>
           <Link href="/contact" className="hover:text-white transition">
             Contact
           </Link>
