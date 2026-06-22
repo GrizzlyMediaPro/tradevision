@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { FaTelegramPlane, FaInstagram, FaHeart } from "react-icons/fa";
 
 export function Footer() {
@@ -25,6 +26,9 @@ export function Footer() {
           </Link>
           <Link href="/curs" className="hover:text-white transition">
             Curs
+          </Link>
+          <Link href={PRACTICAL_COURSE.path} className="hover:text-white transition">
+            Curs Futures
           </Link>
           <Link href="/contact" className="hover:text-white transition">
             Contact

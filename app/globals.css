@@ -18,3 +18,15 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+@keyframes billingAutofillStart {
+  from {
+  }
+  to {
+  }
+}
+
+.billing-autofill-input:-webkit-autofill {
+  animation-name: billingAutofillStart;
+  animation-duration: 0.01s;
+}

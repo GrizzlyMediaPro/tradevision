@@ -132,3 +132,56 @@ model NewsletterSubscriber {
   source       String?
   subscribedAt DateTime @default(now())
 }
+
+// —— Prețuri cursuri plătite ——
+model CourseProductPrice {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug          String   @unique
+  priceAmount   Float
+  priceCurrency String   @default("EUR")
+  updatedAt     DateTime @updatedAt
+}
+
+// —— Coduri discount curs practic ——
+model CourseDiscountCode {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  code      String    @unique
+  type      String
+  value     Float
+  active    Boolean   @default(true)
+  maxUses   Int?
+  usedCount Int       @default(0)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// —— Comenzi curs practic plătit ——
+model PracticalCourseOrder {
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  personType            String?
+  billingData           Json?
+  acceptedTerms         Boolean   @default(false)
+  acceptedPrivacy       Boolean   @default(false)
+  discountCode          String?
+  discountType          String?
+  discountValue         Float?
+  discountAmountEur     Float?
+  finalAmountEur        Float?
+  finalAmountRon        Float?
+  eurRonRate            Float?
+  eurRonRateDate        String?
+  eurRonRateSource      String?
+  status                String    @default("draft")
+  stripeSessionId       String?
+  stripePaymentIntentId String?
+  paidAt                DateTime?
+  smartbillInvoiceSeries String?
+  smartbillInvoiceNumber String?
+  fulfillmentEmailSentAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+}
