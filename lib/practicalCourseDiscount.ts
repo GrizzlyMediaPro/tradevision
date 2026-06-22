@@ -41,7 +41,8 @@ export async function validateDiscountCode(
     return { ok: false, error: "Codul de discount nu este configurat corect." };
   }
 
-  const pricing = calculatePricing({
+  const basePriceEur = await getBasePriceEur();
+  const pricing = calculatePricing(basePriceEur, {
     type: record.type as DiscountType,
     value: record.value,
   });
@@ -67,7 +68,7 @@ export async function clearOrderDiscount(orderId: string) {
       discountType: null,
       discountValue: null,
       discountAmountEur: null,
-      finalAmountEur: getBasePriceEur(),
+      finalAmountEur: await getBasePriceEur(),
     },
   });
 }

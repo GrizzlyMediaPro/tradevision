@@ -14,6 +14,8 @@ import { OrderSummary } from "@/app/components/practical-course/OrderSummary";
 import { PersonTypeToggle } from "@/app/components/practical-course/PersonTypeToggle";
 import { PracticalCourseShell } from "@/app/components/practical-course/PracticalCourseShell";
 import { useBillingAutofillSync } from "@/app/components/practical-course/useBillingAutofillSync";
+import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
+import type { EurRonQuote } from "@/lib/eurRonExchange";
 import type { AppliedDiscount } from "@/lib/practicalCoursePricing";
 import {
   validateBillingPayload,
@@ -24,11 +26,15 @@ import {
 type PracticalCourseCheckoutClientProps = {
   initialOrderId?: string | null;
   cancelled?: boolean;
+  basePriceEur: number;
+  eurRonQuote: EurRonQuote;
 };
 
 export function PracticalCourseCheckoutClient({
   initialOrderId = null,
   cancelled = false,
+  basePriceEur,
+  eurRonQuote,
 }: PracticalCourseCheckoutClientProps) {
   const [orderId, setOrderId] = useState<string | null>(initialOrderId);
   const [bootLoading, setBootLoading] = useState(!initialOrderId);
@@ -45,8 +51,18 @@ export function PracticalCourseCheckoutClient({
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [formRevision, setFormRevision] = useState(0);
 
-  const formRef = useBillingAutofillSync(personType, setBillingPF, setBillingPJ);
+  const { formRef, syncFromDom, getMergedPayload } = useBillingAutofillSync(
+    personType,
+    billingPF,
+    billingPJ,
+    acceptedTerms,
+    acceptedPrivacy,
+    setBillingPF,
+    setBillingPJ,
+    () => setFormRevision((value) => value + 1),
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +70,7 @@ export function PracticalCourseCheckoutClient({
     const ensureOrder = async () => {
       if (initialOrderId) {
         try {
-          const res = await fetch("/api/curs-practic/order");
+          const res = await fetch(`${PRACTICAL_COURSE.apiPath}/order`);
           if (res.ok) {
             const data = (await res.json()) as { status?: string };
             if (data.status !== "paid") {
@@ -71,7 +87,7 @@ export function PracticalCourseCheckoutClient({
       }
 
       try {
-        const res = await fetch("/api/curs-practic/order", { method: "POST" });
+        const res = await fetch(`${PRACTICAL_COURSE.apiPath}/order`, { method: "POST" });
         const data = (await res.json().catch(() => ({}))) as {
           orderId?: string;
         };
@@ -89,24 +105,29 @@ export function PracticalCourseCheckoutClient({
     };
   }, [initialOrderId]);
 
-  const payload = useMemo<BillingPayload>(
-    () => ({
-      personType,
-      billingData: personType === "PF" ? billingPF : billingPJ,
-      acceptedTerms,
-      acceptedPrivacy,
-    }),
-    [personType, billingPF, billingPJ, acceptedTerms, acceptedPrivacy],
-  );
+  const payload = useMemo<BillingPayload>(() => getMergedPayload(), [
+    personType,
+    billingPF,
+    billingPJ,
+    acceptedTerms,
+    acceptedPrivacy,
+    formRevision,
+    getMergedPayload,
+  ]);
 
-  const canPay = validateBillingPayload(payload) === null && Boolean(orderId);
+  const validationError = useMemo(
+    () => validateBillingPayload(payload),
+    [payload],
+  );
+  const canPay =
+    validationError === null && Boolean(orderId) && acceptedTerms && acceptedPrivacy;
 
   const handleApplyDiscount = useCallback(async () => {
     if (!orderId || discountLoading) return;
     setDiscountLoading(true);
     setDiscountError(null);
     try {
-      const res = await fetch(`/api/curs-practic/order/${orderId}/discount`, {
+      const res = await fetch(`${PRACTICAL_COURSE.apiPath}/order/${orderId}/discount`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: discountCodeInput }),
@@ -133,7 +154,7 @@ export function PracticalCourseCheckoutClient({
     setDiscountLoading(true);
     setDiscountError(null);
     try {
-      await fetch(`/api/curs-practic/order/${orderId}/discount`, {
+      await fetch(`${PRACTICAL_COURSE.apiPath}/order/${orderId}/discount`, {
         method: "DELETE",
       });
       setAppliedDiscount(null);
@@ -148,16 +169,27 @@ export function PracticalCourseCheckoutClient({
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (!canPay || !orderId || status === "loading") return;
+      syncFromDom();
+      const currentPayload = getMergedPayload();
+      const submitValidationError = validateBillingPayload(currentPayload);
+
+      if (submitValidationError || !orderId || status === "loading") {
+        if (submitValidationError) {
+          setSubmitError(submitValidationError);
+          setStatus("error");
+        }
+        return;
+      }
+
       setStatus("loading");
       setSubmitError(null);
       try {
         const billingRes = await fetch(
-          `/api/curs-practic/order/${orderId}/billing`,
+          `${PRACTICAL_COURSE.apiPath}/order/${orderId}/billing`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(currentPayload),
           },
         );
         const billingData = (await billingRes.json().catch(() => ({}))) as {
@@ -170,7 +202,7 @@ export function PracticalCourseCheckoutClient({
         }
 
         const checkoutRes = await fetch(
-          `/api/curs-practic/order/${orderId}/checkout`,
+          `${PRACTICAL_COURSE.apiPath}/order/${orderId}/checkout`,
           { method: "POST" },
         );
         const checkoutData = (await checkoutRes.json().catch(() => ({}))) as {
@@ -190,13 +222,13 @@ export function PracticalCourseCheckoutClient({
         setStatus("error");
       }
     },
-    [canPay, orderId, status, payload],
+    [getMergedPayload, orderId, status, syncFromDom],
   );
 
   if (bootLoading) {
     return (
       <PracticalCourseShell
-        title="Achiziție curs practic"
+        title="Achiziție Curs Futures"
         subtitle="Se pregătește formularul..."
       >
         <p className="text-sm text-white/60">Un moment...</p>
@@ -206,7 +238,7 @@ export function PracticalCourseCheckoutClient({
 
   return (
     <PracticalCourseShell
-      title="Achiziție curs practic"
+      title="Achiziție Curs Futures"
       subtitle="Completează datele de facturare, acceptă acordurile legale și finalizează plata."
     >
       {cancelled ? (
@@ -239,6 +271,8 @@ export function PracticalCourseCheckoutClient({
         />
 
         <OrderSummary
+          basePriceEur={basePriceEur}
+          eurRonQuote={eurRonQuote}
           discountCodeInput={discountCodeInput}
           onDiscountCodeInputChange={setDiscountCodeInput}
           appliedDiscount={appliedDiscount}
@@ -250,11 +284,16 @@ export function PracticalCourseCheckoutClient({
 
         {status === "error" && submitError ? (
           <p className="text-sm text-red-400">{submitError}</p>
+        ) : !canPay && acceptedTerms && acceptedPrivacy && validationError ? (
+          <p className="text-sm text-amber-300">{validationError}</p>
         ) : null}
 
         <button
           type="submit"
-          disabled={!canPay || status === "loading"}
+          onMouseDown={syncFromDom}
+          disabled={
+            !orderId || !acceptedTerms || !acceptedPrivacy || status === "loading"
+          }
           className="inline-flex w-full items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           {status === "loading" ? "Se deschide plata..." : "Plătește acum"}

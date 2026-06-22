@@ -10,6 +10,7 @@ import {
   FaPaperPlane,
   FaCog,
   FaClock,
+  FaEuroSign,
 } from "react-icons/fa";
 
 const menuItems = [
@@ -69,22 +70,33 @@ const menuItems = [
     shadow: "shadow-yellow-500/20",
   },
   {
-    title: "Reduceri curs practic",
+    title: "Prețuri cursuri",
     description:
-      "Coduri de discount pentru achiziția cursului practic plătit.",
+      "Modifică prețurile cursurilor plătite afișate pe site și în checkout.",
+    icon: FaEuroSign,
+    href: "/admin/cursuri/preturi",
+    color: "from-lime-500 to-green-600",
+    iconBg: "bg-lime-500/15 border-lime-400/30",
+    iconColor: "text-lime-300",
+    shadow: "shadow-lime-500/20",
+  },
+  {
+    title: "Reduceri Curs Futures",
+    description:
+      "Coduri de discount pentru achiziția Curs Futures.",
     icon: FaGraduationCap,
-    href: "/admin/curs-practic/reduceri",
+    href: "/admin/curs-futures/reduceri",
     color: "from-orange-500 to-amber-600",
     iconBg: "bg-orange-500/15 border-orange-400/30",
     iconColor: "text-orange-300",
     shadow: "shadow-orange-500/20",
   },
   {
-    title: "Clienți curs practic",
+    title: "Clienți Curs Futures",
     description:
-      "Listă clienți care au finalizat plata pentru cursul practic.",
+      "Listă clienți care au finalizat plata pentru Curs Futures.",
     icon: FaGraduationCap,
-    href: "/admin/curs-practic/clienti",
+    href: "/admin/curs-futures/clienti",
     color: "from-amber-500 to-yellow-600",
     iconBg: "bg-amber-500/15 border-amber-400/30",
     iconColor: "text-amber-300",

@@ -1,7 +1,19 @@
 "use client";
 
-import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
-import type { BillingDataPF, BillingDataPJ } from "@/lib/practicalCourseValidation";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import type {
+  BillingDataPF,
+  BillingDataPJ,
+  BillingPayload,
+  PersonType,
+} from "@/lib/practicalCourseValidation";
 
 const PF_FIELD_MAP: Record<string, keyof BillingDataPF> = {
   "given-name": "firstName",
@@ -39,51 +51,115 @@ function readFormValues(form: HTMLFormElement): Record<string, string> {
   return values;
 }
 
+function mergePfState(
+  state: BillingDataPF,
+  values: Record<string, string>,
+): BillingDataPF {
+  const next = { ...state };
+  for (const [name, key] of Object.entries(PF_FIELD_MAP)) {
+    const domValue = values[name];
+    if (domValue !== undefined && domValue !== "") {
+      next[key] = domValue;
+    }
+  }
+  return next;
+}
+
+function mergePjState(
+  state: BillingDataPJ,
+  values: Record<string, string>,
+): BillingDataPJ {
+  const next = { ...state };
+  for (const [name, key] of Object.entries(PJ_FIELD_MAP)) {
+    const domValue = values[name];
+    if (domValue !== undefined && domValue !== "") {
+      next[key] = domValue;
+    }
+  }
+  return next;
+}
+
 export function useBillingAutofillSync(
-  personType: "PF" | "PJ",
+  personType: PersonType,
+  billingPF: BillingDataPF,
+  billingPJ: BillingDataPJ,
+  acceptedTerms: boolean,
+  acceptedPrivacy: boolean,
   setBillingPF: Dispatch<SetStateAction<BillingDataPF>>,
   setBillingPJ: Dispatch<SetStateAction<BillingDataPJ>>,
+  onDomChange?: () => void,
 ) {
   const formRef = useRef<HTMLFormElement | null>(null);
   const personTypeRef = useRef(personType);
+  const billingPFRef = useRef(billingPF);
+  const billingPJRef = useRef(billingPJ);
+  const onDomChangeRef = useRef(onDomChange);
+
   personTypeRef.current = personType;
+  billingPFRef.current = billingPF;
+  billingPJRef.current = billingPJ;
+  onDomChangeRef.current = onDomChange;
+
+  const syncFromDom = useCallback(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const values = readFormValues(form);
+
+    if (personTypeRef.current === "PF") {
+      const merged = mergePfState(billingPFRef.current, values);
+      const changed = Object.keys(merged).some(
+        (key) =>
+          merged[key as keyof BillingDataPF] !==
+          billingPFRef.current[key as keyof BillingDataPF],
+      );
+      if (changed) {
+        setBillingPF(merged);
+        onDomChangeRef.current?.();
+      }
+      return;
+    }
+
+    const merged = mergePjState(billingPJRef.current, values);
+    const changed = Object.keys(merged).some(
+      (key) =>
+        merged[key as keyof BillingDataPJ] !==
+        billingPJRef.current[key as keyof BillingDataPJ],
+    );
+    if (changed) {
+      setBillingPJ(merged);
+      onDomChangeRef.current?.();
+    }
+  }, [setBillingPF, setBillingPJ]);
+
+  const getMergedPayload = useCallback((): BillingPayload => {
+    const form = formRef.current;
+    const values = form ? readFormValues(form) : {};
+
+    if (personType === "PF") {
+      return {
+        personType,
+        acceptedTerms,
+        acceptedPrivacy,
+        billingData: form
+          ? mergePfState(billingPFRef.current, values)
+          : billingPFRef.current,
+      };
+    }
+
+    return {
+      personType,
+      acceptedTerms,
+      acceptedPrivacy,
+      billingData: form
+        ? mergePjState(billingPJRef.current, values)
+        : billingPJRef.current,
+    };
+  }, [personType, acceptedTerms, acceptedPrivacy]);
 
   useEffect(() => {
     const form = formRef.current;
     if (!form) return;
-
-    const syncFromDom = () => {
-      const values = readFormValues(form);
-
-      if (personTypeRef.current === "PF") {
-        setBillingPF((prev) => {
-          const next = { ...prev };
-          let changed = false;
-          for (const [name, key] of Object.entries(PF_FIELD_MAP)) {
-            const domValue = values[name];
-            if (domValue !== undefined && domValue !== prev[key]) {
-              next[key] = domValue;
-              changed = true;
-            }
-          }
-          return changed ? next : prev;
-        });
-        return;
-      }
-
-      setBillingPJ((prev) => {
-        const next = { ...prev };
-        let changed = false;
-        for (const [name, key] of Object.entries(PJ_FIELD_MAP)) {
-          const domValue = values[name];
-          if (domValue !== undefined && domValue !== prev[key]) {
-            next[key] = domValue;
-            changed = true;
-          }
-        }
-        return changed ? next : prev;
-      });
-    };
 
     const handleAutofillAnimation = (event: AnimationEvent) => {
       if (event.animationName === "billingAutofillStart") {
@@ -92,15 +168,24 @@ export function useBillingAutofillSync(
     };
 
     form.addEventListener("animationstart", handleAutofillAnimation);
-    const interval = window.setInterval(syncFromDom, 400);
-    const timeout = window.setTimeout(() => window.clearInterval(interval), 4000);
+    form.addEventListener("input", syncFromDom, true);
+    form.addEventListener("change", syncFromDom, true);
+    form.addEventListener("focusin", syncFromDom, true);
+
+    const interval = window.setInterval(syncFromDom, 500);
 
     return () => {
       form.removeEventListener("animationstart", handleAutofillAnimation);
+      form.removeEventListener("input", syncFromDom, true);
+      form.removeEventListener("change", syncFromDom, true);
+      form.removeEventListener("focusin", syncFromDom, true);
       window.clearInterval(interval);
-      window.clearTimeout(timeout);
     };
-  }, [personType, setBillingPF, setBillingPJ]);
+  }, [personType, syncFromDom]);
 
-  return formRef;
+  useLayoutEffect(() => {
+    syncFromDom();
+  }, [acceptedTerms, acceptedPrivacy, personType, syncFromDom]);
+
+  return { formRef, syncFromDom, getMergedPayload };
 }

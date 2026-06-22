@@ -7,10 +7,14 @@ import {
   isOrderReadyForCheckout,
 } from "@/lib/practicalCourseOrder";
 import {
-  eurToStripeCents,
   getBasePriceEur,
   getOrderFinalAmountEur,
 } from "@/lib/practicalCoursePricing";
+import {
+  convertEurToRon,
+  getEurRonQuote,
+  ronToStripeBani,
+} from "@/lib/eurRonExchange";
 import { getSiteUrl, getStripeClient } from "@/lib/stripe";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -54,7 +58,9 @@ export async function POST(_req: Request, context: RouteContext) {
 
     const billing = order.billingData as Record<string, string>;
     const customerEmail = billing.email?.trim();
-    const finalAmountEur = getOrderFinalAmountEur(order);
+    const finalAmountEur = await getOrderFinalAmountEur(order);
+    const eurRonQuote = await getEurRonQuote();
+    const finalAmountRon = convertEurToRon(finalAmountEur, eurRonQuote.rate);
     const siteUrl = getSiteUrl();
 
     const session = await stripe.checkout.sessions.create({
@@ -64,20 +70,24 @@ export async function POST(_req: Request, context: RouteContext) {
         {
           quantity: 1,
           price_data: {
-            currency: "eur",
-            unit_amount: eurToStripeCents(finalAmountEur),
+            currency: "ron",
+            unit_amount: ronToStripeBani(finalAmountRon),
             product_data: {
               name: PRACTICAL_COURSE.title,
-              description: PRACTICAL_COURSE.subtitle,
+              description: `${PRACTICAL_COURSE.subtitle} (preț contractual ${finalAmountEur} EUR)`,
             },
           },
         },
       ],
-      success_url: `${siteUrl}/curs-practic/multumim`,
-      cancel_url: `${siteUrl}/curs-practic?cancelled=1`,
+      success_url: `${siteUrl}${PRACTICAL_COURSE.thanksPath}`,
+      cancel_url: `${siteUrl}${PRACTICAL_COURSE.path}?cancelled=1`,
       metadata: {
         orderId: id,
         discountCode: order.discountCode ?? "",
+        finalAmountEur: String(finalAmountEur),
+        finalAmountRon: String(finalAmountRon),
+        eurRonRate: String(eurRonQuote.rate),
+        eurRonRateSource: eurRonQuote.source,
       },
     });
 
@@ -87,6 +97,10 @@ export async function POST(_req: Request, context: RouteContext) {
         stripeSessionId: session.id,
         status: "pending_payment",
         finalAmountEur,
+        finalAmountRon,
+        eurRonRate: eurRonQuote.rate,
+        eurRonRateDate: eurRonQuote.publishedAt,
+        eurRonRateSource: eurRonQuote.source,
       },
     });
 
@@ -122,7 +136,7 @@ export async function GET(_req: Request, context: RouteContext) {
 
     return NextResponse.json({
       ...order,
-      baseAmountEur: getBasePriceEur(),
+      baseAmountEur: await getBasePriceEur(),
     });
   } catch (err) {
     console.error("Eroare la citirea stării comenzii", err);

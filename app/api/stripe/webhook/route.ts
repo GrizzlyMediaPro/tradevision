@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/db";
-import { incrementDiscountUsage } from "@/lib/practicalCourseDiscount";
+import { completePaidPracticalCourseOrder } from "@/lib/practicalCoursePayment";
 import { getStripeClient } from "@/lib/stripe";
 
 export async function POST(req: Request) {
@@ -30,21 +30,14 @@ export async function POST(req: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.metadata?.orderId;
     if (orderId) {
-      const order = await prisma.practicalCourseOrder.update({
-        where: { id: orderId },
-        data: {
-          status: "paid",
-          stripeSessionId: session.id,
-          stripePaymentIntentId:
-            typeof session.payment_intent === "string"
-              ? session.payment_intent
-              : session.payment_intent?.id ?? null,
-          paidAt: new Date(),
-        },
-      });
-
-      if (order.discountCode) {
-        await incrementDiscountUsage(order.discountCode);
+      try {
+        await completePaidPracticalCourseOrder(orderId, session);
+      } catch (err) {
+        console.error("Practical course fulfillment failed", orderId, err);
+        return NextResponse.json(
+          { error: "Fulfillment eșuat." },
+          { status: 500 },
+        );
       }
     }
   }

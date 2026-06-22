@@ -9,6 +9,10 @@ import {
   updateDiscountCode,
   type DiscountCodeInput,
 } from "@/app/admin/actions/practicalCourse";
+import {
+  ExpiresAtPicker,
+  toLocalDatetimeValue,
+} from "@/app/components/admin/ExpiresAtPicker";
 
 type DiscountRow = {
   id: string;
@@ -73,7 +77,7 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
       active: row.active,
       maxUses: row.maxUses,
       expiresAt: row.expiresAt
-        ? new Date(row.expiresAt).toISOString().slice(0, 16)
+        ? toLocalDatetimeValue(new Date(row.expiresAt))
         : null,
     });
   };
@@ -146,19 +150,16 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
               className={inputClass}
             />
           </Field>
-          <Field label="Expiră la (opțional)" className="sm:col-span-2">
-            <input
-              type="datetime-local"
-              value={form.expiresAt ?? ""}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  expiresAt: e.target.value || null,
-                }))
-              }
-              className={inputClass}
-            />
-          </Field>
+          <ExpiresAtPicker
+            className="sm:col-span-2"
+            value={form.expiresAt ?? null}
+            onChange={(expiresAt) =>
+              setForm((f) => ({
+                ...f,
+                expiresAt,
+              }))
+            }
+          />
           <label className="flex items-center gap-2 text-sm text-white/75">
             <input
               type="checkbox"

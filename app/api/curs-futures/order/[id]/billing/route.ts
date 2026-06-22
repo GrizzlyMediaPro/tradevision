@@ -35,6 +35,7 @@ export async function PATCH(req: Request, context: RouteContext) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
+    const basePriceEur = await getBasePriceEur();
     const updated = await prisma.practicalCourseOrder.update({
       where: { id },
       data: {
@@ -43,13 +44,13 @@ export async function PATCH(req: Request, context: RouteContext) {
         acceptedTerms: body.acceptedTerms,
         acceptedPrivacy: body.acceptedPrivacy,
         status: "pending_payment",
-        finalAmountEur: order.finalAmountEur ?? getBasePriceEur(),
+        finalAmountEur: order.finalAmountEur ?? basePriceEur,
       },
     });
 
     return NextResponse.json({
       ok: true,
-      finalAmountEur: updated.finalAmountEur ?? getBasePriceEur(),
+      finalAmountEur: updated.finalAmountEur ?? basePriceEur,
     });
   } catch (err) {
     console.error("Eroare la salvarea facturării curs practic", err);

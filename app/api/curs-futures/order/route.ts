@@ -6,6 +6,7 @@ import {
   getOrderCookieOrderId,
 } from "@/lib/practicalCourseOrder";
 import { getBasePriceEur } from "@/lib/practicalCoursePricing";
+import { getEurRonQuote } from "@/lib/eurRonExchange";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET() {
@@ -21,6 +22,10 @@ export async function GET() {
         id: true,
         status: true,
         finalAmountEur: true,
+        finalAmountRon: true,
+        eurRonRate: true,
+        eurRonRateDate: true,
+        eurRonRateSource: true,
         discountCode: true,
         discountAmountEur: true,
         paidAt: true,
@@ -31,9 +36,12 @@ export async function GET() {
       return NextResponse.json({ error: "Comanda nu a fost găsită." }, { status: 404 });
     }
 
+    const eurRonQuote = await getEurRonQuote();
+
     return NextResponse.json({
       ...order,
-      baseAmountEur: getBasePriceEur(),
+      baseAmountEur: await getBasePriceEur(),
+      eurRonQuote,
     });
   } catch (err) {
     console.error("Eroare la citirea comenzii", err);

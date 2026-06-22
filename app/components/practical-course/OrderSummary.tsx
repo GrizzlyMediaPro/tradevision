@@ -2,12 +2,16 @@
 
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import {
+  convertEurToRon,
   formatPriceEur,
-  getBasePriceEur,
+  formatPriceRon,
   type AppliedDiscount,
 } from "@/lib/practicalCoursePricing";
+import type { EurRonQuote } from "@/lib/eurRonExchange";
 
 type OrderSummaryProps = {
+  basePriceEur: number;
+  eurRonQuote: EurRonQuote;
   discountCodeInput: string;
   onDiscountCodeInputChange: (value: string) => void;
   appliedDiscount: AppliedDiscount | null;
@@ -17,7 +21,18 @@ type OrderSummaryProps = {
   discountError: string | null;
 };
 
+function formatRateLabel(quote: EurRonQuote): string {
+  if (quote.source === "bnr") {
+    const [year, month, day] = quote.publishedAt.split("-");
+    const dateLabel = day && month && year ? `${day}.${month}.${year}` : quote.publishedAt;
+    return `curs BNR din ${dateLabel}`;
+  }
+  return "curs de schimb configurat";
+}
+
 export function OrderSummary({
+  basePriceEur,
+  eurRonQuote,
   discountCodeInput,
   onDiscountCodeInputChange,
   appliedDiscount,
@@ -26,9 +41,10 @@ export function OrderSummary({
   discountLoading,
   discountError,
 }: OrderSummaryProps) {
-  const basePrice = getBasePriceEur();
-  const finalPrice = appliedDiscount?.finalAmountEur ?? basePrice;
+  const basePrice = basePriceEur;
+  const finalPriceEur = appliedDiscount?.finalAmountEur ?? basePrice;
   const discountAmount = appliedDiscount?.discountAmountEur ?? 0;
+  const finalPriceRon = convertEurToRon(finalPriceEur, eurRonQuote.rate);
 
   return (
     <div className="rounded-3xl border border-white/10 bg-white/3 p-6">
@@ -53,10 +69,21 @@ export function OrderSummary({
           </div>
         ) : null}
         <div className="border-t border-white/10 pt-3 flex items-center justify-between gap-4">
-          <span className="font-semibold text-white">Total de plată</span>
+          <span className="font-semibold text-white">Total contractual</span>
           <span className="text-xl font-bold text-yellow-300">
-            {formatPriceEur(finalPrice)}
+            {formatPriceEur(finalPriceEur)}
           </span>
+        </div>
+        <div className="rounded-2xl border border-yellow-300/15 bg-yellow-400/5 px-4 py-3 text-left">
+          <p className="text-xs font-medium uppercase tracking-wider text-yellow-200/80">
+            Total de plată în RON
+          </p>
+          <p className="mt-1 text-lg font-bold text-yellow-200">
+            {formatPriceRon(finalPriceRon)}
+          </p>
+          <p className="mt-1 text-xs text-white/50">
+            Conversie la {formatRateLabel(eurRonQuote)} ({eurRonQuote.rate.toFixed(4).replace(".", ",")} lei/EUR).
+          </p>
         </div>
       </div>
 

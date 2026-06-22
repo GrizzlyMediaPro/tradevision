@@ -48,7 +48,7 @@ export async function createDiscountCode(input: DiscountCodeInput) {
     },
   });
 
-  revalidatePath("/admin/curs-practic/reduceri");
+  revalidatePath("/admin/curs-futures/reduceri");
 }
 
 export async function updateDiscountCode(id: string, input: DiscountCodeInput) {
@@ -67,12 +67,12 @@ export async function updateDiscountCode(id: string, input: DiscountCodeInput) {
     },
   });
 
-  revalidatePath("/admin/curs-practic/reduceri");
+  revalidatePath("/admin/curs-futures/reduceri");
 }
 
 export async function deleteDiscountCode(id: string) {
   await prisma.courseDiscountCode.delete({ where: { id } });
-  revalidatePath("/admin/curs-practic/reduceri");
+  revalidatePath("/admin/curs-futures/reduceri");
 }
 
 export async function getPaidCourseClients() {
@@ -82,13 +82,15 @@ export async function getPaidCourseClients() {
     take: 500,
   });
 
-  return rows.map((row) => ({
-    id: row.id,
-    clientName: getClientDisplayName(row.personType, row.billingData),
-    email: getBillingEmail(row.personType, row.billingData),
-    personType: row.personType,
-    discountCode: row.discountCode,
-    paidAmount: formatPriceEur(getOrderFinalAmountEur(row)),
-    paidAt: row.paidAt?.toISOString() ?? row.updatedAt.toISOString(),
-  }));
+  return Promise.all(
+    rows.map(async (row) => ({
+      id: row.id,
+      clientName: getClientDisplayName(row.personType, row.billingData),
+      email: getBillingEmail(row.personType, row.billingData),
+      personType: row.personType,
+      discountCode: row.discountCode,
+      paidAmount: formatPriceEur(await getOrderFinalAmountEur(row)),
+      paidAt: row.paidAt?.toISOString() ?? row.updatedAt.toISOString(),
+    })),
+  );
 }

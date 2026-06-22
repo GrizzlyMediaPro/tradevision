@@ -14,9 +14,9 @@ export default async function AdminDiscountsPage() {
           <Link href="/admin" className="text-sm text-white/50 hover:text-white">
             ← Admin
           </Link>
-          <h1 className="mt-2 text-3xl font-bold">Reduceri curs practic</h1>
+          <h1 className="mt-2 text-3xl font-bold">Reduceri Curs Futures</h1>
           <p className="mt-2 text-sm text-white/60">
-            Gestionează codurile de discount pentru achiziția cursului practic.
+            Gestionează codurile de discount pentru achiziția Curs Futures.
           </p>
         </div>
         <AdminDiscountsClient initialCodes={codes} />

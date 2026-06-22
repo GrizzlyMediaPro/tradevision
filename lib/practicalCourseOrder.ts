@@ -36,7 +36,7 @@ export async function createOrderWithCookie() {
   const order = await prisma.practicalCourseOrder.create({
     data: {
       status: "draft",
-      finalAmountEur: getBasePriceEur(),
+      finalAmountEur: await getBasePriceEur(),
     },
   });
   const token = await createPracticalCourseOrderToken(order.id);

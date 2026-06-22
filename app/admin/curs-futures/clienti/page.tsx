@@ -14,9 +14,9 @@ export default async function AdminPracticalCourseClientsPage() {
           <Link href="/admin" className="text-sm text-white/50 hover:text-white">
             ← Admin
           </Link>
-          <h1 className="mt-2 text-3xl font-bold">Clienți curs practic</h1>
+          <h1 className="mt-2 text-3xl font-bold">Clienți Curs Futures</h1>
           <p className="mt-2 text-sm text-white/60">
-            Persoane care au finalizat plata pentru cursul practic.
+            Persoane care au finalizat plata pentru Curs Futures.
           </p>
         </div>
 
