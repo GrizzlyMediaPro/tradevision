@@ -242,6 +242,7 @@ function buildInvoiceProducts(
     isTaxIncluded: true,
     taxName: config.taxName,
     taxPercentage: config.taxPercentage,
+    saveToDb: false,
     ...(input.discount.type === "percent"
       ? {
           discountType: 2 as const,
