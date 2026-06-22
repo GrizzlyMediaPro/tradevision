@@ -85,7 +85,7 @@ export function MultumimPageClient() {
           <p className="max-w-lg text-sm text-amber-300">
             Factura nu a putut fi emisă automat: {smartbillError}. Corectează
             seria SmartBill în `.env` (`SMARTBILL_INVOICE_SERIES`) și reîncarcă
-            această pagină pentru retrimitere.
+            această pagină pentru retrimitere. 
           </p>
         ) : null}
         {confirmError ? (
