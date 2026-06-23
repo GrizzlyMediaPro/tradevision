@@ -8,8 +8,10 @@ import {
 } from "@/lib/practicalCourseValidation";
 import { normalizeDiscountCode } from "@/lib/practicalCourseDiscount";
 import { formatPriceEur, getOrderFinalAmountEur } from "@/lib/practicalCoursePricing";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function getDiscountCodes() {
+  await requireAdmin();
   return prisma.courseDiscountCode.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -25,6 +27,7 @@ export type DiscountCodeInput = {
 };
 
 export async function createDiscountCode(input: DiscountCodeInput) {
+  await requireAdmin();
   const code = normalizeDiscountCode(input.code);
   if (!code) throw new Error("Codul este obligatoriu.");
   if (input.type !== "percent" && input.type !== "fixed") {
@@ -52,6 +55,7 @@ export async function createDiscountCode(input: DiscountCodeInput) {
 }
 
 export async function updateDiscountCode(id: string, input: DiscountCodeInput) {
+  await requireAdmin();
   const code = normalizeDiscountCode(input.code);
   if (!code) throw new Error("Codul este obligatoriu.");
 
@@ -71,11 +75,13 @@ export async function updateDiscountCode(id: string, input: DiscountCodeInput) {
 }
 
 export async function deleteDiscountCode(id: string) {
+  await requireAdmin();
   await prisma.courseDiscountCode.delete({ where: { id } });
   revalidatePath("/admin/curs-futures/reduceri");
 }
 
 export async function getPaidCourseClients() {
+  await requireAdmin();
   const rows = await prisma.practicalCourseOrder.findMany({
     where: { status: "paid" },
     orderBy: { paidAt: "desc" },

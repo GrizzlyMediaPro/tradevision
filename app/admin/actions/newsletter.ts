@@ -21,6 +21,7 @@ export type SubscriberRow = {
 };
 
 export async function getNewsletterSubscribers(): Promise<SubscriberRow[]> {
+  await requireAdmin();
   const rows = await prisma.newsletterSubscriber.findMany({
     orderBy: { subscribedAt: "desc" },
   });

@@ -15,6 +15,7 @@ export type ContactMessageRow = {
 };
 
 export async function getContactMessages(): Promise<ContactMessageRow[]> {
+  await requireAdmin();
   const rows = await prisma.contactMessage.findMany({
     orderBy: { createdAt: "desc" },
   });
