@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   description: "Plata pentru Curs Futures a fost înregistrată cu succes.",
 };
 
-export default function MultumimPage() {
-  return <MultumimPageClient />;
+type PageProps = {
+  searchParams: Promise<{ session_id?: string }>;
+};
+
+export default async function MultumimPage({ searchParams }: PageProps) {
+  const { session_id: stripeSessionId } = await searchParams;
+  return <MultumimPageClient stripeSessionId={stripeSessionId ?? null} />;
 }

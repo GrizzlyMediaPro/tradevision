@@ -79,7 +79,7 @@ export async function POST(_req: Request, context: RouteContext) {
           },
         },
       ],
-      success_url: `${siteUrl}${PRACTICAL_COURSE.thanksPath}`,
+      success_url: `${siteUrl}${PRACTICAL_COURSE.thanksPath}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}${PRACTICAL_COURSE.path}?cancelled=1`,
       metadata: {
         orderId: id,

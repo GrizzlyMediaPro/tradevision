@@ -8,6 +8,8 @@ import {
 } from "@/lib/practicalCourseValidation";
 import { normalizeDiscountCode } from "@/lib/practicalCourseDiscount";
 import { formatPriceEur, getOrderFinalAmountEur } from "@/lib/practicalCoursePricing";
+import { reconcilePracticalCourseOrder } from "@/lib/practicalCoursePayment";
+import { getStripeClient } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/adminAuth";
 
 export async function getDiscountCodes() {
@@ -99,4 +101,63 @@ export async function getPaidCourseClients() {
       paidAt: row.paidAt?.toISOString() ?? row.updatedAt.toISOString(),
     })),
   );
+}
+
+export async function getStuckCourseOrders() {
+  await requireAdmin();
+  const rows = await prisma.practicalCourseOrder.findMany({
+    where: { status: "pending_payment" },
+    orderBy: { updatedAt: "desc" },
+    take: 100,
+  });
+
+  return Promise.all(
+    rows.map(async (row) => ({
+      id: row.id,
+      clientName: getClientDisplayName(row.personType, row.billingData),
+      email: getBillingEmail(row.personType, row.billingData),
+      amountRon: row.finalAmountRon,
+      stripeSessionId: row.stripeSessionId,
+      updatedAt: row.updatedAt.toISOString(),
+      paidAmount: formatPriceEur(await getOrderFinalAmountEur(row)),
+    })),
+  );
+}
+
+export async function reconcileStuckCourseOrder(orderId: string) {
+  await requireAdmin();
+  const result = await reconcilePracticalCourseOrder(orderId);
+  revalidatePath("/admin/curs-futures/clienti");
+  return result;
+}
+
+export async function deleteStuckCourseOrder(orderId: string) {
+  await requireAdmin();
+
+  const order = await prisma.practicalCourseOrder.findUnique({
+    where: { id: orderId },
+  });
+  if (!order) {
+    revalidatePath("/admin/curs-futures/clienti");
+    return { deleted: true, alreadyGone: true };
+  }
+  if (order.status === "paid") {
+    throw new Error("Nu poți șterge o comandă deja plătită.");
+  }
+
+  if (order.stripeSessionId) {
+    const stripe = getStripeClient();
+    if (stripe) {
+      const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId);
+      if (session.payment_status === "paid") {
+        throw new Error(
+          "Plata există în Stripe. Folosește Reconciliază, nu ștergerea.",
+        );
+      }
+    }
+  }
+
+  await prisma.practicalCourseOrder.delete({ where: { id: orderId } });
+  revalidatePath("/admin/curs-futures/clienti");
+  return { deleted: true, alreadyGone: false };
 }

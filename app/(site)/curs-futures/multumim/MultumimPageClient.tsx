@@ -15,7 +15,11 @@ type ConfirmPaymentResponse = {
   error?: string;
 };
 
-export function MultumimPageClient() {
+type MultumimPageClientProps = {
+  stripeSessionId: string | null;
+};
+
+export function MultumimPageClient({ stripeSessionId }: MultumimPageClientProps) {
   const [loading, setLoading] = useState(true);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
@@ -29,6 +33,10 @@ export function MultumimPageClient() {
       try {
         const confirmRes = await fetch(`${PRACTICAL_COURSE.apiPath}/order/confirm`, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            stripeSessionId ? { sessionId: stripeSessionId } : {},
+          ),
         });
         const confirmData = (await confirmRes.json().catch(() => ({}))) as ConfirmPaymentResponse;
 
@@ -56,7 +64,7 @@ export function MultumimPageClient() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [stripeSessionId]);
 
   return (
     <PracticalCourseShell

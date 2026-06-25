@@ -18,6 +18,28 @@ function getBillingEmailFromOrder(billingData: unknown): string | null {
   return String((billingData as { email?: string }).email ?? "").trim() || null;
 }
 
+function parseStripeSessionRetrieveError(
+  err: unknown,
+  stripeSessionId: string,
+): Error {
+  const isLiveSession = stripeSessionId.startsWith("cs_live_");
+  const isTestKey = !process.env.STRIPE_SECRET_KEY?.trim().startsWith("sk_live_");
+  const isMissing =
+    err &&
+    typeof err === "object" &&
+    "code" in err &&
+    (err as { code?: string }).code === "resource_missing";
+
+  if (isMissing && isLiveSession && isTestKey) {
+    return new Error(
+      "Plata este în Stripe live, dar serverul folosește chei de test. Reconciliază din producție (trade-vision.ro) sau setează STRIPE_SECRET_KEY live în .env.",
+    );
+  }
+
+  if (err instanceof Error) return err;
+  return new Error("Nu am putut citi sesiunea Stripe.");
+}
+
 async function buildConfirmResult(orderId: string): Promise<{
   status: "paid";
   fulfillmentSent: boolean;
@@ -53,6 +75,11 @@ export async function completePaidPracticalCourseOrder(
     where: { id: orderId },
   });
   if (!existing) {
+    console.error(
+      "completePaidPracticalCourseOrder: comanda nu există",
+      orderId,
+      session.id,
+    );
     return { emailSent: false, invoiceIssued: false };
   }
 
@@ -82,6 +109,66 @@ export type ConfirmPaymentResult = {
   email?: string | null;
   smartbillError?: string;
 };
+
+export async function confirmPracticalCoursePaymentBySession(
+  stripeSessionId: string,
+): Promise<ConfirmPaymentResult> {
+  const stripe = getStripeClient();
+  if (!stripe) {
+    return { status: "pending", fulfillmentSent: false, invoiceIssued: false };
+  }
+
+  const session = await stripe.checkout.sessions
+    .retrieve(stripeSessionId)
+    .catch((err) => {
+      throw parseStripeSessionRetrieveError(err, stripeSessionId);
+    });
+  const orderId = session.metadata?.orderId?.trim();
+  if (!orderId) {
+    return { status: "not_found", fulfillmentSent: false, invoiceIssued: false };
+  }
+
+  if (session.payment_status !== "paid") {
+    return { status: "pending", fulfillmentSent: false, invoiceIssued: false };
+  }
+
+  const fulfillment = await completePaidPracticalCourseOrder(orderId, session);
+  const result = await buildConfirmResult(orderId);
+
+  return {
+    ...result,
+    smartbillError: fulfillment.smartbillError,
+    invoiceIssued: fulfillment.invoiceIssued,
+  };
+}
+
+export async function reconcilePracticalCourseOrder(
+  orderId: string,
+): Promise<ConfirmPaymentResult> {
+  const order = await prisma.practicalCourseOrder.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!order) {
+    return { status: "not_found", fulfillmentSent: false, invoiceIssued: false };
+  }
+
+  if (order.status === "paid") {
+    const fulfillment = await fulfillPaidPracticalCourseOrder(orderId);
+    const result = await buildConfirmResult(orderId);
+    return {
+      ...result,
+      smartbillError: fulfillment.smartbillError,
+      invoiceIssued: fulfillment.invoiceIssued,
+    };
+  }
+
+  if (!order.stripeSessionId) {
+    return { status: "pending", fulfillmentSent: false, invoiceIssued: false };
+  }
+
+  return confirmPracticalCoursePaymentBySession(order.stripeSessionId);
+}
 
 export async function confirmPracticalCoursePayment(
   orderId: string,

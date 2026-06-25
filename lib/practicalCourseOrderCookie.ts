@@ -1,7 +1,7 @@
 export const PRACTICAL_COURSE_ORDER_COOKIE_NAME = "tv_practical_course_order";
 
-/** Durata sesiunii de checkout (2 ore) */
-export const PRACTICAL_COURSE_ORDER_MAX_AGE_SEC = 2 * 60 * 60;
+/** Durata sesiunii de checkout (24 ore — plata poate întârzia) */
+export const PRACTICAL_COURSE_ORDER_MAX_AGE_SEC = 24 * 60 * 60;
 
 function resolveSecret(): string | null {
   const s = process.env.WEBINAR_CONFIRM_SECRET?.trim();

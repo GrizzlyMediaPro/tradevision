@@ -1,11 +1,17 @@
 import Link from "next/link";
-import { getPaidCourseClients } from "@/app/admin/actions/practicalCourse";
+import {
+  getPaidCourseClients,
+  getStuckCourseOrders,
+} from "@/app/admin/actions/practicalCourse";
 import { AdminPracticalCourseClientsClient } from "./AdminPracticalCourseClientsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPracticalCourseClientsPage() {
-  const clients = await getPaidCourseClients();
+  const [clients, stuckOrders] = await Promise.all([
+    getPaidCourseClients(),
+    getStuckCourseOrders(),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#020312] px-4 py-10 text-white sm:px-8">
@@ -20,7 +26,10 @@ export default async function AdminPracticalCourseClientsPage() {
           </p>
         </div>
 
-        <AdminPracticalCourseClientsClient clients={clients} />
+        <AdminPracticalCourseClientsClient
+          clients={clients}
+          stuckOrders={stuckOrders}
+        />
       </div>
     </main>
   );

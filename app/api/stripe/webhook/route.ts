@@ -28,8 +28,13 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const orderId = session.metadata?.orderId;
-    if (orderId) {
+    const orderId = session.metadata?.orderId?.trim();
+    if (!orderId) {
+      console.error(
+        "Stripe webhook: checkout.session.completed fără orderId",
+        session.id,
+      );
+    } else {
       try {
         await completePaidPracticalCourseOrder(orderId, session);
       } catch (err) {

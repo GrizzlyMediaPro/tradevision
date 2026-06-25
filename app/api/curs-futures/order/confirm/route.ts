@@ -3,10 +3,25 @@ import {
   assertOrderAccess,
   getOrderCookieOrderId,
 } from "@/lib/practicalCourseOrder";
-import { confirmPracticalCoursePayment } from "@/lib/practicalCoursePayment";
+import {
+  confirmPracticalCoursePayment,
+  confirmPracticalCoursePaymentBySession,
+} from "@/lib/practicalCoursePayment";
 
-export async function POST() {
+type ConfirmBody = {
+  sessionId?: string;
+};
+
+export async function POST(req: Request) {
   try {
+    const body = (await req.json().catch(() => ({}))) as ConfirmBody;
+    const sessionId = body.sessionId?.trim();
+
+    if (sessionId) {
+      const result = await confirmPracticalCoursePaymentBySession(sessionId);
+      return NextResponse.json(result);
+    }
+
     const orderId = await getOrderCookieOrderId();
     if (!orderId || !(await assertOrderAccess(orderId))) {
       return NextResponse.json({ error: "Acces neautorizat." }, { status: 403 });
