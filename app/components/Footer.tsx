@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
+import { NinjaTraderDisclosures } from "@/app/components/NinjaTraderDisclosures";
 import { FaTelegramPlane, FaInstagram, FaHeart } from "react-icons/fa";
 
 export function Footer() {
@@ -27,8 +27,8 @@ export function Footer() {
           <Link href="/curs" className="hover:text-white transition">
             Curs
           </Link>
-          <Link href={PRACTICAL_COURSE.path} className="hover:text-white transition">
-            Curs Futures
+          <Link href="/ninjatrader" className="hover:text-white transition">
+            NinjaTrader
           </Link>
           <Link href="/contact" className="hover:text-white transition">
             Contact
@@ -67,6 +67,8 @@ export function Footer() {
           </Link>
         </div>
       </div>
+
+      <NinjaTraderDisclosures />
 
       {/* Bottom strip: copyright + made by */}
       <div className="w-full bg-black/60 border-t border-white/10 backdrop-blur-sm">

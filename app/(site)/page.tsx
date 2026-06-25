@@ -8,6 +8,7 @@ import { TestimonialsSection } from "@/app/components/TestimonialsSection";
 import { ScreenshotCarousel } from "@/app/components/ScreenshotCarousel";
 import { BonusesSection } from "@/app/components/BonusesSection";
 import { FaqSection } from "@/app/components/FaqSection";
+import { NinjaTraderHomeSection } from "@/app/components/NinjaTraderHomeSection";
 import { FinalCta } from "@/app/components/FinalCta";
 import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
 import { getLinkWidget } from "@/app/admin/actions/linkwidget";
@@ -50,6 +51,8 @@ export default async function Home() {
       />
 
       <BonusesSection />
+
+      <NinjaTraderHomeSection />
 
       <FaqSection />
 
