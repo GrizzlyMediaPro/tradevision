@@ -11,8 +11,14 @@ export const KINETICK_EOD_URL = "http://www.kinetick.com/end-of-day";
 export const NINJATRADER_MEDIA_KIT_URL =
   "https://ninjatraderecosystem.com/Vendor/Media-Kit.php";
 
-export const NINJATRADER_RISK_DISCLOSURE_URL =
-  "https://ninjatraderecosystem.com/Risk-Disclosure.php";
+/** Pagină proprie de divulgare a riscului (cerință NinjaTrader Ecosystem). */
+export const TRADE_VISION_RISK_DISCLOSURE_PATH = "/declaratie-risc";
+
+export const TESTIMONIAL_DISCLOSURE =
+  "Testimonialele de pe acest site pot să nu fie reprezentative pentru experiența altor clienți și nu constituie o garanție a performanței sau succesului viitor.";
+
+export const LIVE_TRADE_ROOM_DISCLOSURE =
+  "Această prezentare are scop exclusiv educațional, iar opiniile exprimate sunt doar ale prezentatorului. Toate tranzacțiile prezentate trebuie considerate ipotetice și nu ar trebui să te aștepți să le replicezi într-un cont de tranzacționare live.";
 
 export const NINJATRADER_ASSETS = {
   wordmark: "/ninjatrader/NinjaTrader_Wordmark_color_RGB.png",
@@ -24,14 +30,14 @@ export const NINJATRADER_ASSETS = {
 export const NINJATRADER_HOME_LOGOS = {
   ninjaTrader: {
     src: NINJATRADER_ASSETS.wordmark,
-    alt: "NinjaTrader — Get Started",
+    alt: "NinjaTrader — Începe acum",
     href: NINJATRADER_REGISTER_URL,
     width: 480,
     height: 80,
   },
   kinetick: {
     src: NINJATRADER_ASSETS.kinetickLogo,
-    alt: "Kinetick — Recommended Market Data Service",
+    alt: "Kinetick — Serviciu recomandat de date de piață",
     href: KINETICK_URL,
     width: 480,
     height: 160,
@@ -82,7 +88,7 @@ export const NINJATRADER_FREE_BENEFITS = [
 ] as const;
 
 export const FUTURES_RISK_DISCLOSURE =
-  "Futures, foreign currency and options trading contains substantial risk and is not for every investor. An investor could potentially lose all or more than the initial investment. Risk capital is money that can be lost without jeopardizing ones financial security or lifestyle. Only risk capital should be used for trading and only those with sufficient risk capital should consider trading. Past performance is not necessarily indicative of future results.";
+  "Tranzacționarea futures, valutară și a opțiunilor implică riscuri substanțiale și nu este potrivită pentru fiecare investitor. Un investitor ar putea pierde tot capitalul sau mai mult decât investiția inițială. Capitalul de risc este banii care pot fi pierduți fără a-ți pune în pericol securitatea financiară sau stilul de viață. Doar capitalul de risc ar trebui folosit pentru tranzacționare și doar cei cu capital de risc suficient ar trebui să ia în considerare tranzacționarea. Performanțele trecute nu sunt neapărat indicative pentru rezultatele viitoare.";
 
 export const CFTC_HYPOTHETICAL_DISCLOSURE =
-  "CFTC Rules 4.41 - Hypothetical or Simulated performance results have certain limitations, unlike an actual performance record, simulated results do not represent actual trading. Also, since the trades have not been executed, the results may have under-or-over compensated for the impact, if any, of certain market factors, such as lack of liquidity. Simulated trading programs in general are also subject to the fact that they are designed with the benefit of hindsight. No representation is being made that any account will or is likely to achieve profit or losses similar to those shown.";
+  "Regulile CFTC 4.41 — Rezultatele de performanță ipotetice sau simulate au anumite limitări. Spre deosebire de un istoric real de tranzacționare, rezultatele simulate nu reprezintă tranzacționare efectivă. De asemenea, deoarece tranzacțiile nu au fost executate, rezultatele pot fi sub- sau supra-compensate în privința impactului anumitor factori de piață, cum ar fi lipsa lichidității. Programele de tranzacționare simulate sunt, în general, supuse faptului că sunt concepute cu beneficiul retrospectiv. Nu se face nicio reprezentare că vreun cont va obține sau este probabil să obțină profituri sau pierderi similare cu cele prezentate.";

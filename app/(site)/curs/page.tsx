@@ -356,7 +356,7 @@ export default function CursPage() {
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-lg mx-auto">
           Învață trading de la zero cu cursul nostru gratuit. Parcurge fiecare
           lecție în ordine și construiește-ți fundația de care ai nevoie pentru
-          a deveni un trader profitabil.
+          a deveni un trader consistent.
         </p>
       </div>
 

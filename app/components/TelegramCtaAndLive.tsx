@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { LinkWidgetState } from "../admin/actions/linkwidget";
+import { LIVE_TRADE_ROOM_DISCLOSURE } from "@/app/data/ninjaTrader";
 
 type Props = {
   linkWidget?: LinkWidgetState;
@@ -78,14 +79,14 @@ export function TelegramCtaAndLive({ linkWidget }: Props) {
       <div className="w-full rounded-3xl border border-white/10 bg-linear-to-r from-white/4 to-white/2 px-6 py-6 md:px-10 md:py-8 flex flex-col md:flex-row items-stretch gap-8">
         <div className="md:w-1/2 flex flex-col items-start justify-center text-left gap-4">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-purple-300">
-            {linkWidget?.badge ?? "Trading live"}
+            {linkWidget?.badge ?? "Tranzacționare live"}
           </p>
           <h3 className="text-xl md:text-2xl font-semibold text-white">
             {linkWidget?.title ?? "Urmărește-ne live pe YouTube"}
           </h3>
           <p className="text-sm md:text-base text-white/70 max-w-md">
             {linkWidget?.description ??
-              "Alătură-te live-urilor Trade Vision pentru sesiuni de day trading, Q&A și analiză de piață în timp real."}
+              "Alătură-te live-urilor Trade Vision pentru sesiuni de tranzacționare intraday, întrebări și răspunsuri și analiză de piață în timp real."}
           </p>
           {/* Desktop button lângă text */}
           <a
@@ -105,7 +106,7 @@ export function TelegramCtaAndLive({ linkWidget }: Props) {
                   ? "/thumbnail.png"
                   : (linkWidget?.thumbnail || "/thumbnail.png")
               }
-              alt={linkWidget?.title || "Trading live pe YouTube"}
+              alt={linkWidget?.title || "Tranzacționare live pe YouTube"}
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 50vw, 100vw"
@@ -124,6 +125,9 @@ export function TelegramCtaAndLive({ linkWidget }: Props) {
             {linkWidget?.buttonText ?? "Vezi live-ul"}
           </a>
         </div>
+        <p className="text-[10px] md:text-[11px] leading-relaxed text-white/45 max-w-3xl">
+          {LIVE_TRADE_ROOM_DISCLOSURE}
+        </p>
       </div>
     </div>
   );

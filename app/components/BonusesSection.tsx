@@ -23,7 +23,7 @@ const bonuses = [
     iconColor: "text-yellow-300",
     title: "Discounturi exclusive",
     description:
-      "60% OFF la Top One, 30% OFF la Tradeify. Economisești sute de dolari la finanțare.",
+      "60% reducere la Top One, 30% reducere la Tradeify. Economisești sute de dolari la finanțare.",
     cta: { label: "Economii reale", href: "/firme" },
   },
 ];

@@ -16,7 +16,7 @@ export function NinjaTraderHomeSection() {
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-4 max-w-2xl text-xs md:text-sm text-white/55 leading-relaxed">
             NinjaTrader este gratuit pentru charting, simulare și multe altele.
-            Clienții pot accesa date futures, forex și EOD fără costuri suplimentare.
+            Clienții pot accesa date futures, valutar și la închidere de zi fără costuri suplimentare.
           </p>
         </div>
 

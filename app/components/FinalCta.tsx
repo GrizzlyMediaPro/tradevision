@@ -47,10 +47,10 @@ export function FinalCta() {
 
       <div className="relative w-full max-w-[1250px] mx-auto px-4 pt-20 pb-16 flex flex-col items-center text-center gap-6">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
-          Gata să faci primii pași în trading?
+          Gata să faci primii pași în tranzacționare?
         </h2>
         <p className="text-sm md:text-base text-white/55 max-w-lg">
-          Abonează-te și primești noutăți despre trading, alerte de piață și
+          Abonează-te și primești noutăți despre tranzacționare, alerte de piață și
           conținut educativ direct pe email.
         </p>
 
@@ -63,7 +63,7 @@ export function FinalCta() {
               Te-ai înscris cu succes!
             </p>
             <p className="text-xs text-white/45">
-              O să primești pe acest email noutăți legate de trading și conținut educativ.
+              O să primești pe acest email noutăți legate de tranzacționare și conținut educativ.
             </p>
           </div>
         ) : (

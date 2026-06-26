@@ -34,16 +34,16 @@ const benefits = [
   {
     icon: FaYoutube,
     iconColor: "text-red-400",
-    title: "Sesiuni live de trading",
+    title: "Sesiuni live de tranzacționare",
     description:
       "Cristi tranzacționează live pe YouTube. Vezi cum ia decizii, cum gestionează riscul și cum reacționează la mișcări.",
   },
   {
     icon: FaPercentage,
     iconColor: "text-yellow-300",
-    title: "Ghid prop firms + discounturi",
+    title: "Ghid firme de finanțare + reduceri",
     description:
-      "Comparații obiective între firmele de finanțare. Coduri exclusive: 60% OFF la Top One, 30% OFF la Tradeify.",
+      "Comparații obiective între firmele de finanțare. Coduri exclusive: 60% reducere la Top One, 30% reducere la Tradeify.",
   },
   {
     icon: FaRoute,

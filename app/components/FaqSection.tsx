@@ -7,7 +7,7 @@ const faqs = [
   {
     question: "Chiar e gratuit? Care e treaba?",
     answer:
-      "Da, 100% gratuit. Fără card, fără trial, fără condiții. Un curs complet pentru care alții ți-ar fi cerut mii de euro noi îl oferim complet gratis pentru a-ți face o imagine clară despre ce înseamnă să fii trader.",
+      "Da, 100% gratuit. Fără card, fără perioadă de probă, fără condiții. Un curs complet pentru care alții ți-ar fi cerut mii de euro noi îl oferim complet gratis pentru a-ți face o imagine clară despre ce înseamnă să fii trader.",
   },
   {
     question: "Am nevoie de experiență anterioară?",
@@ -25,14 +25,14 @@ const faqs = [
       "Vom lansa un program avansat în vară pentru cei care vor să aprofundeze. Dar cursul gratuit e complet în sine. Nu primești mailuri agresive de vânzare. Dacă vrei doar cursul gratuit, perfect.",
   },
   {
-    question: "Tradingul nu e riscant?",
+    question: "Tranzacționarea nu e riscantă?",
     answer:
-      "Da, tradingul implică riscuri reale. Tocmai de asta cursul pune accent pe managementul riscului și pe psihologie. Nu promitem că vei câștiga bani. Promitem că vei înțelege piața și vei ști cum să abordezi tradingul corect. Restul depinde de tine.",
+      "Da, tranzacționarea implică riscuri reale. Tocmai de asta cursul pune accent pe managementul riscului și pe psihologie. Nu promitem că vei câștiga bani. Promitem că vei înțelege piața și vei ști cum să abordezi tranzacționarea corect. Restul depinde de tine.",
   },
   {
     question: "Ce piețe acoperiți?",
     answer:
-      "Focus pe piața futures (NQ, ES, indici), dar conceptele se aplică peste tot: forex, crypto, acțiuni. Principiile de analiză și risk management sunt universale.",
+      "Accent pe piața futures (NQ, ES, indici), dar conceptele se aplică peste tot: valutar, criptomonede, acțiuni. Principiile de analiză și management al riscului sunt universale.",
   },
 ];
 
@@ -96,7 +96,7 @@ export function FaqSection() {
         {/* Disclaimer */}
         <div className="w-full max-w-[1250px] rounded-2xl border border-white/8 bg-white/2 px-6 py-5 md:px-8 md:py-6">
           <p className="text-[11px] md:text-xs text-white/35 leading-relaxed text-center">
-            Tradingul implică riscuri semnificative și nu este potrivit pentru
+            Tranzacționarea implică riscuri semnificative și nu este potrivită pentru
             toți investitorii. Performanțele trecute nu garantează rezultate
             viitoare. Conținutul oferit are caracter educațional și nu constituie
             sfat financiar personalizat. Tranzacționează doar cu bani pe care îți

@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
   CFTC_HYPOTHETICAL_DISCLOSURE,
   FUTURES_RISK_DISCLOSURE,
-  NINJATRADER_RISK_DISCLOSURE_URL,
+  TRADE_VISION_RISK_DISCLOSURE_PATH,
 } from "@/app/data/ninjaTrader";
 
 export function NinjaTraderDisclosures() {
@@ -12,12 +12,10 @@ export function NinjaTraderDisclosures() {
         <p className="text-[10px] md:text-[11px] leading-relaxed text-white/45 text-center">
           {FUTURES_RISK_DISCLOSURE}{" "}
           <Link
-            href={NINJATRADER_RISK_DISCLOSURE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={TRADE_VISION_RISK_DISCLOSURE_PATH}
             className="text-white/60 underline underline-offset-2 hover:text-white/80 transition"
           >
-            View Full Risk Disclosure
+            Vezi declarația completă de risc
           </Link>
         </p>
         <p className="text-[10px] md:text-[11px] leading-relaxed text-white/45 text-center">

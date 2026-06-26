@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
+import { TESTIMONIAL_DISCLOSURE } from "@/app/data/ninjaTrader";
 
 const testimonials = [
   { videoId: "rouZMXnAUnU" },
@@ -18,7 +19,7 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
       <div className="relative w-full aspect-9/16">
         <iframe
           src={`https://www.youtube.com/embed/${item.videoId}${playing ? "?autoplay=1" : ""}`}
-          title={`Testimonial video comunitate (${item.videoId})`}
+          title={`Mărturie video din comunitate (${item.videoId})`}
           className="absolute inset-0 h-full w-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -28,7 +29,7 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
           <button
             type="button"
             onClick={() => setPlaying(true)}
-            aria-label="Redă testimonial video"
+            aria-label="Redă mărturie video"
             className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 cursor-pointer transition hover:bg-black/40"
           >
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-yellow-400 via-amber-300 to-yellow-500 shadow-[0_12px_30px_rgba(250,204,21,0.4)] hover:brightness-110 transition">
@@ -52,7 +53,7 @@ export function TestimonialsSection() {
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-5 text-sm md:text-base text-white/55 max-w-lg mx-auto">
             Testimoniale video de la membrii comunității care au parcurs cursul
-            și au început tradingul.
+            și au început tranzacționarea.
           </p>
         </div>
 
@@ -61,6 +62,10 @@ export function TestimonialsSection() {
             <TestimonialCard key={item.videoId} item={item} />
           ))}
         </div>
+
+        <p className="text-[10px] md:text-[11px] leading-relaxed text-white/45 max-w-3xl mx-auto text-center">
+          {TESTIMONIAL_DISCLOSURE}
+        </p>
       </div>
     </section>
   );

@@ -60,6 +60,12 @@ export function Footer() {
             Politică de Cookies
           </Link>
           <Link
+            href="/declaratie-risc"
+            className="hover:text-white transition"
+          >
+            Declarație de risc
+          </Link>
+          <Link
             href="/politica-confidentialitate"
             className="hover:text-white transition"
           >
@@ -90,6 +96,12 @@ export function Footer() {
               Politica de cookies
             </Link>
             <Link
+              href="/declaratie-risc"
+              className="hover:text-white/90 transition underline-offset-2 hover:underline"
+            >
+              Declarație de risc
+            </Link>
+            <Link
               href="/politica-confidentialitate"
               className="hover:text-white/90 transition underline-offset-2 hover:underline"
             >
@@ -97,7 +109,7 @@ export function Footer() {
             </Link>
           </nav>
           <div className="text-center text-[11px] md:text-xs text-white/70 flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3">
-            <span>© 2026 TradeVision. All Rights Reserved.</span>
+            <span>© 2026 TradeVision. Toate drepturile rezervate.</span>
             <span className="hidden md:inline-block">|</span>
             <div className="inline-flex items-center gap-1.5">
               <span>Făcut cu</span>
