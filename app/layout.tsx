@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { roRO } from "@clerk/localizations";
 import "./globals.css";
 import { SiteChrome } from "./components/SiteChrome";
 
@@ -79,7 +80,9 @@ export default function RootLayout({
     </html>
   );
   return clerkKey ? (
-    <ClerkProvider publishableKey={clerkKey}>{content}</ClerkProvider>
+    <ClerkProvider publishableKey={clerkKey} localization={roRO}>
+      {content}
+    </ClerkProvider>
   ) : (
     content
   );

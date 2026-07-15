@@ -185,3 +185,26 @@ model PracticalCourseOrder {
   @@index([status])
   @@index([createdAt(sort: Desc)])
 }
+
+// —— Firme partenere afișate pe pagina Payout Tracker ——
+model TrackerPartnerLink {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// —— Snapshot-uri zilnice Payout Tracker ——
+model PayoutTrackerSnapshot {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId  String
+  snapshotDate String
+  data         Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([clerkUserId, snapshotDate])
+  @@index([clerkUserId, snapshotDate(sort: Desc)])
+}

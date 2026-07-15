@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { SignedIn, UserButton } from "@clerk/nextjs";
+import { clerkUserButtonAppearance } from "@/lib/clerkAppearance";
 import {
   FaTelegramPlane,
   FaInstagram,
@@ -105,6 +107,12 @@ export function Navbar() {
             >
               <FaTelegramPlane className="h-4 w-4" />
             </a>
+            {/* Avatar Clerk (doar autentificat) */}
+            <SignedIn>
+              <div className="navbar-user-button inline-flex size-9 shrink-0 items-center justify-center md:size-11">
+                <UserButton appearance={clerkUserButtonAppearance} />
+              </div>
+            </SignedIn>
             {/* Hamburger */}
             <button
               className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white hover:bg-white/10 transition cursor-pointer overflow-hidden"
@@ -152,6 +160,12 @@ export function Navbar() {
               <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
               <span className="uppercase">Alătură-te comunității</span>
             </a>
+            {/* Avatar Clerk (doar autentificat) */}
+            <SignedIn>
+              <div className="navbar-user-button inline-flex size-9 shrink-0 items-center justify-center md:size-11">
+                <UserButton appearance={clerkUserButtonAppearance} />
+              </div>
+            </SignedIn>
           </div>
         </div>
       </div>
