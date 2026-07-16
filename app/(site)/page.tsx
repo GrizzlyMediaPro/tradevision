@@ -1,5 +1,6 @@
 import { Hero } from "@/app/components/Hero";
 import { StatsBar } from "@/app/components/StatsBar";
+import { TrackerAnnouncement } from "@/app/components/TrackerAnnouncement";
 import { ProblemSection } from "@/app/components/ProblemSection";
 import { BenefitsSection } from "@/app/components/BenefitsSection";
 import { CurriculumSection } from "@/app/components/CurriculumSection";
@@ -20,6 +21,8 @@ export default async function Home() {
       <Hero />
 
       <StatsBar />
+
+      <TrackerAnnouncement />
 
       <ProblemSection />
 

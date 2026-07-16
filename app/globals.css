@@ -30,3 +30,24 @@ body {
   animation-name: billingAutofillStart;
   animation-duration: 0.01s;
 }
+
+/* Navbar: avatar Clerk la fel de mare ca iconițele sociale (h-9 / h-11) */
+.navbar-user-button .cl-userButtonBox,
+.navbar-user-button .cl-userButtonTrigger,
+.navbar-user-button .cl-userButtonAvatarBox {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  min-height: 2.25rem !important;
+}
+
+@media (min-width: 768px) {
+  .navbar-user-button .cl-userButtonBox,
+  .navbar-user-button .cl-userButtonTrigger,
+  .navbar-user-button .cl-userButtonAvatarBox {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    min-width: 2.75rem !important;
+    min-height: 2.75rem !important;
+  }
+}

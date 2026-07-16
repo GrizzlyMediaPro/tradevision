@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { SignedIn, UserButton } from "@clerk/nextjs";
+import { clerkUserButtonAppearance } from "@/lib/clerkAppearance";
 import {
   FaTelegramPlane,
   FaInstagram,
@@ -20,12 +22,12 @@ export function Navbar() {
     <>
       {/* Announcement bar — sticky la scroll */}
       <Link
-        href="/curs"
+        href="/tracking"
         className="sticky top-0 z-[60] block w-full bg-purple-600 hover:bg-purple-500 transition"
       >
         <div className="w-full max-w-[1250px] mx-auto flex items-center justify-center gap-2 px-4 py-2 text-[11px] sm:text-xs font-medium text-white">
           <span className="text-center">
-            Cursul gratuit e disponibil acum — înscrie-te și primești instant accesul
+            Payout Tracker e disponibil acum — urmărește profitul și payout-urile gratuit
           </span>
           <FaArrowRight className="h-3 w-3 shrink-0" />
         </div>
@@ -64,12 +66,12 @@ export function Navbar() {
             Firme
           </Link>
           <Link
-            href="/curs"
+            href="/tracking"
             className={`hover:text-white transition ${
-              pathname === "/curs" ? "text-yellow-300" : "text-zinc-200"
+              pathname.startsWith("/tracking") ? "text-yellow-300" : "text-zinc-200"
             }`}
           >
-            Curs
+            Payout Tracker
           </Link>
           <Link
             href="/contact"
@@ -105,6 +107,12 @@ export function Navbar() {
             >
               <FaTelegramPlane className="h-4 w-4" />
             </a>
+            {/* Avatar Clerk (doar autentificat) */}
+            <SignedIn>
+              <div className="navbar-user-button inline-flex size-9 shrink-0 items-center justify-center md:size-11">
+                <UserButton appearance={clerkUserButtonAppearance} />
+              </div>
+            </SignedIn>
             {/* Hamburger */}
             <button
               className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/40 text-white hover:bg-white/10 transition cursor-pointer overflow-hidden"
@@ -152,6 +160,12 @@ export function Navbar() {
               <FaTelegramPlane className="h-5 w-5 md:h-5 md:w-5" />
               <span className="uppercase">Alătură-te comunității</span>
             </a>
+            {/* Avatar Clerk (doar autentificat) */}
+            <SignedIn>
+              <div className="navbar-user-button inline-flex size-9 shrink-0 items-center justify-center md:size-11">
+                <UserButton appearance={clerkUserButtonAppearance} />
+              </div>
+            </SignedIn>
           </div>
         </div>
       </div>
@@ -180,11 +194,11 @@ export function Navbar() {
             Firme
           </Link>
           <Link
-            href="/curs"
+            href="/tracking"
             className="py-2 border-b border-white/5"
             onClick={() => setMenuOpen(false)}
           >
-            Curs
+            Payout Tracker
           </Link>
           <Link
             href="/contact"

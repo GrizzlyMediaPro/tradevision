@@ -11,6 +11,8 @@ import {
   FaCog,
   FaClock,
   FaEuroSign,
+  FaUsers,
+  FaLink,
 } from "react-icons/fa";
 
 const menuItems = [
@@ -101,6 +103,28 @@ const menuItems = [
     iconBg: "bg-amber-500/15 border-amber-400/30",
     iconColor: "text-amber-300",
     shadow: "shadow-amber-500/20",
+  },
+  {
+    title: "Utilizatori",
+    description:
+      "Vezi toți utilizatorii înregistrați pe site — caută, filtrează și sortează conturile.",
+    icon: FaUsers,
+    href: "/admin/users",
+    color: "from-teal-500 to-teal-600",
+    iconBg: "bg-teal-500/15 border-teal-400/30",
+    iconColor: "text-teal-300",
+    shadow: "shadow-teal-500/20",
+  },
+  {
+    title: "Firme Tracker",
+    description:
+      "Gestionează firmele și link-urile de afiliere afișate pe pagina Payout Tracker.",
+    icon: FaLink,
+    href: "/admin/tracking-firms",
+    color: "from-pink-500 to-pink-600",
+    iconBg: "bg-pink-500/15 border-pink-400/30",
+    iconColor: "text-pink-300",
+    shadow: "shadow-pink-500/20",
   },
   {
     title: "Formular Contact",

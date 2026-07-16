@@ -10,7 +10,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.13.3",
     "@clerk/nextjs": "^6.39.0",
+    "@clerk/themes": "^2.4.57",
     "@prisma/client": "^6.19.2",
     "@react-pdf/renderer": "^4.5.1",
     "@stripe/stripe-js": "^9.8.0",
