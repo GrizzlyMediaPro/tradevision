@@ -80,7 +80,12 @@ export default function RootLayout({
     </html>
   );
   return clerkKey ? (
-    <ClerkProvider publishableKey={clerkKey} localization={roRO}>
+    <ClerkProvider
+      publishableKey={clerkKey}
+      localization={roRO}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+    >
       {content}
     </ClerkProvider>
   ) : (
