@@ -22,12 +22,12 @@ export function Navbar() {
     <>
       {/* Announcement bar — sticky la scroll */}
       <Link
-        href="/curs"
+        href="/tracking"
         className="sticky top-0 z-[60] block w-full bg-purple-600 hover:bg-purple-500 transition"
       >
         <div className="w-full max-w-[1250px] mx-auto flex items-center justify-center gap-2 px-4 py-2 text-[11px] sm:text-xs font-medium text-white">
           <span className="text-center">
-            Cursul gratuit e disponibil acum — înscrie-te și primești instant accesul
+            Payout Tracker e disponibil acum — urmărește profitul și payout-urile gratuit
           </span>
           <FaArrowRight className="h-3 w-3 shrink-0" />
         </div>
@@ -66,12 +66,12 @@ export function Navbar() {
             Firme
           </Link>
           <Link
-            href="/curs"
+            href="/tracking"
             className={`hover:text-white transition ${
-              pathname === "/curs" ? "text-yellow-300" : "text-zinc-200"
+              pathname.startsWith("/tracking") ? "text-yellow-300" : "text-zinc-200"
             }`}
           >
-            Curs
+            Payout Tracker
           </Link>
           <Link
             href="/contact"
@@ -194,11 +194,11 @@ export function Navbar() {
             Firme
           </Link>
           <Link
-            href="/curs"
+            href="/tracking"
             className="py-2 border-b border-white/5"
             onClick={() => setMenuOpen(false)}
           >
-            Curs
+            Payout Tracker
           </Link>
           <Link
             href="/contact"

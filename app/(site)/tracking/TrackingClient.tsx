@@ -44,6 +44,8 @@ const COLS = [
   "",
 ];
 
+const BALANCE_OPTIONS = [25_000, 50_000, 100_000, 150_000, 300_000] as const;
+
 const GRID_COLS = "1.2fr 1fr 1fr 1fr 0.8fr 1fr 170px 34px";
 
 function todayIso(): string {
@@ -670,6 +672,10 @@ export function TrackingClient({
                         const r = ramas(acc);
                         const done =
                           r <= 0 && (Number(acc.target) || 0) > 0;
+                        const balanta = Number(acc.balanta) || 0;
+                        const knownBalance = (
+                          BALANCE_OPTIONS as readonly number[]
+                        ).includes(balanta);
                         return (
                           <div
                             key={ai}
@@ -687,14 +693,30 @@ export function TrackingClient({
                               }
                               className={`${inputBase} font-medium`}
                             />
-                            <MoneyInput
-                              value={acc.balanta || 0}
-                              onChange={(v) =>
+                            <select
+                              value={balanta > 0 ? balanta : ""}
+                              onChange={(e) =>
                                 update((d) => {
-                                  d.firms[fi].accounts[ai].balanta = v;
+                                  d.firms[fi].accounts[ai].balanta =
+                                    Number(e.target.value) || 0;
                                 })
                               }
-                            />
+                              className={`${inputBase} cursor-pointer text-center tabular-nums [&>option]:bg-zinc-900`}
+                            >
+                              <option value="" disabled>
+                                Alege
+                              </option>
+                              {!knownBalance && balanta > 0 && (
+                                <option value={balanta}>
+                                  {fmt(balanta)} $
+                                </option>
+                              )}
+                              {BALANCE_OPTIONS.map((v) => (
+                                <option key={v} value={v}>
+                                  {fmt(v)} $
+                                </option>
+                              ))}
+                            </select>
                             <MoneyInput
                               value={acc.actual}
                               onChange={(v) =>
