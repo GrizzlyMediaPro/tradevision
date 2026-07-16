@@ -5,7 +5,7 @@ import {
   WEBINAR_CONFIRM_COOKIE_NAME,
 } from "@/lib/webinarConfirmCookie";
 
-const isProtectedRoute = createRouteMatcher(["/admin(.*)", "/tracking(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/admin(.*)", "/payout(.*)"]);
 
 export default clerkMiddleware(
   async (auth, req) => {

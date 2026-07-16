@@ -31,7 +31,7 @@ export async function createTrackerPartner(data: {
     data: { name, url, order: count },
   });
   revalidatePath("/admin/tracking-firms");
-  revalidatePath("/tracking");
+  revalidatePath("/payout");
 }
 
 export async function updateTrackerPartner(
@@ -48,12 +48,12 @@ export async function updateTrackerPartner(
     data: { name, url },
   });
   revalidatePath("/admin/tracking-firms");
-  revalidatePath("/tracking");
+  revalidatePath("/payout");
 }
 
 export async function deleteTrackerPartner(id: string) {
   await requireAdmin();
   await prisma.trackerPartnerLink.delete({ where: { id } });
   revalidatePath("/admin/tracking-firms");
-  revalidatePath("/tracking");
+  revalidatePath("/payout");
 }

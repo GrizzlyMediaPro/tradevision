@@ -78,7 +78,7 @@ export function TrackerAnnouncement() {
           {/* CTA */}
           <div className="flex flex-col items-center gap-3">
             <Link
-              href="/tracking"
+              href="/payout"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer"
             >
               Încearcă Payout Tracker

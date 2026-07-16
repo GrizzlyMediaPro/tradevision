@@ -22,7 +22,7 @@ export function Navbar() {
     <>
       {/* Announcement bar — sticky la scroll */}
       <Link
-        href="/tracking"
+        href="/payout"
         className="sticky top-0 z-[60] block w-full bg-purple-600 hover:bg-purple-500 transition"
       >
         <div className="w-full max-w-[1250px] mx-auto flex items-center justify-center gap-2 px-4 py-2 text-[11px] sm:text-xs font-medium text-white">
@@ -66,9 +66,9 @@ export function Navbar() {
             Firme
           </Link>
           <Link
-            href="/tracking"
+            href="/payout"
             className={`hover:text-white transition ${
-              pathname.startsWith("/tracking") ? "text-yellow-300" : "text-zinc-200"
+              pathname.startsWith("/payout") ? "text-yellow-300" : "text-zinc-200"
             }`}
           >
             Payout Tracker
@@ -194,7 +194,7 @@ export function Navbar() {
             Firme
           </Link>
           <Link
-            href="/tracking"
+            href="/payout"
             className="py-2 border-b border-white/5"
             onClick={() => setMenuOpen(false)}
           >

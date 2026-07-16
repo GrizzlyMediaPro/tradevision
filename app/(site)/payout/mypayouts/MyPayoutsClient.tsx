@@ -86,7 +86,7 @@ export function MyPayoutsClient() {
 
     async function load() {
       try {
-        const response = await fetch("/api/tracking/history?full=1", {
+        const response = await fetch("/api/payout/history?full=1", {
           cache: "no-store",
         });
         const result = (await response.json()) as {
@@ -230,7 +230,7 @@ export function MyPayoutsClient() {
         {/* Filtre + back */}
         <div className="w-full flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/tracking"
+            href="/payout"
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-xs font-semibold text-white/85 hover:bg-white/10 transition cursor-pointer"
           >
             <FaArrowLeft className="h-2.5 w-2.5" />
@@ -334,7 +334,7 @@ export function MyPayoutsClient() {
                 return (
                   <Link
                     key={item.date}
-                    href={`/tracking?date=${item.date}`}
+                    href={`/payout?date=${item.date}`}
                     className="group flex flex-wrap items-center gap-x-5 gap-y-1.5 border-b border-white/5 px-1 py-3 last:border-b-0 transition hover:bg-white/3"
                   >
                     <span className="w-[120px] text-sm font-medium text-white">
