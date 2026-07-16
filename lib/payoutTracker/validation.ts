@@ -25,6 +25,7 @@ function isValidAccount(value: unknown): value is PayoutTrackerAccount {
     isNonNegativeNumber(value.actual) &&
     isNonNegativeNumber(value.target) &&
     isNonNegativeNumber(value.zile) &&
+    (value.gata === undefined || typeof value.gata === "boolean") &&
     typeof value.payout === "boolean" &&
     (value.payoutSuma === undefined ||
       isNonNegativeNumber(value.payoutSuma))

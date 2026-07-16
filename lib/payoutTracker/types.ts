@@ -4,6 +4,7 @@ export type PayoutTrackerAccount = {
   actual: number;
   target: number;
   zile: number;
+  gata?: boolean;
   payout: boolean;
   payoutSuma?: number;
 };

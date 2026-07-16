@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/tracking",
+        destination: "/payout",
+        permanent: true,
+      },
+      {
+        source: "/tracking/:path*",
+        destination: "/payout/:path*",
+        permanent: true,
+      },
+      {
         source: "/curs-practic",
         destination: "/curs-futures",
         permanent: true,

@@ -39,7 +39,7 @@ const COLS = [
   "Profit actual",
   "Profit necesar",
   "Zile rămase",
-  "Mai ai nevoie de",
+  "Gata",
   "Gata de payout",
   "",
 ];
@@ -87,10 +87,6 @@ function defaultState(date = todayIso()): TrackerState {
 
 function fmt(n: number): string {
   return (Number(n) || 0).toLocaleString("ro-RO");
-}
-
-function ramas(acc: Account): number {
-  return Math.max(0, (Number(acc.target) || 0) - (Number(acc.actual) || 0));
 }
 
 const inputBase =
@@ -167,8 +163,8 @@ function HowItWorks() {
               profitul necesar pentru payout și zilele profitabile rămase.
             </li>
             <li>
-              Coloana „Mai ai nevoie de” se calculează automat (necesar −
-              actual) și devine verde când ajungi la 0.
+              Coloana „Gata” o bifezi tu când ai atins profitul necesar —
+              bifată, contul apare marcat cu „Gata ✓”.
             </li>
             <li>
               „Gata de payout” o bifezi tu manual — după bifare apare un câmp
@@ -213,7 +209,7 @@ export function TrackingClient({
   const [error, setError] = useState<string | null>(null);
   const [localMigration, setLocalMigration] = useState<TrackerState | null>(null);
   const fetchHistory = useCallback(async () => {
-    const response = await fetch("/api/tracking/history", { cache: "no-store" });
+    const response = await fetch("/api/payout/history", { cache: "no-store" });
     const result = (await response.json()) as {
       snapshots?: PayoutTrackerHistoryItem[];
       error?: string;
@@ -226,7 +222,7 @@ export function TrackingClient({
 
   const fetchSnapshot = useCallback(async (date: string) => {
     const response = await fetch(
-      `/api/tracking?date=${encodeURIComponent(date)}`,
+      `/api/payout?date=${encodeURIComponent(date)}`,
       { cache: "no-store" },
     );
     const result = (await response.json()) as {
@@ -343,7 +339,7 @@ export function TrackingClient({
   );
 
   const saveSnapshot = useCallback(async (snapshot: TrackerState) => {
-    const response = await fetch("/api/tracking", {
+    const response = await fetch("/api/payout", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -454,7 +450,7 @@ export function TrackingClient({
           </button>
 
           <Link
-            href="/tracking/mypayouts"
+            href="/payout/mypayouts"
             className="inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-6 py-2 text-xs font-semibold text-white hover:brightness-110 transition cursor-pointer"
           >
             My Payouts
@@ -669,9 +665,6 @@ export function TrackingClient({
 
                     <div className="mt-2 flex flex-col">
                       {firm.accounts.map((acc, ai) => {
-                        const r = ramas(acc);
-                        const done =
-                          r <= 0 && (Number(acc.target) || 0) > 0;
                         const balanta = Number(acc.balanta) || 0;
                         const knownBalance = (
                           BALANCE_OPTIONS as readonly number[]
@@ -746,13 +739,32 @@ export function TrackingClient({
                               }
                               className={`${inputBase} text-center tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                             />
-                            <span
-                              className={`text-sm font-semibold tabular-nums text-center whitespace-nowrap ${
-                                done ? "text-emerald-400" : "text-white/85"
-                              }`}
-                            >
-                              {done ? "Gata ✓" : `${fmt(r)} $`}
-                            </span>
+                            <label className="flex items-center justify-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={!!acc.gata}
+                                onChange={(e) =>
+                                  update((d) => {
+                                    d.firms[fi].accounts[ai].gata =
+                                      e.target.checked;
+                                  })
+                                }
+                                className="peer sr-only"
+                              />
+                              <span className="flex h-5 w-5 items-center justify-center rounded-md border border-white/20 bg-black/40 text-transparent transition-all duration-150 peer-checked:border-emerald-400/60 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-[0_0_12px_rgba(16,185,129,0.45)] peer-hover:border-white/40 peer-checked:peer-hover:border-emerald-300">
+                                <svg
+                                  className="h-3 w-3"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth={3.5}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                              </span>
+                            </label>
                             <div className="flex min-w-0 flex-col items-stretch gap-1.5">
                               <button
                                 type="button"
