@@ -20,19 +20,39 @@ export async function GET(req: Request) {
   }
 
   try {
-    const snapshot = await prisma.payoutTrackerSnapshot.findUnique({
+    const exact = await prisma.payoutTrackerSnapshot.findUnique({
       where: {
         clerkUserId_snapshotDate: {
           clerkUserId: userId,
           snapshotDate: date,
         },
       },
-      select: { data: true, updatedAt: true },
+      select: { data: true, updatedAt: true, snapshotDate: true },
+    });
+
+    if (exact) {
+      return NextResponse.json({
+        data: exact.data,
+        updatedAt: exact.updatedAt.toISOString(),
+        carriedFrom: null,
+      });
+    }
+
+    // Fără salvare pe ziua cerută: preia ultima salvare anterioară
+    // (ziua rămâne „ca ultima salvare” până la următorul Salvează).
+    const previous = await prisma.payoutTrackerSnapshot.findFirst({
+      where: {
+        clerkUserId: userId,
+        snapshotDate: { lt: date },
+      },
+      orderBy: { snapshotDate: "desc" },
+      select: { data: true, updatedAt: true, snapshotDate: true },
     });
 
     return NextResponse.json({
-      data: snapshot?.data ?? null,
-      updatedAt: snapshot?.updatedAt.toISOString() ?? null,
+      data: previous?.data ?? null,
+      updatedAt: previous?.updatedAt.toISOString() ?? null,
+      carriedFrom: previous?.snapshotDate ?? null,
     });
   } catch (error) {
     console.error("Eroare la citirea Payout Tracker", error);

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
+  FaChartLine,
   FaChevronLeft,
   FaSearch,
   FaSort,
@@ -178,9 +179,9 @@ export default function AdminUsersPage() {
         </p>
       ) : (
         <div className="w-full overflow-x-auto">
-          <div className="min-w-[900px]">
+          <div className="min-w-[980px]">
             {/* Header */}
-            <div className="grid grid-cols-[2fr_2fr_1.4fr_1.4fr_1fr] gap-4 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-wider text-white/60">
+            <div className="grid grid-cols-[2fr_2fr_1.3fr_1.3fr_0.9fr_0.9fr] gap-4 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-wider text-white/60">
               <button
                 onClick={() => handleSort("name")}
                 className="flex items-center gap-1.5 cursor-pointer"
@@ -206,6 +207,7 @@ export default function AdminUsersPage() {
                 Ultimul login <SortIcon column="lastSignInAt" />
               </button>
               <span>Status</span>
+              <span>Tracker</span>
             </div>
 
             {/* Rows */}
@@ -218,7 +220,7 @@ export default function AdminUsersPage() {
                 visible.map((user) => (
                   <div
                     key={user.id}
-                    className="grid grid-cols-[2fr_2fr_1.4fr_1.4fr_1fr] gap-4 items-center px-6 py-3.5 rounded-2xl border border-white/10 bg-linear-to-r from-white/4 to-white/2"
+                    className="grid grid-cols-[2fr_2fr_1.3fr_1.3fr_0.9fr_0.9fr] gap-4 items-center px-6 py-3.5 rounded-2xl border border-white/10 bg-linear-to-r from-white/4 to-white/2"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <Image
@@ -277,6 +279,17 @@ export default function AdminUsersPage() {
                           Activ
                         </span>
                       )}
+                    </div>
+
+                    <div>
+                      <Link
+                        href={`/admin/users/${user.id}/payout`}
+                        title="Vezi datele Payout Tracker"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-500/10 px-3 py-1.5 text-[11px] font-medium text-teal-200 hover:bg-teal-500/20 transition cursor-pointer"
+                      >
+                        <FaChartLine className="h-3 w-3" />
+                        Vezi
+                      </Link>
                     </div>
                   </div>
                 ))

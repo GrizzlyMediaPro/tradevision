@@ -89,6 +89,16 @@ function fmt(n: number): string {
   return (Number(n) || 0).toLocaleString("ro-RO");
 }
 
+function formatRoDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return new Date(y, m - 1, d).toLocaleDateString("ro-RO", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 const inputBase =
   "w-full min-w-0 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none transition focus:border-purple-400/60";
 
@@ -180,8 +190,9 @@ function HowItWorks() {
             </li>
             <li>
               După modificări apasă „Salvează” — datele sunt păstrate în
-              contul tău. În „My Payouts” găsești statistici, istoricul
-              salvărilor și exportul în CSV.
+              contul tău. Zilele fără salvare preiau automat ultima zi salvată,
+              până la următoarea salvare. În „My Payouts” găsești statistici,
+              istoricul salvărilor și exportul în CSV.
             </li>
           </ul>
         </div>
@@ -207,6 +218,7 @@ export function TrackingClient({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [carriedFrom, setCarriedFrom] = useState<string | null>(null);
   const [localMigration, setLocalMigration] = useState<TrackerState | null>(null);
   const fetchHistory = useCallback(async () => {
     const response = await fetch("/api/payout/history", { cache: "no-store" });
@@ -227,6 +239,7 @@ export function TrackingClient({
     );
     const result = (await response.json()) as {
       data?: unknown;
+      carriedFrom?: string | null;
       error?: string;
     };
     if (!response.ok) {
@@ -235,9 +248,15 @@ export function TrackingClient({
     if (result.data !== null && !isValidTrackerData(result.data)) {
       throw new Error("Datele salvate au un format invalid.");
     }
-    return result.data === null
-      ? defaultState(date)
-      : { date, firms: result.data.firms };
+    const source =
+      typeof result.carriedFrom === "string" ? result.carriedFrom : null;
+    if (result.data === null) {
+      return { state: defaultState(date), carriedFrom: null };
+    }
+    return {
+      state: { date, firms: result.data.firms },
+      carriedFrom: source,
+    };
   }, []);
 
   useEffect(() => {
@@ -246,12 +265,13 @@ export function TrackingClient({
     async function initialize() {
       const date = initialDate ?? todayIso();
       try {
-        const [snapshots, snapshot] = await Promise.all([
+        const [snapshots, loaded] = await Promise.all([
           fetchHistory(),
           fetchSnapshot(date),
         ]);
         if (cancelled) return;
-        setState(snapshot);
+        setState(loaded.state);
+        setCarriedFrom(loaded.carriedFrom);
 
         if (
           snapshots.length === 0 &&
@@ -270,6 +290,7 @@ export function TrackingClient({
       } catch (loadError) {
         if (cancelled) return;
         setState(defaultState(date));
+        setCarriedFrom(null);
         setError(
           loadError instanceof Error
             ? loadError.message
@@ -322,7 +343,9 @@ export function TrackingClient({
       setLoading(true);
       setError(null);
       try {
-        setState(await fetchSnapshot(date));
+        const loaded = await fetchSnapshot(date);
+        setState(loaded.state);
+        setCarriedFrom(loaded.carriedFrom);
         setDirty(false);
         setSavedFlash(false);
       } catch (loadError) {
@@ -360,6 +383,7 @@ export function TrackingClient({
     try {
       await saveSnapshot(state);
       setDirty(false);
+      setCarriedFrom(null);
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 2000);
     } catch (saveError) {
@@ -381,6 +405,7 @@ export function TrackingClient({
       await saveSnapshot(localMigration);
       setState(localMigration);
       setDirty(false);
+      setCarriedFrom(null);
       setLocalMigration(null);
       try {
         localStorage.removeItem(STORAGE_KEY);
@@ -466,6 +491,14 @@ export function TrackingClient({
             </span>
           )}
         </div>
+
+        {carriedFrom && !dirty && (
+          <p className="w-full text-center text-[11px] text-white/45">
+            Nu există salvare pe această zi — afișăm datele din{" "}
+            <span className="text-white/70">{formatRoDate(carriedFrom)}</span>.
+            Apasă „Salvează” ca să le păstrezi pentru ziua curentă.
+          </p>
+        )}
 
         {error && (
           <div className="w-full rounded-2xl border border-red-400/20 bg-red-400/5 px-6 py-4">
