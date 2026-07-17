@@ -107,7 +107,7 @@ const menuItems = [
   {
     title: "Utilizatori",
     description:
-      "Vezi toți utilizatorii înregistrați pe site, caută, filtrează și sortează conturile.",
+      "Vezi toți utilizatorii, statisticile agregate și datele din Payout Tracker.",
     icon: FaUsers,
     href: "/admin/users",
     color: "from-teal-500 to-teal-600",

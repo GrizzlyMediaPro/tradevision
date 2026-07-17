@@ -12,11 +12,29 @@ import {
   FaSortUp,
   FaUsers,
 } from "react-icons/fa";
-import { getUsers, type AdminUser } from "../actions/users";
+import {
+  getUsersOverview,
+  type AdminUserWithStats,
+  type AdminUsersOverviewStats,
+} from "../actions/users";
 
-type SortKey = "name" | "email" | "createdAt" | "lastSignInAt";
+type SortKey =
+  | "name"
+  | "email"
+  | "createdAt"
+  | "lastSignInAt"
+  | "investitii"
+  | "payouts"
+  | "profit";
 type SortDir = "asc" | "desc";
-type Filter = "all" | "admin" | "verified" | "unverified" | "banned";
+type Filter =
+  | "all"
+  | "admin"
+  | "verified"
+  | "unverified"
+  | "banned"
+  | "tracker"
+  | "no-tracker";
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: "all", label: "Toți" },
@@ -24,9 +42,18 @@ const FILTERS: { value: Filter; label: string }[] = [
   { value: "verified", label: "Email verificat" },
   { value: "unverified", label: "Email neverificat" },
   { value: "banned", label: "Blocați" },
+  { value: "tracker", label: "Cu tracker" },
+  { value: "no-tracker", label: "Fără tracker" },
 ];
 
-function fullName(user: AdminUser): string {
+const EMPTY_STATS: AdminUsersOverviewStats = {
+  withTracker: 0,
+  investitii: 0,
+  payouts: 0,
+  profit: 0,
+};
+
+function fullName(user: AdminUserWithStats): string {
   return `${user.firstName} ${user.lastName}`.trim() || "—";
 }
 
@@ -41,8 +68,42 @@ function formatDate(timestamp: number | null): string {
   });
 }
 
+function formatMoney(n: number): string {
+  return `${(Number(n) || 0).toLocaleString("ro-RO")} $`;
+}
+
+function StatCard({
+  label,
+  value,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  tone?: "neutral" | "positive" | "negative";
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/3 px-5 py-4 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+        {label}
+      </p>
+      <p
+        className={`mt-1.5 text-xl md:text-2xl font-semibold tabular-nums ${
+          tone === "positive"
+            ? "text-emerald-400"
+            : tone === "negative"
+              ? "text-red-300"
+              : "text-white"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<AdminUserWithStats[]>([]);
+  const [stats, setStats] = useState<AdminUsersOverviewStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -51,8 +112,11 @@ export default function AdminUsersPage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   useEffect(() => {
-    getUsers()
-      .then(setUsers)
+    getUsersOverview()
+      .then((overview) => {
+        setUsers(overview.users);
+        setStats(overview.stats);
+      })
       .catch(() => setError("Utilizatorii nu au putut fi încărcați."))
       .finally(() => setLoading(false));
   }, []);
@@ -74,6 +138,8 @@ export default function AdminUsersPage() {
       if (filter === "verified" && !user.emailVerified) return false;
       if (filter === "unverified" && user.emailVerified) return false;
       if (filter === "banned" && !user.banned) return false;
+      if (filter === "tracker" && user.snapshotCount === 0) return false;
+      if (filter === "no-tracker" && user.snapshotCount > 0) return false;
 
       if (!query) return true;
       return (
@@ -92,8 +158,14 @@ export default function AdminUsersPage() {
         cmp = a.email.localeCompare(b.email);
       } else if (sortKey === "createdAt") {
         cmp = a.createdAt - b.createdAt;
-      } else {
+      } else if (sortKey === "lastSignInAt") {
         cmp = (a.lastSignInAt ?? 0) - (b.lastSignInAt ?? 0);
+      } else if (sortKey === "investitii") {
+        cmp = a.investitii - b.investitii;
+      } else if (sortKey === "payouts") {
+        cmp = a.payouts - b.payouts;
+      } else {
+        cmp = a.profit - b.profit;
       }
       return cmp * dir;
     });
@@ -133,10 +205,35 @@ export default function AdminUsersPage() {
         </h1>
         <div className="mt-3 h-[2px] w-[90px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Toți utilizatorii înregistrați prin Clerk — conturile create pentru
-          Payout Tracker și adminii site-ului.
+          Toți utilizatorii înregistrați prin Clerk, cu statistici agregate din
+          Payout Tracker.
         </p>
       </div>
+
+      {!loading && !error && (
+        <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard label="Cu tracker" value={String(stats.withTracker)} />
+          <StatCard
+            label="Investiții totale"
+            value={formatMoney(stats.investitii)}
+          />
+          <StatCard
+            label="Payouts totale"
+            value={formatMoney(stats.payouts)}
+          />
+          <StatCard
+            label="Profit total"
+            value={formatMoney(stats.profit)}
+            tone={
+              stats.profit > 0
+                ? "positive"
+                : stats.profit < 0
+                  ? "negative"
+                  : "neutral"
+            }
+          />
+        </div>
+      )}
 
       {/* Search + filtre */}
       <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
@@ -179,9 +276,9 @@ export default function AdminUsersPage() {
         </p>
       ) : (
         <div className="w-full overflow-x-auto">
-          <div className="min-w-[980px]">
+          <div className="min-w-[1180px]">
             {/* Header */}
-            <div className="grid grid-cols-[2fr_2fr_1.3fr_1.3fr_0.9fr_0.9fr] gap-4 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-wider text-white/60">
+            <div className="grid grid-cols-[1.8fr_1.6fr_1.1fr_1.1fr_0.9fr_0.9fr_0.9fr_0.85fr_0.7fr] gap-3 px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-[11px] font-semibold uppercase tracking-wider text-white/60">
               <button
                 onClick={() => handleSort("name")}
                 className="flex items-center gap-1.5 cursor-pointer"
@@ -206,6 +303,24 @@ export default function AdminUsersPage() {
               >
                 Ultimul login <SortIcon column="lastSignInAt" />
               </button>
+              <button
+                onClick={() => handleSort("investitii")}
+                className="flex items-center gap-1.5 cursor-pointer"
+              >
+                Investiții <SortIcon column="investitii" />
+              </button>
+              <button
+                onClick={() => handleSort("payouts")}
+                className="flex items-center gap-1.5 cursor-pointer"
+              >
+                Payouts <SortIcon column="payouts" />
+              </button>
+              <button
+                onClick={() => handleSort("profit")}
+                className="flex items-center gap-1.5 cursor-pointer"
+              >
+                Profit <SortIcon column="profit" />
+              </button>
               <span>Status</span>
               <span>Tracker</span>
             </div>
@@ -220,7 +335,7 @@ export default function AdminUsersPage() {
                 visible.map((user) => (
                   <div
                     key={user.id}
-                    className="grid grid-cols-[2fr_2fr_1.3fr_1.3fr_0.9fr_0.9fr] gap-4 items-center px-6 py-3.5 rounded-2xl border border-white/10 bg-linear-to-r from-white/4 to-white/2"
+                    className="grid grid-cols-[1.8fr_1.6fr_1.1fr_1.1fr_0.9fr_0.9fr_0.9fr_0.85fr_0.7fr] gap-3 items-center px-5 py-3.5 rounded-2xl border border-white/10 bg-linear-to-r from-white/4 to-white/2"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <Image
@@ -260,8 +375,39 @@ export default function AdminUsersPage() {
                       {formatDate(user.createdAt)}
                     </span>
 
-                    <span className="text-xs text-white/60 tabular-nums">
-                      {formatDate(user.lastSignInAt)}
+                    <div className="min-w-0">
+                      <span className="block text-xs text-white/60 tabular-nums">
+                        {formatDate(user.lastSignInAt)}
+                      </span>
+                      {user.lastActiveAt ? (
+                        <span className="block text-[10px] text-white/30 tabular-nums">
+                          activ {formatDate(user.lastActiveAt)}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <span className="text-xs tabular-nums text-white/70">
+                      {user.snapshotCount > 0
+                        ? formatMoney(user.investitii)
+                        : "—"}
+                    </span>
+
+                    <span className="text-xs tabular-nums text-white/70">
+                      {user.snapshotCount > 0 ? formatMoney(user.payouts) : "—"}
+                    </span>
+
+                    <span
+                      className={`text-xs font-medium tabular-nums ${
+                        user.snapshotCount === 0
+                          ? "text-white/35"
+                          : user.profit > 0
+                            ? "text-emerald-400"
+                            : user.profit < 0
+                              ? "text-red-300"
+                              : "text-white/60"
+                      }`}
+                    >
+                      {user.snapshotCount > 0 ? formatMoney(user.profit) : "—"}
                     </span>
 
                     <div className="flex flex-wrap gap-1.5">
@@ -288,7 +434,9 @@ export default function AdminUsersPage() {
                         className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-500/10 px-3 py-1.5 text-[11px] font-medium text-teal-200 hover:bg-teal-500/20 transition cursor-pointer"
                       >
                         <FaChartLine className="h-3 w-3" />
-                        Vezi
+                        {user.snapshotCount > 0
+                          ? `${user.snapshotCount} zile`
+                          : "Vezi"}
                       </Link>
                     </div>
                   </div>

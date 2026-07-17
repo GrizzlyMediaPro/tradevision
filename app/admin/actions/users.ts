@@ -34,9 +34,67 @@ export type AdminUserPayoutTracker = {
   snapshots: AdminUserPayoutSnapshot[];
 };
 
-export async function getUsers(): Promise<AdminUser[]> {
-  await requireAdmin();
+export type AdminUserWithStats = AdminUser & {
+  snapshotCount: number;
+  lastSnapshotDate: string | null;
+  investitii: number;
+  payouts: number;
+  profit: number;
+  accounts: number;
+};
 
+export type AdminUsersOverviewStats = {
+  withTracker: number;
+  investitii: number;
+  payouts: number;
+  profit: number;
+};
+
+export type AdminUsersOverview = {
+  users: AdminUserWithStats[];
+  stats: AdminUsersOverviewStats;
+};
+
+function snapshotTotals(data: PayoutTrackerData) {
+  let investitii = 0;
+  let payouts = 0;
+  let accounts = 0;
+  for (const firm of data.firms) {
+    investitii += Number(firm.investitii) || 0;
+    payouts += Number(firm.payouts) || 0;
+    accounts += firm.accounts.length;
+  }
+  return { investitii, payouts, profit: payouts - investitii, accounts };
+}
+
+/** Agregă pe ultimele snapshot-uri din fiecare lună (ca pe pagina de detaliu). */
+function lifetimeTotalsFromSnapshots(
+  snapshots: { date: string; data: PayoutTrackerData }[],
+) {
+  const latestPerMonth = new Map<
+    string,
+    { date: string; data: PayoutTrackerData }
+  >();
+  for (const item of snapshots) {
+    const key = item.date.slice(0, 7);
+    const current = latestPerMonth.get(key);
+    if (!current || item.date > current.date) {
+      latestPerMonth.set(key, item);
+    }
+  }
+
+  const totals = { investitii: 0, payouts: 0, profit: 0, accounts: 0 };
+  for (const item of latestPerMonth.values()) {
+    const t = snapshotTotals(item.data);
+    totals.investitii += t.investitii;
+    totals.payouts += t.payouts;
+    totals.profit += t.profit;
+    totals.accounts += t.accounts;
+  }
+  return totals;
+}
+
+async function fetchClerkUsers(): Promise<AdminUser[]> {
   const client = await clerkClient();
   const users: AdminUser[] = [];
   const pageSize = 100;
@@ -52,7 +110,7 @@ export async function getUsers(): Promise<AdminUser[]> {
 
     for (const user of data) {
       const primaryEmail = user.emailAddresses.find(
-        (address) => address.id === user.primaryEmailAddressId
+        (address) => address.id === user.primaryEmailAddressId,
       );
       const pub = (user.publicMetadata ?? {}) as Record<string, unknown>;
       const priv = (user.privateMetadata ?? {}) as Record<string, unknown>;
@@ -77,6 +135,67 @@ export async function getUsers(): Promise<AdminUser[]> {
   }
 
   return users;
+}
+
+export async function getUsers(): Promise<AdminUser[]> {
+  await requireAdmin();
+  return fetchClerkUsers();
+}
+
+export async function getUsersOverview(): Promise<AdminUsersOverview> {
+  await requireAdmin();
+
+  const [users, rows] = await Promise.all([
+    fetchClerkUsers(),
+    prisma.payoutTrackerSnapshot.findMany({
+      select: { clerkUserId: true, snapshotDate: true, data: true },
+      orderBy: { snapshotDate: "desc" },
+    }),
+  ]);
+
+  const snapshotsByUser = new Map<
+    string,
+    { date: string; data: PayoutTrackerData }[]
+  >();
+
+  for (const row of rows) {
+    if (!isValidTrackerData(row.data)) continue;
+    const list = snapshotsByUser.get(row.clerkUserId) ?? [];
+    list.push({ date: row.snapshotDate, data: row.data });
+    snapshotsByUser.set(row.clerkUserId, list);
+  }
+
+  const usersWithStats: AdminUserWithStats[] = users.map((user) => {
+    const snapshots = snapshotsByUser.get(user.id) ?? [];
+    const totals = lifetimeTotalsFromSnapshots(snapshots);
+    return {
+      ...user,
+      snapshotCount: snapshots.length,
+      lastSnapshotDate: snapshots[0]?.date ?? null,
+      investitii: totals.investitii,
+      payouts: totals.payouts,
+      profit: totals.profit,
+      accounts: totals.accounts,
+    };
+  });
+
+  const stats: AdminUsersOverviewStats = {
+    withTracker: 0,
+    investitii: 0,
+    payouts: 0,
+    profit: 0,
+  };
+
+  for (const user of usersWithStats) {
+    if (user.snapshotCount > 0) {
+      stats.withTracker += 1;
+      stats.investitii += user.investitii;
+      stats.payouts += user.payouts;
+      stats.profit += user.profit;
+    }
+  }
+
+  return { users: usersWithStats, stats };
 }
 
 export async function getUserPayoutTracker(
