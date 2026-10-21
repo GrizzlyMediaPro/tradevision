@@ -27,9 +27,6 @@ export function Footer() {
           <Link href="/curs" className="hover:text-white transition">
             Curs
           </Link>
-          <Link href="/ninjatrader" className="hover:text-white transition">
-            NinjaTrader
-          </Link>
           <Link href="/contact" className="hover:text-white transition">
             Contact
           </Link>

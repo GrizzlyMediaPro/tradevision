@@ -24,7 +24,7 @@ export function Hero() {
           {/* Badge */}
           <span className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold text-yellow-300 tracking-wide">
             <span className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
-            8 lecții video &middot; 100% gratuit
+            15 lecții video &middot; 100% gratuit
           </span>
 
           {/* Heading */}
@@ -37,7 +37,7 @@ export function Hero() {
 
           {/* Subtitle */}
           <p className="text-sm md:text-base text-white/60 max-w-lg leading-relaxed">
-            8 lecții video de la un trader cu o experiență de 6 ani în tranzacționare. Fără promisiuni, doar lucruri testate și care funcționează pe grafice.
+            15 lecții video de la un trader cu o experiență de 6 ani în tranzacționare. Fără promisiuni, doar lucruri testate și care funcționează pe grafice.
           </p>
 
           {/* CTA button */}

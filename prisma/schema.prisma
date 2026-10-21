@@ -208,3 +208,75 @@ model PayoutTrackerSnapshot {
   @@unique([clerkUserId, snapshotDate])
   @@index([clerkUserId, snapshotDate(sort: Desc)])
 }
+
+// —— Curs privat (mentorat 1-on-1) ——
+model PrivateCourse {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique
+  description String?
+  status      String   @default("published") // draft | published
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PrivateCourseChapter {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String   @db.ObjectId
+  title       String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId, order])
+}
+
+model PrivateCourseLesson {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  chapterId       String   @db.ObjectId
+  courseId        String   @db.ObjectId
+  title           String
+  description     String?
+  order           Int      @default(0)
+  muxUploadId     String?
+  muxAssetId      String?
+  muxPlaybackId   String?
+  durationSeconds Float?
+  status          String   @default("pending") // pending | processing | ready | error
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([chapterId, order])
+  @@index([courseId])
+  @@index([muxUploadId])
+  @@index([muxAssetId])
+}
+
+model CourseEntitlement {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId      String
+  courseId         String    @db.ObjectId
+  grantedByAdminId String
+  grantedAt        DateTime  @default(now())
+  revokedAt        DateTime?
+  notes            String?
+
+  @@unique([clerkUserId, courseId])
+  @@index([courseId])
+  @@index([clerkUserId])
+}
+
+model LessonProgress {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId    String
+  lessonId       String   @db.ObjectId
+  courseId       String   @db.ObjectId
+  watchedSeconds Float    @default(0)
+  completed      Boolean  @default(false)
+  lastWatchedAt  DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([clerkUserId, lessonId])
+  @@index([clerkUserId, courseId])
+}

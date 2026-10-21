@@ -6,12 +6,16 @@ import { BenefitsSection } from "@/app/components/BenefitsSection";
 import { CurriculumSection } from "@/app/components/CurriculumSection";
 import { FoundersSection } from "@/app/components/FoundersSection";
 import { TestimonialsSection } from "@/app/components/TestimonialsSection";
+import { ScreenshotCarousel } from "@/app/components/ScreenshotCarousel";
 import { BonusesSection } from "@/app/components/BonusesSection";
 import { FaqSection } from "@/app/components/FaqSection";
-import { NinjaTraderHomeSection } from "@/app/components/NinjaTraderHomeSection";
 import { FinalCta } from "@/app/components/FinalCta";
 import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
 import { getLinkWidget } from "@/app/admin/actions/linkwidget";
+import {
+  communityResultsScreenshots,
+  ourResultsScreenshots,
+} from "@/app/lib/screenshotResultsImages";
 
 export default async function Home() {
   const linkWidget = await getLinkWidget();
@@ -32,11 +36,21 @@ export default async function Home() {
 
       <FoundersSection />
 
+      <ScreenshotCarousel
+        title="Rezultatele noastre"
+        subtitle="Rezultate reale din conturile noastre de trading, documentate transparent."
+        images={ourResultsScreenshots}
+      />
+
       <TestimonialsSection />
 
-      <BonusesSection />
+      <ScreenshotCarousel
+        title="Rezultate din comunitate"
+        subtitle="Screenshot-uri trimise de membrii comunității Trade Vision care au aplicat ce au învățat."
+        images={communityResultsScreenshots}
+      />
 
-      <NinjaTraderHomeSection />
+      <BonusesSection />
 
       <FaqSection />
 

@@ -72,6 +72,17 @@ const menuItems = [
     shadow: "shadow-yellow-500/20",
   },
   {
+    title: "Curs Mentorat 1-on-1",
+    description:
+      "Curs video privat: capitole, upload Mux, progres și acces manual pentru clienți 1-on-1.",
+    icon: FaGraduationCap,
+    href: "/admin/curs-mentorat",
+    color: "from-cyan-500 to-teal-600",
+    iconBg: "bg-cyan-500/15 border-cyan-400/30",
+    iconColor: "text-cyan-300",
+    shadow: "shadow-cyan-500/20",
+  },
+  {
     title: "Prețuri cursuri",
     description:
       "Modifică prețurile cursurilor plătite afișate pe site și în checkout.",

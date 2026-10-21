@@ -5,7 +5,11 @@ import {
   WEBINAR_CONFIRM_COOKIE_NAME,
 } from "@/lib/webinarConfirmCookie";
 
-const isProtectedRoute = createRouteMatcher(["/admin(.*)", "/payout(.*)"]);
+const isProtectedRoute = createRouteMatcher([
+  "/admin(.*)",
+  "/payout(.*)",
+  "/curs-mentorat(.*)",
+]);
 
 export default clerkMiddleware(
   async (auth, req) => {

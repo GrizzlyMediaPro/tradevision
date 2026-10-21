@@ -13,9 +13,9 @@ const benefits = [
   {
     icon: FaPlayCircle,
     iconColor: "text-purple-400",
-    title: "8 lecții video pas cu pas",
+    title: "15 lecții video pas cu pas",
     description:
-      "De la bazele pieței la primele tale analize tehnice. Fiecare lecție construiește pe lecția anterioară.",
+      "De la bazele pieței până la planul de retragere. Fiecare lecție construiește pe cea anterioară.",
   },
   {
     icon: FaChartBar,

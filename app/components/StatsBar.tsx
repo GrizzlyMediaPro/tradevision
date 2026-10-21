@@ -28,7 +28,7 @@ function useCountUp(end: number, duration: number, start: boolean) {
 type StatItem = { value: number; suffix: string; label: string };
 
 const stats: StatItem[] = [
-  { value: 8, suffix: "", label: "Lecții video structurate" },
+  { value: 15, suffix: "", label: "Lecții video structurate" },
   { value: 500, suffix: "+", label: "Cursanți înscriși" },
   { value: 0, suffix: " lei", label: "Costul cursului" },
 ];
