@@ -1,123 +1,55 @@
+"use client";
+
 import { FaClock } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 const lessons = [
-  {
-    title: "Ce este tranzacționarea?",
-    description:
-      "Piețele, instrumentele și de ce majoritatea pierd bani înainte să aibă un proces.",
-    duration: "~17 min",
-  },
-  {
-    title: "Tranzacționarea ca business",
-    description:
-      "Obiective, reguli de risc și o rutină zilnică, nu o serie de impulsuri.",
-    duration: "~22 min",
-  },
-  {
-    title: "Platforma și graficele",
-    description:
-      "Setările de bază, contul demo și cum nu te pierzi în butoane.",
-    duration: "~18 min",
-  },
-  {
-    title: "Cum citești un grafic",
-    description:
-      "Lumânări, timeframe-uri și structura mișcării, pas cu pas.",
-    duration: "~28 min",
-  },
-  {
-    title: "Contextul zilei",
-    description:
-      "Sesiuni, știri și când merită să stai departe de piață.",
-    duration: "~16 min",
-  },
-  {
-    title: "Abordarea corectă",
-    description:
-      "Răbdarea, selecția configurațiilor și oprirea tranzacționării excesive.",
-    duration: "~20 min",
-  },
-  {
-    title: "Managementul riscului",
-    description:
-      "Cât riști pe tranzacție, unde pui stopul și cum supraviețuiești unei serii proaste.",
-    duration: "~19 min",
-  },
-  {
-    title: "Cum formezi strategia",
-    description:
-      "Reguli de intrare și ieșire pe care le poți verifica, nu le simți.",
-    duration: "~24 min",
-  },
-  {
-    title: "Jurnalul de tranzacții",
-    description:
-      "Ce notezi după fiecare trade ca să vezi tiparul, nu doar rezultatul.",
-    duration: "~14 min",
-  },
-  {
-    title: "Testarea înainte de bani reali",
-    description:
-      "Cum treci strategia prin cont demo până ai suficiente exemple.",
-    duration: "~15 min",
-  },
-  {
-    title: "Fluxul de ordine",
-    description:
-      "Intenția participanților mari și cum o folosești la intrare.",
-    duration: "~21 min",
-  },
-  {
-    title: "Execuția",
-    description:
-      "De la planul scris la click: ce nu schimbi în timp ce ești în tranzacție.",
-    duration: "~13 min",
-  },
-  {
-    title: "Psihologia unei sesiuni",
-    description:
-      "Frica, răzbunarea și cum închizi platforma când nu mai ești lucid.",
-    duration: "~18 min",
-  },
-  {
-    title: "Firme de finanțare",
-    description:
-      "Reguli, limite zilnice și cum îți adaptezi strategia fără să o strici.",
-    duration: "~23 min",
-  },
-  {
-    title: "Planul până la prima retragere",
-    description:
-      "Etapele de la provocare la payout și greșelile care le lungesc.",
-    duration: "~16 min",
-  },
-];
+  "01",
+  "02",
+  "03",
+  "04",
+  "05",
+  "06",
+  "07",
+  "08",
+  "09",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+] as const;
 
 function LessonCard({
   index,
-  lesson,
+  lessonId,
 }: {
   index: number;
-  lesson: (typeof lessons)[number];
+  lessonId: (typeof lessons)[number];
 }) {
+  const t = useT();
+
   return (
     <article className="flex h-full flex-col rounded-3xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-4 py-5 text-left shadow-[0_8px_18px_rgba(0,0,0,0.45)] md:px-5">
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-purple-600 text-xs font-bold text-white shadow-[0_8px_20px_rgba(147,51,234,0.4)]">
         {String(index + 1).padStart(2, "0")}
       </div>
-      <h3 className="mt-4 text-sm font-semibold text-white md:text-base">{lesson.title}</h3>
+      <h3 className="mt-4 text-sm font-semibold text-white md:text-base">{t(`curriculum.${lessonId}.title`)}</h3>
       <p className="mt-2 flex-1 text-xs leading-relaxed text-white/50 md:text-sm">
-        {lesson.description}
+        {t(`curriculum.${lessonId}.body`)}
       </p>
       <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-white/35">
         <FaClock className="h-3 w-3" />
-        {lesson.duration}
+        {t(`curriculum.${lessonId}.duration`)}
       </span>
     </article>
   );
 }
 
 export function CurriculumSection() {
+  const t = useT();
+
   return (
     <section className="relative w-full overflow-hidden">
       <div
@@ -135,18 +67,17 @@ export function CurriculumSection() {
       <div className="relative mx-auto w-full max-w-[1250px] px-4 pt-20 pb-16">
         <div className="text-center">
           <h2 className="text-2xl font-semibold uppercase tracking-wide text-white md:text-3xl">
-            15 lecții. Un singur obiectiv: să înțelegi piața.
+            {t("curriculum.title")}
           </h2>
           <div className="mx-auto mt-3 h-[2px] w-[80px] rounded-full bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500" />
           <p className="mx-auto mt-5 max-w-lg text-sm text-white/55 md:text-base">
-            Parcurge-le în ordine. La final, o să te uiți la un grafic și o să
-            știi exact ce vezi.
+            {t("curriculum.subtitle")}
           </p>
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {lessons.map((lesson, index) => (
-            <LessonCard key={lesson.title} index={index} lesson={lesson} />
+          {lessons.map((lessonId, index) => (
+            <LessonCard key={`curriculum.${lessonId}.title`} index={index} lessonId={lessonId} />
           ))}
         </div>
       </div>

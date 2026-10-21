@@ -24,6 +24,7 @@ import {
   setCarouselSettings,
 } from '../actions/deals';
 import { getFirms } from '../actions/firms';
+import { useT } from '@/lib/i18n/I18nProvider';
 
 type Deal = {
   id: string;
@@ -49,6 +50,7 @@ type FormState = {
 };
 
 export default function AdminDealsPage() {
+  const t = useT();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [firmsFromDb, setFirmsFromDb] = useState<{ name: string; slug: string; logo: string; trustScore: number; discount: string; code: string; fundingUrl?: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -228,7 +230,7 @@ export default function AdminDealsPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t('admin.common.back')}</span>
         </Link>
       </div>
 
@@ -240,12 +242,11 @@ export default function AdminDealsPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Deals Carousel
+          {t('admin.deals.title')}
         </h1>
         <div className="mt-3 h-[2px] w-[110px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Creează, editează sau șterge cardurile afișate în deals carousel și
-          controlează viteza de auto-slide.
+          {t('admin.deals.subtitle')}
         </p>
       </div>
 
@@ -257,11 +258,13 @@ export default function AdminDealsPage() {
             <div>
               <h2 className="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
                 <span>
-                  {form.mode === 'create' ? 'Adaugă deal' : 'Editează deal'}
+                  {form.mode === 'create'
+                    ? t('admin.deals.addTitle')
+                    : t('admin.deals.editTitle')}
                 </span>
               </h2>
               <p className="mt-1 text-xs text-white/45">
-                Poți selecta o firmă existentă sau poți introduce manual datele.
+                {t('admin.deals.formHelp')}
               </p>
             </div>
             {form.mode === 'edit' && (
@@ -271,7 +274,7 @@ export default function AdminDealsPage() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
               >
                 <FaTimes className="h-3 w-3" />
-                <span>Renunță editarea</span>
+                <span>{t('admin.deals.cancelEdit')}</span>
               </button>
             )}
           </div>
@@ -280,7 +283,7 @@ export default function AdminDealsPage() {
             {/* Select firm */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Firmă
+                {t('admin.deals.firm')}
               </label>
               <select
                 value={form.selectedFirmSlug}
@@ -289,8 +292,8 @@ export default function AdminDealsPage() {
                 }
                 className="rounded-xl border border-white/15 bg-black/40 px-4 py-2.5 text-sm text-white outline-none focus:border-purple-400/60 focus:ring-1 focus:ring-purple-400/40"
               >
-                <option value="">Alege o opțiune</option>
-                <option value="manual">Introdu manual</option>
+                <option value="">{t('admin.deals.choose')}</option>
+                <option value="manual">{t('admin.deals.manual')}</option>
                 {sortedFirms.map((firm) => (
                   <option key={firm.slug} value={firm.slug}>
                     {firm.name}
@@ -303,7 +306,7 @@ export default function AdminDealsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Logo firmă
+                  {t('admin.deals.logo')}
                 </label>
                 <div
                   onDragOver={(e) => {
@@ -338,8 +341,8 @@ export default function AdminDealsPage() {
                         }}
                       />
                       <span className="text-[11px] text-white/45 text-center">
-                        Încarcă un fișier imagine (max 4MB) <br />
-                        Poți și să tragi un fișier peste acest spațiu.
+                        {t('admin.deals.uploadLine1')} <br />
+                        {t('admin.deals.uploadLine2')}
                       </span>
                     </div>
                   ) : (
@@ -348,7 +351,7 @@ export default function AdminDealsPage() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={form.logo}
-                          alt="Preview logo"
+                          alt={t('admin.deals.logoAlt')}
                           className="h-8 w-8 object-contain"
                         />
                       </div>
@@ -359,7 +362,7 @@ export default function AdminDealsPage() {
                         }
                         className="text-[11px] text-red-300 hover:text-red-200 transition"
                       >
-                        Șterge logo
+                        {t('admin.deals.removeLogo')}
                       </button>
                     </div>
                   )}
@@ -367,7 +370,7 @@ export default function AdminDealsPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Nume firmă
+                  {t('admin.deals.firmName')}
                 </label>
                 <input
                   type="text"
@@ -375,7 +378,7 @@ export default function AdminDealsPage() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  placeholder="Ex: Lucid Trading"
+                  placeholder={t('admin.deals.firmPlaceholder')}
                   className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                   required
                 />
@@ -386,7 +389,7 @@ export default function AdminDealsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Rating (0 - 5 stele)
+                  {t('admin.deals.rating')}
                 </label>
                 <input
                   type="number"
@@ -402,7 +405,7 @@ export default function AdminDealsPage() {
               </div>
             <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Discount
+                  {t('admin.deals.discount')}
                 </label>
                 <input
                   type="text"
@@ -410,7 +413,7 @@ export default function AdminDealsPage() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, discount: e.target.value }))
                   }
-                  placeholder="Ex: 50% Off"
+                  placeholder={t('admin.deals.discountPlaceholder')}
                   className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
               </div>
@@ -419,7 +422,7 @@ export default function AdminDealsPage() {
             {/* Funding URL */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Link Obține finanțare
+                {t('admin.deals.funding')}
               </label>
               <input
                 type="text"
@@ -427,7 +430,7 @@ export default function AdminDealsPage() {
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, fundingUrl: e.target.value }))
                 }
-                placeholder="https://link-afiliat..."
+                placeholder={t('admin.deals.fundingPlaceholder')}
                 className="rounded-xl border border-white/15 bg:white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
               />
             </div>
@@ -435,7 +438,7 @@ export default function AdminDealsPage() {
             {/* Code */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Cod reducere
+                {t('admin.deals.code')}
               </label>
               <input
                 type="text"
@@ -443,7 +446,7 @@ export default function AdminDealsPage() {
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, code: e.target.value }))
                 }
-                placeholder="Ex: MIKE"
+                placeholder={t('admin.deals.codePlaceholder')}
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg:white/8 focus:ring-1 focus:ring-purple-400/30"
                 required
               />
@@ -452,7 +455,7 @@ export default function AdminDealsPage() {
             {/* Submit */}
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-[11px] text-white/40 max-w-xs">
-                Modificările sunt doar la nivel de interfață în acest moment.
+                {t('admin.deals.uiOnly')}
               </p>
               <button
                 type="submit"
@@ -462,12 +465,12 @@ export default function AdminDealsPage() {
                 {form.mode === 'create' ? (
                   <>
                     <FaPlus className="h-4 w-4" />
-                    <span>Adaugă deal</span>
+                    <span>{t('admin.deals.addTitle')}</span>
                   </>
                 ) : (
                   <>
                     <FaEdit className="h-4 w-4" />
-                    <span>Salvează modificările</span>
+                    <span>{t('admin.deals.save')}</span>
                   </>
                 )}
               </button>
@@ -481,16 +484,15 @@ export default function AdminDealsPage() {
           <section className="flex h-full flex-col rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-6 py-6 md:px-7 md:py-7 shadow-[0_16px_40px_rgba(0,0,0,0.55)] backdrop-blur-sm">
             <div className="flex items-center justify-between gap-3 mb-4">
               <h2 className="text-sm md:text-base font-semibold text-white">
-                Deals existente ({deals.length})
+                {t('admin.deals.existing', { count: deals.length })}
               </h2>
             </div>
 
             {loading ? (
-              <p className="text-sm text-white/45">Se încarcă...</p>
+              <p className="text-sm text-white/45">{t('admin.common.loading')}</p>
             ) : deals.length === 0 ? (
               <p className="text-sm text-white/45">
-                Nu există încă niciun deal. Adaugă unul din formularul din
-                stânga.
+                {t('admin.deals.empty')}
               </p>
             ) : (
               <div className="mt-1 flex flex-1 flex-col gap-3 overflow-y-auto pr-1">
@@ -519,7 +521,7 @@ export default function AdminDealsPage() {
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-white/50">
                         <span>{deal.rating.toFixed(1)} / 5★</span>
                         <span className="h-1 w-1 rounded-full bg-white/25" />
-                        <span>Cod: {deal.code}</span>
+                        <span>{t('admin.deals.codeLabel', { code: deal.code })}</span>
                         {deal.firmSlug && (
                           <>
                             <span className="h-1 w-1 rounded-full bg-white/25" />
@@ -563,10 +565,10 @@ export default function AdminDealsPage() {
             </div>
             <div>
               <h2 className="text-sm md:text-base font-semibold text-white">
-                Setări auto-slide carousel
+                {t('admin.deals.autoTitle')}
               </h2>
               <p className="text-[11px] text-white/45">
-                Controlează viteza sau dezactivează auto-play pentru deals carousel.
+                {t('admin.deals.autoHelp')}
               </p>
             </div>
           </div>
@@ -578,12 +580,12 @@ export default function AdminDealsPage() {
             {autoPlayEnabled ? (
               <>
                 <FaToggleOn className="h-4 w-4 text-emerald-400" />
-                <span>Auto-play ON</span>
+                <span>{t('admin.deals.autoOn')}</span>
               </>
             ) : (
               <>
                 <FaToggleOff className="h-4 w-4 text-white/40" />
-                <span>Auto-play OFF</span>
+                <span>{t('admin.deals.autoOff')}</span>
               </>
             )}
           </button>
@@ -592,7 +594,7 @@ export default function AdminDealsPage() {
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)] gap-4 items-center">
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-medium uppercase tracking-wider text-white/60">
-              Interval auto-slide (secunde)
+              {t('admin.deals.interval')}
             </label>
             <input
               type="number"
@@ -606,11 +608,11 @@ export default function AdminDealsPage() {
           </div>
           <div className="flex flex-col items-start gap-1 text-[11px] text-white/40">
             <p>
-              Valoarea actuală:{' '}
+              {t('admin.deals.current')}{' '}
               <span className="font-semibold text-yellow-300">
                 {autoPlayEnabled
                   ? `${autoPlayInterval / 1000}s`
-                  : 'dezactivat'}
+                  : t('admin.deals.off')}
               </span>
             </p>
             <button
@@ -618,7 +620,7 @@ export default function AdminDealsPage() {
               onClick={handleSaveCarouselSettings}
               className="mt-2 rounded-full border border-yellow-400/40 bg-yellow-500/20 px-3 py-1.5 text-xs font-medium text-yellow-200 hover:bg-yellow-500/30"
             >
-              Salvează setări carousel
+              {t('admin.deals.saveCarousel')}
             </button>
           </div>
         </div>

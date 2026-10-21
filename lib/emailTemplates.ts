@@ -1,5 +1,8 @@
 import sanitizeHtml from "sanitize-html";
 import { convert } from "html-to-text";
+import type { Locale } from "@/lib/i18n/locale";
+import { messages } from "@/lib/i18n/messages/catalog";
+import { translate, type Vars } from "@/lib/i18n/translate";
 
 type HtmlAttribs = sanitizeHtml.Attributes;
 
@@ -164,8 +167,11 @@ export function renderEmailLayout(options: {
   contentHtml: string;
   recipientEmail?: string;
   unsubscribeToken?: string;
+  locale?: Locale;
 }): string {
   const { title, previewText, contentHtml, recipientEmail, unsubscribeToken } = options;
+  const locale = options.locale ?? "en";
+  const t = (id: string, vars?: Vars) => translate(messages[locale], id, vars);
 
   const preview = previewText
     ? escapeHtml(previewText)
@@ -173,7 +179,7 @@ export function renderEmailLayout(options: {
   const emailHost = BRAND.siteUrl.replace(/^https?:\/\//, "");
 
   return `<!DOCTYPE html>
-<html lang="ro">
+<html lang="${locale}">
   <head>
     <meta charSet="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
@@ -239,7 +245,7 @@ export function renderEmailLayout(options: {
                   ${contentHtml}
                 </div>
                 <p style="margin:20px 0 10px;font-size:14px;line-height:1.6;color:#000000;">
-                  Cu respect,
+                  ${t("email.respect")}
                 </p>
                 <table role="presentation" width="100%" cellPadding="0" cellSpacing="0" style="margin-top:14px;border:1px solid rgba(148,163,184,0.25);background-color:#ffffff;">
                   <tr>
@@ -257,7 +263,7 @@ export function renderEmailLayout(options: {
                         TRADEVISION
                       </p>
                       <p style="margin:0 0 8px;font-size:12px;line-height:1.4;font-style:italic;color:#374151;">
-                        Echipă educație financiară
+                        ${t("email.team")}
                       </p>
                       <p style="margin:0 0 4px;font-size:12px;line-height:1.5;color:#111827;white-space:nowrap;">
                         ✉️ <a href="mailto:contact@trade-vision.ro" style="color:#111827;text-decoration:none;white-space:nowrap;">contact@trade-vision.ro</a>
@@ -273,19 +279,19 @@ export function renderEmailLayout(options: {
             <tr>
               <td style="padding:14px 12px 18px;background:transparent;border-top:1px solid rgba(148,163,184,0.2);">
                 <p style="margin:0 0 6px;font-size:11px;line-height:1.5;color:#d1d5db;">
-                  Acest email ți-a fost trimis de <strong style="color:#f3f4f6;">${BRAND.siteName}</strong>.
+                  ${t("email.sentBy")}<strong style="color:#f3f4f6;">${BRAND.siteName}</strong>.
                 </p>
                 <p style="margin:0 0 6px;font-size:11px;line-height:1.5;color:#d1d5db;">
-                  Pentru mai multe detalii, vizitează
+                  ${t("email.details")}
                   <a href="${BRAND.siteUrl}" style="color:#c4b5fd;text-decoration:none;font-weight:500;">
                     ${BRAND.siteUrl.replace(/^https?:\/\//, "")}
                   </a>.
                 </p>
                 <p style="margin:4px 0 0;font-size:10px;line-height:1.5;color:#9ca3af;">
-                  Te rugăm să nu răspunzi direct la acest mesaj dacă nu este specificat altfel în conținut.
+                  ${t("email.noReply")}
                 </p>
                 ${recipientEmail && unsubscribeToken ? `<p style="margin:8px 0 0;font-size:10px;line-height:1.5;color:#9ca3af;">
-                  Nu mai dorești să primești emailuri? <a href="${BRAND.siteUrl}/dezabonare?email=${encodeURIComponent(recipientEmail)}&token=${unsubscribeToken}" style="color:#c4b5fd;text-decoration:underline;">Dezabonează-te</a>.
+                  ${t("email.unsubscribe")}<a href="${BRAND.siteUrl}/dezabonare?email=${encodeURIComponent(recipientEmail)}&token=${unsubscribeToken}" style="color:#c4b5fd;text-decoration:underline;">${t("email.unsubscribeLink")}</a>${t("email.unsubscribeAfter")}
                 </p>` : ""}
               </td>
             </tr>

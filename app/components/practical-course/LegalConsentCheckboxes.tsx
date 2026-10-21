@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 type LegalConsentCheckboxesProps = {
   acceptedTerms: boolean;
@@ -16,6 +17,7 @@ export function LegalConsentCheckboxes({
   acceptedPrivacy,
   onChange,
 }: LegalConsentCheckboxesProps) {
+  const t = useT();
   return (
     <div className="space-y-3">
       <ConsentRow
@@ -25,15 +27,15 @@ export function LegalConsentCheckboxes({
         }
         required
       >
-        Am citit și accept{" "}
+        {t("course.consent.privacy.before")}
         <Link
           href="/politica-confidentialitate"
           target="_blank"
           className="underline decoration-white/40 underline-offset-2 hover:text-yellow-300"
         >
-          politica de confidențialitate
-        </Link>{" "}
-        (GDPR).
+          {t("course.consent.privacy.link")}
+        </Link>
+        {t("course.consent.privacy.after")}
       </ConsentRow>
       <ConsentRow
         checked={acceptedTerms}
@@ -42,16 +44,15 @@ export function LegalConsentCheckboxes({
         }
         required
       >
-        Accept{" "}
+        {t("course.consent.terms.before")}
         <Link
           href="/termeni-conditii"
           target="_blank"
           className="underline decoration-white/40 underline-offset-2 hover:text-yellow-300"
         >
-          termenii și condițiile
-        </Link>{" "}
-        și confirm că această acceptare reprezintă acordul contractual pentru
-        achiziția cursului.
+          {t("course.consent.terms.link")}
+        </Link>
+        {t("course.consent.terms.after")}
       </ConsentRow>
     </div>
   );

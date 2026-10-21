@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireCourseAccess } from "@/lib/privateCourseAccess";
+import { getT } from "@/lib/i18n/get-t";
+
+function accessStatus(message: string) {
+  if (message.startsWith("Unauthorized")) return 401;
+  if (message.startsWith("Forbidden")) return 403;
+  if (message.startsWith("Course not found")) return 404;
+  return 500;
+}
 
 const COMPLETE_THRESHOLD = 0.9;
 
 export async function POST(req: Request) {
+  const t = await getT();
   try {
     const body = (await req.json()) as {
       lessonId?: string;
@@ -14,14 +23,14 @@ export async function POST(req: Request) {
     };
 
     if (!body.lessonId || typeof body.watchedSeconds !== "number") {
-      return NextResponse.json({ error: "Date invalide" }, { status: 400 });
+      return NextResponse.json({ error: t("private.api.invalidData") }, { status: 400 });
     }
 
     const lesson = await prisma.privateCourseLesson.findUnique({
       where: { id: body.lessonId },
     });
     if (!lesson) {
-      return NextResponse.json({ error: "Lecție inexistentă" }, { status: 404 });
+      return NextResponse.json({ error: t("private.api.lessonMissing") }, { status: 404 });
     }
 
     const { userId } = await requireCourseAccess(lesson.courseId);
@@ -78,12 +87,16 @@ export async function POST(req: Request) {
       watchedSeconds: progress.watchedSeconds,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Eroare";
-    const status = message.startsWith("Unauthorized")
-      ? 401
-      : message.startsWith("Forbidden")
-        ? 403
-        : 500;
-    return NextResponse.json({ error: message }, { status });
+    const message = err instanceof Error ? err.message : "";
+    const status = accessStatus(message);
+    const error =
+      status === 401
+        ? t("private.api.unauthorized")
+        : status === 403
+          ? t("private.api.forbidden")
+          : status === 404
+            ? t("private.api.courseNotFound")
+            : t("private.api.generic");
+    return NextResponse.json({ error }, { status });
   }
 }

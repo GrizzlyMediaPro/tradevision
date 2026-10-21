@@ -13,6 +13,7 @@ import {
   ExpiresAtPicker,
   toLocalDatetimeValue,
 } from "@/app/components/admin/ExpiresAtPicker";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 
 type DiscountRow = {
   id: string;
@@ -40,6 +41,9 @@ const emptyForm: DiscountCodeInput = {
 
 export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps) {
   const router = useRouter();
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const [isPending, startTransition] = useTransition();
   const [form, setForm] = useState<DiscountCodeInput>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -63,7 +67,7 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
         resetForm();
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Eroare la salvare.");
+        setError(err instanceof Error ? err.message : t("admin.discounts.error.save"));
       }
     });
   };
@@ -83,14 +87,16 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm("Ștergi acest cod de discount?")) return;
+    if (!confirm(t("admin.discounts.confirmDelete"))) return;
     startTransition(async () => {
       try {
         await deleteDiscountCode(id);
         if (editingId === id) resetForm();
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Eroare la ștergere.");
+        setError(
+          err instanceof Error ? err.message : t("admin.discounts.error.delete"),
+        );
       }
     });
   };
@@ -99,17 +105,17 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
     <div className="space-y-8">
       <div className="rounded-2xl border border-white/10 bg-white/3 p-6">
         <h2 className="text-lg font-semibold">
-          {editingId ? "Editează cod discount" : "Cod discount nou"}
+          {editingId ? t("admin.discounts.editTitle") : t("admin.discounts.newTitle")}
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Cod">
+          <Field label={t("admin.common.code")}>
             <input
               value={form.code}
               onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
               className={inputClass}
             />
           </Field>
-          <Field label="Tip">
+          <Field label={t("admin.common.type")}>
             <select
               value={form.type}
               onChange={(e) =>
@@ -120,11 +126,11 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
               }
               className={inputClass}
             >
-              <option value="percent">Procent</option>
-              <option value="fixed">Sumă fixă EUR</option>
+              <option value="percent">{t("admin.discounts.percent")}</option>
+              <option value="fixed">{t("admin.discounts.fixed")}</option>
             </select>
           </Field>
-          <Field label="Valoare">
+          <Field label={t("admin.common.value")}>
             <input
               type="number"
               min="0"
@@ -136,7 +142,7 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
               className={inputClass}
             />
           </Field>
-          <Field label="Utilizări maxime (opțional)">
+          <Field label={t("admin.discounts.maxUses")}>
             <input
               type="number"
               min="1"
@@ -168,7 +174,7 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
                 setForm((f) => ({ ...f, active: e.target.checked }))
               }
             />
-            Activ
+            {t("admin.common.active")}
           </label>
         </div>
         {error ? <p className="mt-3 text-sm text-red-400">{error}</p> : null}
@@ -179,7 +185,11 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
             disabled={isPending}
             className="rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-slate-900 disabled:opacity-50"
           >
-            {isPending ? "Se salvează..." : editingId ? "Actualizează" : "Adaugă cod"}
+            {isPending
+              ? t("admin.common.saving")
+              : editingId
+                ? t("admin.discounts.update")
+                : t("admin.discounts.add")}
           </button>
           {editingId ? (
             <button
@@ -187,7 +197,7 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
               onClick={resetForm}
               className="rounded-xl border border-white/15 px-5 py-2.5 text-sm text-white/70"
             >
-              Anulează
+              {t("admin.common.cancel")}
             </button>
           ) : null}
         </div>
@@ -197,20 +207,20 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/10 text-white/50">
             <tr>
-              <th className="px-4 py-3">Cod</th>
-              <th className="px-4 py-3">Tip</th>
-              <th className="px-4 py-3">Valoare</th>
-              <th className="px-4 py-3">Utilizări</th>
-              <th className="px-4 py-3">Activ</th>
-              <th className="px-4 py-3">Expiră</th>
-              <th className="px-4 py-3">Acțiuni</th>
+              <th className="px-4 py-3">{t("admin.common.code")}</th>
+              <th className="px-4 py-3">{t("admin.common.type")}</th>
+              <th className="px-4 py-3">{t("admin.common.value")}</th>
+              <th className="px-4 py-3">{t("admin.discounts.uses")}</th>
+              <th className="px-4 py-3">{t("admin.common.active")}</th>
+              <th className="px-4 py-3">{t("admin.discounts.expires")}</th>
+              <th className="px-4 py-3">{t("admin.common.actions")}</th>
             </tr>
           </thead>
           <tbody>
             {initialCodes.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-white/50">
-                  Nu există coduri de discount.
+                  {t("admin.discounts.empty")}
                 </td>
               </tr>
             ) : (
@@ -218,7 +228,9 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
                 <tr key={row.id} className="border-b border-white/5">
                   <td className="px-4 py-3 font-medium">{row.code}</td>
                   <td className="px-4 py-3">
-                    {row.type === "percent" ? "Procent" : "Fix EUR"}
+                    {row.type === "percent"
+                      ? t("admin.discounts.percent")
+                      : t("admin.discounts.fixedShort")}
                   </td>
                   <td className="px-4 py-3">
                     {row.type === "percent" ? `${row.value}%` : `${row.value} EUR`}
@@ -227,10 +239,12 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
                     {row.usedCount}
                     {row.maxUses ? ` / ${row.maxUses}` : ""}
                   </td>
-                  <td className="px-4 py-3">{row.active ? "Da" : "Nu"}</td>
+                  <td className="px-4 py-3">
+                    {row.active ? t("admin.common.yes") : t("admin.common.no")}
+                  </td>
                   <td className="px-4 py-3">
                     {row.expiresAt
-                      ? new Date(row.expiresAt).toLocaleString("ro-RO")
+                      ? new Date(row.expiresAt).toLocaleString(dateLocale)
                       : "-"}
                   </td>
                   <td className="px-4 py-3">
@@ -240,14 +254,14 @@ export function AdminDiscountsClient({ initialCodes }: AdminDiscountsClientProps
                         onClick={() => handleEdit(row)}
                         className="text-yellow-300 hover:underline"
                       >
-                        Editează
+                        {t("admin.common.edit")}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(row.id)}
                         className="text-red-300 hover:underline"
                       >
-                        Șterge
+                        {t("admin.common.delete")}
                       </button>
                     </div>
                   </td>

@@ -1,10 +1,14 @@
 import { MultumimPageClient } from "./MultumimPageClient";
+import { getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Plată confirmată",
-  description: "Plata pentru Curs Futures a fost înregistrată cu succes.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("course.thanks.metaTitle"),
+    description: t("course.thanks.metaDescription"),
+  };
+}
 
 type PageProps = {
   searchParams: Promise<{ session_id?: string }>;

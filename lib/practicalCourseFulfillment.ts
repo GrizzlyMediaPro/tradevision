@@ -17,6 +17,15 @@ import {
   type CourseInvoiceDiscount,
 } from "@/lib/smartbill";
 import { convertEurToRon } from "@/lib/eurRonExchange";
+import { messages } from "@/lib/i18n/messages/catalog";
+import { parseLocale, type Locale } from "@/lib/i18n/locale";
+import { translate } from "@/lib/i18n/translate";
+
+function readOrderLocale(billingData: unknown): Locale {
+  if (!billingData || typeof billingData !== "object") return "en";
+  const value = (billingData as { locale?: unknown }).locale;
+  return parseLocale(typeof value === "string" ? value : undefined);
+}
 
 export type FulfillmentResult = {
   emailSent: boolean;
@@ -24,8 +33,10 @@ export type FulfillmentResult = {
   smartbillError?: string;
 };
 
-function parseSmartBillError(err: unknown): string {
-  if (!(err instanceof Error)) return "Eroare necunoscută la emiterea facturii.";
+function parseSmartBillError(err: unknown, locale: Locale): string {
+  if (!(err instanceof Error)) {
+    return translate(messages[locale], "course.invoice.unknownError");
+  }
   const match = err.message.match(/\{.*\}/);
   if (!match) return err.message;
   try {
@@ -46,6 +57,7 @@ async function issueSmartBillInvoice(input: {
   paidAt: Date | null;
   existingSeries: string | null;
   existingNumber: string | null;
+  locale: Locale;
 }): Promise<{
   invoiceSeries: string | null;
   invoiceNumber: string | null;
@@ -94,7 +106,7 @@ async function issueSmartBillInvoice(input: {
 
     return { invoiceSeries, invoiceNumber, invoicePdf };
   } catch (err) {
-    const error = parseSmartBillError(err);
+    const error = parseSmartBillError(err, input.locale);
     console.error(`SmartBill failed for order ${input.orderId}`, err);
     return {
       invoiceSeries: invoiceSeries ?? null,
@@ -118,6 +130,7 @@ export async function fulfillPaidPracticalCourseOrder(
 
   const personType = order.personType as PersonType | null;
   const billingData = order.billingData as BillingData | null;
+  const locale = readOrderLocale(billingData);
   const recipientEmail = getBillingEmail(personType, billingData);
   const recipientName = getClientDisplayName(personType, billingData);
 
@@ -177,6 +190,7 @@ export async function fulfillPaidPracticalCourseOrder(
     paidAt: order.paidAt,
     existingSeries: order.smartbillInvoiceSeries,
     existingNumber: order.smartbillInvoiceNumber,
+    locale,
   });
 
   const invoiceIssued = Boolean(
@@ -194,6 +208,7 @@ export async function fulfillPaidPracticalCourseOrder(
       invoicePdf: invoiceResult.invoicePdf,
       invoiceSeries: invoiceResult.invoiceSeries,
       invoiceNumber: invoiceResult.invoiceNumber,
+      locale,
     });
 
     await prisma.practicalCourseOrder.update({
@@ -207,6 +222,7 @@ export async function fulfillPaidPracticalCourseOrder(
       invoicePdf: invoiceResult.invoicePdf!,
       invoiceSeries: invoiceResult.invoiceSeries!,
       invoiceNumber: invoiceResult.invoiceNumber!,
+      locale,
     });
   }
 

@@ -2,23 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FaCalendarAlt, FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
-const MONTHS_RO = [
-  "Ianuarie",
-  "Februarie",
-  "Martie",
-  "Aprilie",
-  "Mai",
-  "Iunie",
-  "Iulie",
-  "August",
-  "Septembrie",
-  "Octombrie",
-  "Noiembrie",
-  "Decembrie",
-];
-
-const WEEKDAYS_RO = ["Lu", "Ma", "Mi", "Jo", "Vi", "Sa", "Du"];
+const MONTH_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
+const WEEKDAY_IDS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);
@@ -177,9 +164,11 @@ function ScrollTimeColumn({
 export function ExpiresAtPicker({
   value,
   onChange,
-  label = "Expiră la (opțional)",
+  label,
   className = "",
 }: ExpiresAtPickerProps) {
+  const t = useT();
+  const resolvedLabel = label ?? t("admin.expires.label");
   const rootRef = useRef<HTMLDivElement | null>(null);
   const parsed = parseDateTime(value);
   const selectedDate = parsed.date ? parseIsoDate(parsed.date) : null;
@@ -265,7 +254,7 @@ export function ExpiresAtPicker({
   return (
     <div ref={rootRef} className={`flex flex-col gap-2 ${className}`}>
       <span className="text-xs uppercase tracking-wider text-white/50">
-        {label}
+        {resolvedLabel}
       </span>
 
       <div className="flex flex-wrap items-start gap-4">
@@ -280,7 +269,7 @@ export function ExpiresAtPicker({
             }`}
           >
             <span className={displayDate ? "text-white" : "text-white/35"}>
-              {displayDate || "Selectează data"}
+              {displayDate || t("admin.expires.placeholder")}
             </span>
             <FaCalendarAlt className="h-4 w-4 shrink-0 text-yellow-300/80" />
           </button>
@@ -288,7 +277,7 @@ export function ExpiresAtPicker({
           {calendarOpen ? (
             <div
               role="dialog"
-              aria-label="Calendar expirare"
+              aria-label={t("admin.expires.calendar")}
               className="absolute left-0 top-full z-50 mt-2 w-full min-w-[280px] rounded-2xl border border-white/10 bg-[#0a0d1f] p-4 shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
             >
               <div className="mb-4 flex items-center gap-2">
@@ -296,7 +285,7 @@ export function ExpiresAtPicker({
                   type="button"
                   onClick={goToPreviousMonth}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-white/70 transition hover:border-white/25 hover:text-white"
-                  aria-label="Luna anterioară"
+                  aria-label={t("admin.expires.prevMonth")}
                 >
                   <FaChevronLeft className="h-3 w-3" />
                 </button>
@@ -306,15 +295,15 @@ export function ExpiresAtPicker({
                     value={viewMonth}
                     onChange={(e) => setViewMonth(Number(e.target.value))}
                     className="rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-xs text-white outline-none focus:border-yellow-300/50"
-                    aria-label="Luna"
+                    aria-label={t("admin.expires.month")}
                   >
-                    {MONTHS_RO.map((monthName, index) => (
+                    {MONTH_IDS.map((monthId, index) => (
                       <option
-                        key={monthName}
+                        key={monthId}
                         value={index}
                         className="bg-[#0a0d1f]"
                       >
-                        {monthName}
+                        {t(`admin.month.${monthId}`)}
                       </option>
                     ))}
                   </select>
@@ -322,7 +311,7 @@ export function ExpiresAtPicker({
                     value={viewYear}
                     onChange={(e) => setViewYear(Number(e.target.value))}
                     className="rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-xs text-white outline-none focus:border-yellow-300/50"
-                    aria-label="Anul"
+                    aria-label={t("admin.expires.year")}
                   >
                     {years.map((year) => (
                       <option key={year} value={year} className="bg-[#0a0d1f]">
@@ -336,19 +325,19 @@ export function ExpiresAtPicker({
                   type="button"
                   onClick={goToNextMonth}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-white/70 transition hover:border-white/25 hover:text-white"
-                  aria-label="Luna următoare"
+                  aria-label={t("admin.expires.nextMonth")}
                 >
                   <FaChevronRight className="h-3 w-3" />
                 </button>
               </div>
 
               <div className="mb-2 grid grid-cols-7 gap-1">
-                {WEEKDAYS_RO.map((day) => (
+                {WEEKDAY_IDS.map((day) => (
                   <div
                     key={day}
                     className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-white/40"
                   >
-                    {day}
+                    {t(`admin.weekday.${day}`)}
                   </div>
                 ))}
               </div>
@@ -397,7 +386,7 @@ export function ExpiresAtPicker({
           }`}
         >
           <ScrollTimeColumn
-            label="Ore"
+            label={t("admin.expires.hours")}
             values={HOURS}
             selected={parsed.hour}
             disabled={!parsed.date}
@@ -405,7 +394,7 @@ export function ExpiresAtPicker({
           />
           <span className="pb-12 text-lg font-semibold text-white/30">:</span>
           <ScrollTimeColumn
-            label="Minute"
+            label={t("admin.expires.minutes")}
             values={MINUTES}
             selected={parsed.minute}
             disabled={!parsed.date}
@@ -416,9 +405,12 @@ export function ExpiresAtPicker({
         {parsed.date ? (
           <div className="flex flex-col justify-end gap-2">
             <p className="text-xs text-white/45">
-              Expiră:{" "}
+              {t("admin.expires.prefix")}{" "}
               <span className="text-white/75">
-                {displayDate} la {displayTime}
+                {t("admin.expires.when", {
+                  date: displayDate,
+                  time: displayTime,
+                })}
               </span>
             </p>
             <button
@@ -427,12 +419,12 @@ export function ExpiresAtPicker({
               className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-white/60 transition hover:border-white/20 hover:text-white"
             >
               <FaTimes className="h-3 w-3" />
-              Fără expirare
+              {t("admin.expires.clear")}
             </button>
           </div>
         ) : (
           <p className="max-w-[180px] self-center text-xs leading-relaxed text-white/40">
-            Selectează o dată, apoi ajustează ora din listele derulabile.
+            {t("admin.expires.hint")}
           </p>
         )}
       </div>

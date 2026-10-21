@@ -2,6 +2,7 @@
 
 import { clerkClient } from "@clerk/nextjs/server";
 import { requireAdmin } from "@/lib/adminAuth";
+import { getT } from "@/lib/i18n/get-t";
 import { prisma } from "@/lib/db";
 import type { PayoutTrackerData } from "@/lib/payoutTracker/types";
 import { isValidTrackerData } from "@/lib/payoutTracker/validation";
@@ -204,7 +205,8 @@ export async function getUserPayoutTracker(
   await requireAdmin();
 
   if (!clerkUserId || typeof clerkUserId !== "string") {
-    throw new Error("ID utilizator invalid.");
+    const t = await getT();
+    throw new Error(t("admin.users.error.invalidId"));
   }
 
   const client = await clerkClient();

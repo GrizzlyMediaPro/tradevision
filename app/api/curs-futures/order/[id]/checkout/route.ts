@@ -16,20 +16,22 @@ import {
   ronToStripeBani,
 } from "@/lib/eurRonExchange";
 import { getSiteUrl, getStripeClient } from "@/lib/stripe";
+import { getT } from "@/lib/i18n/get-t";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(_req: Request, context: RouteContext) {
+  const t = await getT();
   try {
     const { id } = await context.params;
     if (!(await assertOrderAccess(id))) {
-      return NextResponse.json({ error: "Acces neautorizat." }, { status: 403 });
+      return NextResponse.json({ error: t("course.api.unauthorized") }, { status: 403 });
     }
 
     const stripe = getStripeClient();
     if (!stripe) {
       return NextResponse.json(
-        { error: "Plata online nu este configurată momentan." },
+        { error: t("course.api.stripeOff") },
         { status: 503 },
       );
     }
@@ -38,20 +40,20 @@ export async function POST(_req: Request, context: RouteContext) {
       where: { id },
     });
     if (!order) {
-      return NextResponse.json({ error: "Comanda nu a fost găsită." }, { status: 404 });
+      return NextResponse.json({ error: t("course.api.notFound") }, { status: 404 });
     }
     if (isOrderPaid(order.status)) {
-      return NextResponse.json({ error: "Comanda este deja plătită." }, { status: 400 });
+      return NextResponse.json({ error: t("course.api.alreadyPaid") }, { status: 400 });
     }
     if (!isOrderReadyForCheckout(order.status)) {
       return NextResponse.json(
-        { error: "Completează formularul înainte de plată." },
+        { error: t("course.api.incomplete") },
         { status: 400 },
       );
     }
     if (!order.acceptedTerms || !order.acceptedPrivacy || !order.billingData) {
       return NextResponse.json(
-        { error: "Completează toate câmpurile și acordurile obligatorii." },
+        { error: t("course.api.agreements") },
         { status: 400 },
       );
     }
@@ -73,14 +75,17 @@ export async function POST(_req: Request, context: RouteContext) {
             currency: "ron",
             unit_amount: ronToStripeBani(finalAmountRon),
             product_data: {
-              name: PRACTICAL_COURSE.title,
-              description: `${PRACTICAL_COURSE.subtitle} (preț contractual ${finalAmountEur} EUR)`,
+              name: t("futures.title"),
+              description: t("course.stripeDescription", {
+                subtitle: t("futures.subtitle"),
+                amount: finalAmountEur,
+              }),
             },
           },
         },
       ],
       success_url: `${siteUrl}${PRACTICAL_COURSE.thanksPath}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}${PRACTICAL_COURSE.path}?cancelled=1`,
+      cancel_url: `${siteUrl}${PRACTICAL_COURSE.checkoutPath}?cancelled=1`,
       metadata: {
         orderId: id,
         discountCode: order.discountCode ?? "",
@@ -108,17 +113,18 @@ export async function POST(_req: Request, context: RouteContext) {
   } catch (err) {
     console.error("Eroare la crearea sesiunii Stripe", err);
     return NextResponse.json(
-      { error: "Eroare internă. Te rugăm să încerci din nou." },
+      { error: t("course.api.internalRetry") },
       { status: 500 },
     );
   }
 }
 
 export async function GET(_req: Request, context: RouteContext) {
+  const t = await getT();
   try {
     const { id } = await context.params;
     if (!(await assertOrderAccess(id))) {
-      return NextResponse.json({ error: "Acces neautorizat." }, { status: 403 });
+      return NextResponse.json({ error: t("course.api.unauthorized") }, { status: 403 });
     }
 
     const order = await prisma.practicalCourseOrder.findUnique({
@@ -131,7 +137,7 @@ export async function GET(_req: Request, context: RouteContext) {
       },
     });
     if (!order) {
-      return NextResponse.json({ error: "Comanda nu a fost găsită." }, { status: 404 });
+      return NextResponse.json({ error: t("course.api.notFound") }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -140,6 +146,6 @@ export async function GET(_req: Request, context: RouteContext) {
     });
   } catch (err) {
     console.error("Eroare la citirea stării comenzii", err);
-    return NextResponse.json({ error: "Eroare internă." }, { status: 500 });
+    return NextResponse.json({ error: t("course.api.internal") }, { status: 500 });
   }
 }

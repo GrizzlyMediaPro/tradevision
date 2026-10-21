@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCopy } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 const FALLBACK_PARTNERS = [
   {
@@ -54,11 +55,14 @@ type DealsProps = {
   }[];
 };
 
-function formatDiscount(raw: string): string {
+function formatDiscount(
+  raw: string,
+  format: (value: number) => string,
+): string {
   if (!raw) return "";
   const numeric = Number(raw.toString().replace(/[^\d.]/g, ""));
   if (Number.isNaN(numeric)) return raw;
-  return `${numeric}% DISCOUNT`;
+  return format(numeric);
 }
 
 function normalizeUrl(raw?: string | null): string {
@@ -70,6 +74,7 @@ function normalizeUrl(raw?: string | null): string {
 }
 
 export function Deals({ deals: rawDeals }: DealsProps) {
+  const t = useT();
   const partners: DealItem[] = useMemo(() => {
     if (rawDeals && rawDeals.length > 0) {
       return rawDeals.map((d) => ({
@@ -188,13 +193,13 @@ export function Deals({ deals: rawDeals }: DealsProps) {
     <section className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-12 overflow-visible">
       {copied && (
         <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-4 py-1.5 text-xs font-medium text-emerald-200 shadow-lg">
-          Codul a fost copiat
+          {t("firms.copied")}
         </div>
       )}
       <div className="w-full flex flex-col items-center text-center gap-10 overflow-visible">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Cele mai bune oferte și comparații de prop firms
+            {t("deals.title")}
           </h2>
           <div className="mt-3 h-[2px] w-[100px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         </div>
@@ -251,7 +256,9 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                       </div>
 
                       <p className="text-3xl font-semibold text-white">
-                        {formatDiscount(partner.discount)}
+                        {formatDiscount(partner.discount, (value) =>
+                          t("firms.discountBadge", { value }),
+                        )}
                       </p>
 
                       <div className="flex flex-col items-center gap-2">
@@ -263,7 +270,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                           <span>{partner.code}</span>
                         </button>
                         <span className="text-[11px] text-white/60">
-                          Copiază codul
+                          {t("firms.copyTheCode")}
                         </span>
                       </div>
 
@@ -273,7 +280,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                         rel={partner.fundingUrl ? "noopener noreferrer" : undefined}
                         className="mt-4 w-full inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 via-purple-500 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(0,0,0,0.7)] transition hover:brightness-110 cursor-pointer"
                       >
-                        Obține finanțare
+                        {t("firms.getFunding")}
                       </a>
                     </div>
                   </article>
@@ -286,7 +293,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
               <button
                 onClick={handlePrev}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/40 text-xl text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
-                aria-label="Previous deals"
+                aria-label={t("deals.prev")}
               >
                 ‹
               </button>
@@ -301,7 +308,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                         ? "w-7 bg-purple-500"
                         : "w-2.5 bg-white/30 hover:bg-white/60"
                     }`}
-                    aria-label={`Go to deal ${idx + 1}`}
+                    aria-label={t("deals.goto", { n: idx + 1 })}
                   />
                 ))}
               </div>
@@ -309,7 +316,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
               <button
                 onClick={handleNext}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/40 text-xl text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
-                aria-label="Next deals"
+                aria-label={t("deals.next")}
               >
                 ›
               </button>
@@ -347,7 +354,9 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                   </div>
 
                   <p className="text-3xl font-semibold text-white">
-                    {formatDiscount(partner.discount)}
+                    {formatDiscount(partner.discount, (value) =>
+                      t("firms.discountBadge", { value }),
+                    )}
                   </p>
 
                   <div className="flex flex-col items-center gap-2">
@@ -359,7 +368,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                       <span>{partner.code}</span>
                     </button>
                     <span className="text-[11px] text-white/60">
-                      Copiază codul
+                      {t("firms.copyTheCode")}
                     </span>
                   </div>
 
@@ -369,7 +378,7 @@ export function Deals({ deals: rawDeals }: DealsProps) {
                     rel={partner.fundingUrl ? "noopener noreferrer" : undefined}
                     className="mt-4 w-full inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 via-purple-500 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(0,0,0,0.7)] transition hover:brightness-110 cursor-pointer"
                   >
-                    Obține finanțare
+                    {t("firms.getFunding")}
                   </a>
                 </div>
               </article>

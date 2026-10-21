@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n/get-t";
 import {
   getPaidCourseClients,
   getStuckCourseOrders,
@@ -8,6 +9,7 @@ import { AdminPracticalCourseClientsClient } from "./AdminPracticalCourseClients
 export const dynamic = "force-dynamic";
 
 export default async function AdminPracticalCourseClientsPage() {
+  const t = await getT();
   const [clients, stuckOrders] = await Promise.all([
     getPaidCourseClients(),
     getStuckCourseOrders(),
@@ -18,11 +20,11 @@ export default async function AdminPracticalCourseClientsPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <Link href="/admin" className="text-sm text-white/50 hover:text-white">
-            ← Admin
+            {t("admin.common.backArrow")}
           </Link>
-          <h1 className="mt-2 text-3xl font-bold">Clienți Curs Futures</h1>
+          <h1 className="mt-2 text-3xl font-bold">{t("admin.clients.title")}</h1>
           <p className="mt-2 text-sm text-white/60">
-            Persoane care au finalizat plata pentru Curs Futures.
+            {t("admin.clients.subtitle")}
           </p>
         </div>
 

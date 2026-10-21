@@ -1,3 +1,7 @@
+import type { Locale } from "@/lib/i18n/locale";
+import { messages } from "@/lib/i18n/messages/catalog";
+import { translate } from "@/lib/i18n/translate";
+
 export function getDefaultWebinarCountdownTarget() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -22,18 +26,22 @@ export function getWebinarCountdownTarget(targetDate?: string | Date | null) {
   return getDefaultWebinarCountdownTarget();
 }
 
-export function formatWebinarLiveLabel(targetTimestamp: number) {
+export function formatWebinarLiveLabel(
+  targetTimestamp: number,
+  locale: Locale = "en",
+) {
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const targetDate = new Date(targetTimestamp);
-  const weekday = new Intl.DateTimeFormat("ro-RO", { weekday: "long" }).format(
+  const weekday = new Intl.DateTimeFormat(dateLocale, { weekday: "long" }).format(
     targetDate
   );
-  const day = new Intl.DateTimeFormat("ro-RO", { day: "numeric" }).format(
+  const day = new Intl.DateTimeFormat(dateLocale, { day: "numeric" }).format(
     targetDate
   );
-  const month = new Intl.DateTimeFormat("ro-RO", { month: "long" }).format(
+  const month = new Intl.DateTimeFormat(dateLocale, { month: "long" }).format(
     targetDate
   );
-  const time = new Intl.DateTimeFormat("ro-RO", {
+  const time = new Intl.DateTimeFormat(dateLocale, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -42,7 +50,12 @@ export function formatWebinarLiveLabel(targetTimestamp: number) {
   const weekdayLabel = weekday.charAt(0).toUpperCase() + weekday.slice(1);
   const monthLabel = month.charAt(0).toUpperCase() + month.slice(1);
 
-  return `Live ${weekdayLabel}, ${day} ${monthLabel} la ora ${time}`;
+  return translate(messages[locale], "webinar.liveAt", {
+    weekday: weekdayLabel,
+    day,
+    month: monthLabel,
+    time,
+  });
 }
 
 export function formatCountdownUnit(value: number) {

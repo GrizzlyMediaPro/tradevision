@@ -8,6 +8,9 @@ import {
 import { generateUnsubscribeToken } from "@/lib/unsubscribe";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { formatPriceEur } from "@/lib/practicalCoursePricing";
+import type { Locale } from "@/lib/i18n/locale";
+import { messages } from "@/lib/i18n/messages/catalog";
+import { translate, type Vars } from "@/lib/i18n/translate";
 
 export async function sendPracticalCourseThankYouEmail(input: {
   recipientEmail: string;
@@ -16,45 +19,52 @@ export async function sendPracticalCourseThankYouEmail(input: {
   invoicePdf?: Buffer | null;
   invoiceSeries?: string | null;
   invoiceNumber?: string | null;
+  locale?: Locale;
 }) {
   if (!resend) {
     console.warn("Resend nu este configurat; emailul de mulțumire nu a fost trimis.");
     return;
   }
 
+  const locale = input.locale ?? "en";
+  const t = (id: string, vars?: Vars) => translate(messages[locale], id, vars);
+  const title = t("futures.title");
   const email = input.recipientEmail.trim().toLowerCase();
-  const name = input.recipientName.trim() || "participant";
-  const subject = `Mulțumim pentru achiziția ${PRACTICAL_COURSE.title}`;
+  const name = input.recipientName.trim() || t("email.course.fallbackName");
+  const subject = t("email.course.subject", { title });
 
   const invoiceLine =
     input.invoiceSeries && input.invoiceNumber
-      ? `Factura fiscală ${input.invoiceSeries} ${input.invoiceNumber} este atașată la acest email.`
-      : "Factura fiscală îți va fi trimisă separat, dacă este cazul.";
+      ? t("email.course.invoiceAttached", {
+          series: input.invoiceSeries,
+          number: input.invoiceNumber,
+        })
+      : t("email.course.invoiceLater");
 
   const telegramUrl = PRACTICAL_COURSE.telegramGroupUrl;
 
   const lines = [
-    `Salut ${name},`,
+    t("email.course.greeting", { name }),
     "",
-    `Îți mulțumim pentru achiziția ${PRACTICAL_COURSE.title}.`,
+    t("email.course.thanks", { title }),
     "",
-    `Ai achiziționat: ${PRACTICAL_COURSE.title}.`,
+    t("email.course.purchased", { title }),
     "",
-    `Suma plătită: ${formatPriceEur(input.finalAmountEur)}.`,
+    t("email.course.paid", { amount: formatPriceEur(input.finalAmountEur) }),
     "",
     invoiceLine,
     "",
-    "Mai jos ai link-ul pentru acces în grupul de curs, acolo unde sunt materiale și acces la ședințele live.",
+    t("email.course.group"),
     "",
     telegramUrl,
     "",
-    "Dacă ai întrebări, ne poți contacta prin canalele oficiale de pe site.",
+    t("email.course.questions"),
     "",
-    "Îți dorim mult succes în parcursul tău de învățare!",
+    t("email.course.success"),
   ];
 
   const text = renderPlainTextBody(
-    [...lines, "", "Cu respect,", "Trade Vision România"].join("\n"),
+    [...lines, "", t("email.respect"), "Trade Vision România"].join("\n"),
   );
 
   const telegramIdx = lines.indexOf(telegramUrl);
@@ -74,8 +84,11 @@ export async function sendPracticalCourseThankYouEmail(input: {
           {
             filename:
               input.invoiceSeries && input.invoiceNumber
-                ? `Factura_${input.invoiceSeries}_${input.invoiceNumber}.pdf`
-                : "Factura.pdf",
+                ? t("email.course.invoiceFilename", {
+                    series: input.invoiceSeries,
+                    number: input.invoiceNumber,
+                  })
+                : t("email.course.invoiceFilenameFallback"),
             content: input.invoicePdf,
           },
         ]
@@ -89,9 +102,9 @@ export async function sendPracticalCourseThankYouEmail(input: {
       text,
       html: renderEmailLayout({
         title: subject,
-        previewText:
-          "Plata cursului a fost confirmată. Găsești linkul către grupul de curs în acest email.",
+        previewText: t("email.course.preview"),
         contentHtml,
+        locale,
         recipientEmail: email,
         unsubscribeToken: generateUnsubscribeToken(email),
       }),
@@ -109,23 +122,30 @@ export async function sendPracticalCourseInvoiceEmail(input: {
   invoicePdf: Buffer;
   invoiceSeries: string;
   invoiceNumber: string;
+  locale?: Locale;
 }) {
   if (!resend) {
     console.warn("Resend nu este configurat; factura nu a fost trimisă.");
     return;
   }
 
+  const locale = input.locale ?? "en";
+  const t = (id: string, vars?: Vars) => translate(messages[locale], id, vars);
+  const title = t("futures.title");
   const email = input.recipientEmail.trim().toLowerCase();
-  const name = input.recipientName.trim() || "participant";
-  const subject = `Factura ta ${PRACTICAL_COURSE.title}`;
+  const name = input.recipientName.trim() || t("email.course.fallbackName");
+  const subject = t("email.invoice.subject", { title });
 
   const lines = [
-    `Salut ${name},`,
+    t("email.course.greeting", { name }),
     "",
-    `Îți trimitem factura fiscală pentru achiziția ${PRACTICAL_COURSE.title}.`,
-    `Număr factură: ${input.invoiceSeries} ${input.invoiceNumber}.`,
+    t("email.invoice.body", { title }),
+    t("email.invoice.number", {
+      series: input.invoiceSeries,
+      number: input.invoiceNumber,
+    }),
     "",
-    "Documentul PDF este atașat la acest email.",
+    t("email.invoice.attached"),
   ];
 
   const text = renderPlainTextBody(lines.join("\n"));
@@ -138,14 +158,18 @@ export async function sendPracticalCourseInvoiceEmail(input: {
     text,
     html: renderEmailLayout({
       title: subject,
-      previewText: "Factura fiscală pentru Curs Futures este atașată.",
+      previewText: t("email.invoice.preview"),
       contentHtml,
+      locale,
       recipientEmail: email,
       unsubscribeToken: generateUnsubscribeToken(email),
     }),
     attachments: [
       {
-        filename: `Factura_${input.invoiceSeries}_${input.invoiceNumber}.pdf`,
+        filename: t("email.course.invoiceFilename", {
+          series: input.invoiceSeries,
+          number: input.invoiceNumber,
+        }),
         content: input.invoicePdf,
       },
     ],

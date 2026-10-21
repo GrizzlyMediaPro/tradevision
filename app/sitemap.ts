@@ -12,6 +12,7 @@ const staticPaths: { path: string; changeFrequency: MetadataRoute.Sitemap[0]["ch
     { path: "/contact", changeFrequency: "monthly", priority: 0.7 },
     { path: "/curs", changeFrequency: "monthly", priority: 0.8 },
     { path: "/curs-futures", changeFrequency: "monthly", priority: 0.85 },
+    { path: "/curs-futures/inscriere", changeFrequency: "monthly", priority: 0.6 },
     { path: "/curs-futures/multumim", changeFrequency: "monthly", priority: 0.4 },
     { path: "/politica-cookies", changeFrequency: "yearly", priority: 0.3 },
     { path: "/politica-confidentialitate", changeFrequency: "yearly", priority: 0.3 },

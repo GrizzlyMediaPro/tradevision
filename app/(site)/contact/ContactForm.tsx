@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { FaEnvelope, FaCheckCircle } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 export function ContactForm() {
+  const t = useT();
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,8 +43,8 @@ export function ContactForm() {
           <FaEnvelope className="h-4 w-4 text-yellow-300" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-white">Trimite un mesaj</h2>
-          <p className="text-xs text-white/50">Completează formularul de mai jos</p>
+          <h2 className="text-lg font-semibold text-white">{t("contact.formTitle")}</h2>
+          <p className="text-xs text-white/50">{t("contact.formSubtitle")}</p>
         </div>
       </div>
 
@@ -51,15 +53,15 @@ export function ContactForm() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-400/30">
             <FaCheckCircle className="h-8 w-8 text-emerald-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white">Mesaj trimis cu succes!</h3>
+          <h3 className="text-lg font-semibold text-white">{t("contact.successTitle")}</h3>
           <p className="text-sm text-white/50 max-w-sm text-center">
-            Îți vom răspunde cât mai curând posibil. Mulțumim că ne-ai contactat!
+            {t("contact.successBody")}
           </p>
           <button
             onClick={() => setStatus("idle")}
             className="mt-2 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-2.5 text-xs font-semibold text-white/80 hover:bg-white/10 transition cursor-pointer"
           >
-            Trimite alt mesaj
+            {t("contact.sendAnother")}
           </button>
         </div>
       ) : (
@@ -67,19 +69,19 @@ export function ContactForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Nume
+                {t("contact.name")}
               </label>
               <input
                 id="name"
                 name="name"
                 type="text"
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-yellow-300/60 focus:bg-white/8 focus:ring-1 focus:ring-yellow-300/30"
-                placeholder="Numele tău"
+                placeholder={t("contact.namePlaceholder")}
               />
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="email" className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Email
+                {t("contact.email")}
               </label>
               <input
                 id="email"
@@ -87,27 +89,27 @@ export function ContactForm() {
                 type="email"
                 required
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-yellow-300/60 focus:bg-white/8 focus:ring-1 focus:ring-yellow-300/30"
-                placeholder="email@exemplu.com"
+                placeholder={t("contact.emailPlaceholder")}
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <label htmlFor="phone" className="text-xs font-medium uppercase tracking-wider text-white/60">
-              Telefon
+              {t("contact.phone")}
             </label>
             <input
               id="phone"
               name="phone"
               type="tel"
               className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-yellow-300/60 focus:bg-white/8 focus:ring-1 focus:ring-yellow-300/30"
-              placeholder="+40 7XX XXX XXX"
+              placeholder={t("contact.phonePlaceholder")}
             />
           </div>
 
           <div className="flex flex-col gap-2">
             <label htmlFor="message" className="text-xs font-medium uppercase tracking-wider text-white/60">
-              Mesaj
+              {t("contact.message")}
             </label>
             <textarea
               id="message"
@@ -115,13 +117,13 @@ export function ContactForm() {
               rows={5}
               required
               className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition focus:border-yellow-300/60 focus:bg-white/8 focus:ring-1 focus:ring-yellow-300/30 resize-none"
-              placeholder="Spune-ne cu ce te putem ajuta..."
+              placeholder={t("contact.messagePlaceholder")}
             />
           </div>
 
           {status === "error" && (
             <p className="text-xs text-red-400">
-              A apărut o eroare la trimiterea mesajului. Încearcă din nou.
+              {t("contact.error")}
             </p>
           )}
 
@@ -130,7 +132,7 @@ export function ContactForm() {
             disabled={status === "loading"}
             className="mt-2 w-full md:w-auto md:self-end inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-purple-500 via-purple-500 to-purple-600 px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer uppercase tracking-wide disabled:opacity-60"
           >
-            {status === "loading" ? "Se trimite..." : "Trimite mesajul"}
+            {status === "loading" ? t("contact.sending") : t("contact.submit")}
           </button>
         </form>
       )}

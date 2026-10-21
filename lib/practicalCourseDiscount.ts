@@ -15,7 +15,7 @@ export async function validateDiscountCode(
 ): Promise<{ ok: true; discount: AppliedDiscount } | { ok: false; error: string }> {
   const code = normalizeDiscountCode(rawCode);
   if (!code) {
-    return { ok: false, error: "Introdu un cod de discount." };
+    return { ok: false, error: "course.discount.empty" };
   }
 
   const record = await prisma.courseDiscountCode.findUnique({
@@ -23,22 +23,22 @@ export async function validateDiscountCode(
   });
 
   if (!record || !record.active) {
-    return { ok: false, error: "Codul de discount nu este valid." };
+    return { ok: false, error: "course.discount.invalid" };
   }
 
   if (record.expiresAt && record.expiresAt < new Date()) {
-    return { ok: false, error: "Codul de discount a expirat." };
+    return { ok: false, error: "course.discount.expired" };
   }
 
   if (
     typeof record.maxUses === "number" &&
     record.usedCount >= record.maxUses
   ) {
-    return { ok: false, error: "Codul de discount a atins limita de utilizări." };
+    return { ok: false, error: "course.discount.limit" };
   }
 
   if (record.type !== "percent" && record.type !== "fixed") {
-    return { ok: false, error: "Codul de discount nu este configurat corect." };
+    return { ok: false, error: "course.discount.misconfigured" };
   }
 
   const basePriceEur = await getBasePriceEur();
@@ -48,7 +48,7 @@ export async function validateDiscountCode(
   });
 
   if (!pricing) {
-    return { ok: false, error: "Nu am putut calcula reducerea." };
+    return { ok: false, error: "course.discount.calc" };
   }
 
   return {

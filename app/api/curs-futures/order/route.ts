@@ -7,13 +7,15 @@ import {
 } from "@/lib/practicalCourseOrder";
 import { getBasePriceEur } from "@/lib/practicalCoursePricing";
 import { getEurRonQuote } from "@/lib/eurRonExchange";
+import { getT } from "@/lib/i18n/get-t";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET() {
+  const t = await getT();
   try {
     const orderId = await getOrderCookieOrderId();
     if (!orderId) {
-      return NextResponse.json({ error: "Comanda nu a fost găsită." }, { status: 404 });
+      return NextResponse.json({ error: t("course.api.notFound") }, { status: 404 });
     }
 
     const order = await prisma.practicalCourseOrder.findUnique({
@@ -33,7 +35,7 @@ export async function GET() {
     });
 
     if (!order) {
-      return NextResponse.json({ error: "Comanda nu a fost găsită." }, { status: 404 });
+      return NextResponse.json({ error: t("course.api.notFound") }, { status: 404 });
     }
 
     const eurRonQuote = await getEurRonQuote();
@@ -45,11 +47,12 @@ export async function GET() {
     });
   } catch (err) {
     console.error("Eroare la citirea comenzii", err);
-    return NextResponse.json({ error: "Eroare internă." }, { status: 500 });
+    return NextResponse.json({ error: t("course.api.internal") }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
+  const t = await getT();
   try {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -59,7 +62,7 @@ export async function POST(req: Request) {
     });
     if (!success) {
       return NextResponse.json(
-        { error: "Prea multe cereri. Încearcă din nou într-un minut." },
+        { error: t("course.api.rateLimit") },
         { status: 429 },
       );
     }
@@ -71,7 +74,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Eroare la crearea comenzii curs practic", err);
     return NextResponse.json(
-      { error: "Eroare internă. Te rugăm să încerci din nou." },
+      { error: t("course.api.internalRetry") },
       { status: 500 },
     );
   }

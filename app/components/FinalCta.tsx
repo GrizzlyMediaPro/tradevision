@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 export function FinalCta() {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
@@ -47,11 +49,10 @@ export function FinalCta() {
 
       <div className="relative w-full max-w-[1250px] mx-auto px-4 pt-20 pb-16 flex flex-col items-center text-center gap-6">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
-          Gata să faci primii pași în tranzacționare?
+          {t("final.title")}
         </h2>
         <p className="text-sm md:text-base text-white/55 max-w-lg">
-          Abonează-te și primești noutăți despre tranzacționare, alerte de piață și
-          conținut educativ direct pe email.
+          {t("final.subtitle")}
         </p>
 
         {status === "done" ? (
@@ -60,10 +61,10 @@ export function FinalCta() {
               <FaCheckCircle className="h-7 w-7 text-emerald-400" />
             </div>
             <p className="text-base font-semibold text-emerald-400">
-              Te-ai înscris cu succes!
+              {t("final.success")}
             </p>
             <p className="text-xs text-white/45">
-              O să primești pe acest email noutăți legate de tranzacționare și conținut educativ.
+              {t("final.successDetail")}
             </p>
           </div>
         ) : (
@@ -77,7 +78,7 @@ export function FinalCta() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Emailul tău"
+                placeholder={t("final.placeholder")}
                 className="flex-1 rounded-full border border-white/15 bg-white/5 px-5 py-3.5 text-sm text-white placeholder-white/35 outline-none transition focus:border-yellow-300/50 focus:ring-1 focus:ring-yellow-300/30"
               />
               <button
@@ -85,7 +86,7 @@ export function FinalCta() {
                 disabled={status === "loading"}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-60 whitespace-nowrap"
               >
-                {status === "loading" ? "Se trimite..." : "Abonează-te gratuit"}
+                {status === "loading" ? t("common.sending") : t("final.submit")}
                 {status !== "loading" && (
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -95,7 +96,7 @@ export function FinalCta() {
             </form>
 
             {status === "error" && (
-              <p className="text-xs text-red-400">A apărut o eroare. Încearcă din nou.</p>
+              <p className="text-xs text-red-400">{t("common.error")}</p>
             )}
           </>
         )}

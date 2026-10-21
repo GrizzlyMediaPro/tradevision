@@ -27,6 +27,7 @@ import {
   deleteCourseEnrollment,
   type CourseEnrollmentData,
 } from '../actions/course';
+import { useI18n, useT } from '@/lib/i18n/I18nProvider';
 
 type FormMode = 'create' | 'edit';
 
@@ -64,6 +65,9 @@ function extractYouTubeId(input: string): string {
 }
 
 export default function AdminCursPage() {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === 'ro' ? 'ro-RO' : 'en-GB';
   const [chapters, setChapters] = useState<CourseChapter[]>([]);
   const [enrollments, setEnrollments] = useState<CourseEnrollmentData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -193,7 +197,7 @@ export default function AdminCursPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t('admin.common.back')}</span>
         </Link>
       </div>
 
@@ -205,12 +209,11 @@ export default function AdminCursPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Curs Trading
+          {t('admin.course.title')}
         </h1>
         <div className="mt-3 h-[2px] w-[130px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Creează, editează sau șterge lecțiile cursului și setează link-urile
-          YouTube care vor fi redate pe pagina de curs.
+          {t('admin.course.subtitle')}
         </p>
       </div>
 
@@ -223,12 +226,12 @@ export default function AdminCursPage() {
               <h2 className="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
                 <span>
                   {form.mode === 'create'
-                    ? 'Adaugă lecție'
-                    : 'Editează lecție'}
+                    ? t('admin.course.addTitle')
+                    : t('admin.course.editTitle')}
                 </span>
               </h2>
               <p className="mt-1 text-xs text-white/45">
-                Setează titlul, descrierea, numărul lecției și link-ul YouTube.
+                {t('admin.course.formHelp')}
               </p>
             </div>
           </div>
@@ -238,28 +241,28 @@ export default function AdminCursPage() {
             <div className="grid grid-cols-[160px_1fr] gap-3">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Etichetă
+                  {t('admin.course.label')}
                 </label>
                 <input
                   type="text"
                   value={form.lessonLabel}
                   onChange={handleFieldChange('lessonLabel')}
-                  placeholder="Ex: Lecția 2.1"
+                  placeholder={t('admin.course.labelPlaceholder')}
                   className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg-white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
                 <p className="text-[11px] text-white/40">
-                  Gol = Lecția N
+                  {t('admin.course.labelHint')}
                 </p>
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Titlu lecție
+                  {t('admin.course.lessonTitle')}
                 </label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={handleFieldChange('title')}
-                  placeholder="Ex: Introducere în Trading"
+                  placeholder={t('admin.course.titlePlaceholder')}
                   className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg-white/8 focus:ring-1 focus:ring-purple-400/30"
                 />
               </div>
@@ -268,13 +271,13 @@ export default function AdminCursPage() {
             {/* Description */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Descriere lecție
+                {t('admin.course.description')}
               </label>
               <textarea
                 rows={4}
                 value={form.description}
                 onChange={handleFieldChange('description')}
-                placeholder="Descriere scurtă a conținutului lecției..."
+                placeholder={t('admin.course.descriptionPlaceholder')}
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg-white/8 focus:ring-1 focus:ring-purple-400/30 resize-none"
               />
             </div>
@@ -282,7 +285,7 @@ export default function AdminCursPage() {
             {/* YouTube URL */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Link YouTube (embed)
+                {t('admin.course.youtube')}
               </label>
               <input
                 type="text"
@@ -292,15 +295,16 @@ export default function AdminCursPage() {
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg-white/8 focus:ring-1 focus:ring-purple-400/30"
               />
               <p className="text-[11px] text-white/40">
-                Poți lipi atât link complet YouTube, cât și doar ID-ul
-                video-ului.
+                {t('admin.course.youtubeHelp')}
               </p>
             </div>
 
             {/* Submit */}
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-[11px] text-white/40 max-w-xs">
-                Modificările sunt salvate în baza de date și folosite pe pagina <code>/curs</code>.
+                {t('admin.course.savedNoteBefore')}
+                <code>/curs</code>
+                {t('admin.course.savedNoteAfter')}
               </p>
               <button
                 type="submit"
@@ -310,12 +314,12 @@ export default function AdminCursPage() {
                 {form.mode === 'create' ? (
                   <>
                     <FaPlus className="h-4 w-4" />
-                    <span>Adaugă lecție</span>
+                    <span>{t('admin.course.addTitle')}</span>
                   </>
                 ) : (
                   <>
                     <FaEdit className="h-4 w-4" />
-                    <span>Salvează modificările</span>
+                    <span>{t('admin.course.save')}</span>
                   </>
                 )}
               </button>
@@ -327,16 +331,15 @@ export default function AdminCursPage() {
         <section className="flex flex-col rounded-3xl border border-white/10 bg-linear-to-b from-white/5 to-white/2 px-6 py-6 md:px-7 md:py-7 shadow-[0_16px_40px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 mb-4">
             <h2 className="text-sm md:text-base font-semibold text-white">
-              Lecții curs ({chapters.length})
+              {t('admin.course.list', { count: chapters.length })}
             </h2>
           </div>
 
           {loading ? (
-            <p className="text-sm text-white/45">Se încarcă...</p>
+            <p className="text-sm text-white/45">{t('admin.common.loading')}</p>
           ) : chapters.length === 0 ? (
             <p className="text-sm text-white/45">
-              Nu există încă nicio lecție. Adaugă una din formularul din
-              stânga.
+              {t('admin.course.empty')}
             </p>
           ) : (
             <div className="mt-1 flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1">
@@ -350,7 +353,9 @@ export default function AdminCursPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-white truncate">
-                      {ch.lessonLabel || `Lecția ${idx + 1}`}: {ch.title}
+                      {ch.lessonLabel ||
+                        t('admin.course.lessonFallback', { n: idx + 1 })}
+                      : {ch.title}
                     </p>
                     {ch.description && (
                       <p className="mt-1 text-[11px] text-white/55 line-clamp-2">
@@ -358,7 +363,7 @@ export default function AdminCursPage() {
                       </p>
                     )}
                     <p className="mt-1 text-[11px] text-white/40">
-                      Video ID:{' '}
+                      {t('admin.course.videoId')}{' '}
                       <span className="font-mono text-white/70">
                         {ch.videoId}
                       </span>
@@ -395,19 +400,19 @@ export default function AdminCursPage() {
           </div>
           <div>
             <h2 className="text-lg md:text-xl font-semibold text-white">
-              Persoane înscrise ({enrollments.length})
+              {t('admin.course.enrolled', { count: enrollments.length })}
             </h2>
             <p className="mt-0.5 text-xs text-white/45">
-              Persoanele care și-au completat datele pentru a accesa cursul gratuit.
+              {t('admin.course.enrolledHelp')}
             </p>
           </div>
         </div>
 
         {loadingEnrollments ? (
-          <p className="text-sm text-white/45">Se încarcă...</p>
+          <p className="text-sm text-white/45">{t('admin.common.loading')}</p>
         ) : enrollments.length === 0 ? (
           <p className="text-sm text-white/45">
-            Nu există încă nicio persoană înscrisă.
+            {t('admin.course.enrolledEmpty')}
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -415,11 +420,11 @@ export default function AdminCursPage() {
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">#</th>
-                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">Nume</th>
-                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">Prenume</th>
-                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">Email</th>
-                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">Telefon</th>
-                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">Data</th>
+                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">{t('admin.common.name')}</th>
+                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">{t('admin.course.firstName')}</th>
+                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">{t('admin.common.email')}</th>
+                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">{t('admin.common.phone')}</th>
+                  <th className="pb-3 pr-4 text-xs font-medium uppercase tracking-wider text-white/50">{t('admin.common.date')}</th>
                   <th className="pb-3 text-xs font-medium uppercase tracking-wider text-white/50"></th>
                 </tr>
               </thead>
@@ -445,7 +450,7 @@ export default function AdminCursPage() {
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-white/50 text-xs whitespace-nowrap">
-                      {new Date(enrollment.createdAt).toLocaleDateString('ro-RO', {
+                      {new Date(enrollment.createdAt).toLocaleDateString(dateLocale, {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
@@ -461,14 +466,14 @@ export default function AdminCursPage() {
                             onClick={() => handleDeleteEnrollment(enrollment.id)}
                             className="inline-flex items-center gap-1 rounded-full border border-red-500/50 bg-red-500/20 px-3 py-1 text-[11px] font-medium text-red-300 hover:bg-red-500/30 transition cursor-pointer"
                           >
-                            Confirmă
+                            {t('admin.common.confirm')}
                           </button>
                           <button
                             type="button"
                             onClick={() => setConfirmDeleteId(null)}
                             className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] text-white/60 hover:bg-white/10 transition cursor-pointer"
                           >
-                            Anulează
+                            {t('admin.common.cancel')}
                           </button>
                         </div>
                       ) : (

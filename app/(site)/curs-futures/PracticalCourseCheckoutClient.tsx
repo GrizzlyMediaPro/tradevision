@@ -15,6 +15,7 @@ import { PersonTypeToggle } from "@/app/components/practical-course/PersonTypeTo
 import { PracticalCourseShell } from "@/app/components/practical-course/PracticalCourseShell";
 import { useBillingAutofillSync } from "@/app/components/practical-course/useBillingAutofillSync";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
+import { useT } from "@/lib/i18n/I18nProvider";
 import type { EurRonQuote } from "@/lib/eurRonExchange";
 import type { AppliedDiscount } from "@/lib/practicalCoursePricing";
 import {
@@ -36,6 +37,7 @@ export function PracticalCourseCheckoutClient({
   basePriceEur,
   eurRonQuote,
 }: PracticalCourseCheckoutClientProps) {
+  const t = useT();
   const [orderId, setOrderId] = useState<string | null>(initialOrderId);
   const [bootLoading, setBootLoading] = useState(!initialOrderId);
   const [personType, setPersonType] = useState<PersonType>("PF");
@@ -115,10 +117,10 @@ export function PracticalCourseCheckoutClient({
     getMergedPayload,
   ]);
 
-  const validationError = useMemo(
-    () => validateBillingPayload(payload),
-    [payload],
-  );
+  const validationError = useMemo(() => {
+    const id = validateBillingPayload(payload);
+    return id ? t(id) : null;
+  }, [payload, t]);
   const canPay =
     validationError === null && Boolean(orderId) && acceptedTerms && acceptedPrivacy;
 
@@ -137,17 +139,17 @@ export function PracticalCourseCheckoutClient({
         error?: string;
       };
       if (!res.ok || !data.discount) {
-        setDiscountError(data.error || "Codul nu a putut fi aplicat.");
+        setDiscountError(data.error || t("course.checkout.discountFailed"));
         return;
       }
       setAppliedDiscount(data.discount);
       setDiscountCodeInput(data.discount.code);
     } catch {
-      setDiscountError("Eroare de conexiune. Încearcă din nou.");
+      setDiscountError(t("course.checkout.connection"));
     } finally {
       setDiscountLoading(false);
     }
-  }, [orderId, discountCodeInput, discountLoading]);
+  }, [discountCodeInput, discountLoading, orderId, t]);
 
   const handleRemoveDiscount = useCallback(async () => {
     if (!orderId) return;
@@ -160,11 +162,11 @@ export function PracticalCourseCheckoutClient({
       setAppliedDiscount(null);
       setDiscountCodeInput("");
     } catch {
-      setDiscountError("Nu am putut elimina codul.");
+      setDiscountError(t("course.checkout.removeFailed"));
     } finally {
       setDiscountLoading(false);
     }
-  }, [orderId]);
+  }, [orderId, t]);
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -175,7 +177,7 @@ export function PracticalCourseCheckoutClient({
 
       if (submitValidationError || !orderId || status === "loading") {
         if (submitValidationError) {
-          setSubmitError(submitValidationError);
+          setSubmitError(t(submitValidationError));
           setStatus("error");
         }
         return;
@@ -196,7 +198,7 @@ export function PracticalCourseCheckoutClient({
           error?: string;
         };
         if (!billingRes.ok) {
-          setSubmitError(billingData.error || "Nu am putut salva datele.");
+          setSubmitError(billingData.error || t("course.checkout.saveFailed"));
           setStatus("error");
           return;
         }
@@ -211,40 +213,39 @@ export function PracticalCourseCheckoutClient({
         };
         if (!checkoutRes.ok || !checkoutData.url) {
           setSubmitError(
-            checkoutData.error || "Plata nu a putut fi inițiată.",
+            checkoutData.error || t("course.checkout.payFailed"),
           );
           setStatus("error");
           return;
         }
         window.location.href = checkoutData.url;
       } catch {
-        setSubmitError("Eroare de conexiune. Încearcă din nou.");
+        setSubmitError(t("course.checkout.connection"));
         setStatus("error");
       }
     },
-    [getMergedPayload, orderId, status, syncFromDom],
+    [getMergedPayload, orderId, status, syncFromDom, t],
   );
 
   if (bootLoading) {
     return (
       <PracticalCourseShell
-        title="Achiziție Curs Futures"
-        subtitle="Se pregătește formularul..."
+        title={t("course.checkout.title")}
+        subtitle={t("course.checkout.loadingSubtitle")}
       >
-        <p className="text-sm text-white/60">Un moment...</p>
+        <p className="text-sm text-white/60">{t("course.checkout.loading")}</p>
       </PracticalCourseShell>
     );
   }
 
   return (
     <PracticalCourseShell
-      title="Achiziție Curs Futures"
-      subtitle="Completează datele de facturare, acceptă acordurile legale și finalizează plata."
+      title={t("course.checkout.title")}
+      subtitle={t("course.checkout.subtitle")}
     >
       {cancelled ? (
         <div className="mb-6 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          Plata a fost anulată. Poți completa din nou formularul și încerca
-          din nou.
+          {t("course.checkout.cancelled")}
         </div>
       ) : null}
 
@@ -296,7 +297,7 @@ export function PracticalCourseCheckoutClient({
           }
           className="inline-flex w-full items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
-          {status === "loading" ? "Se deschide plata..." : "Plătește acum"}
+          {status === "loading" ? t("course.checkout.paying") : t("course.checkout.pay")}
         </button>
       </form>
     </PracticalCourseShell>

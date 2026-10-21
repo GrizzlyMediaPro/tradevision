@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/adminAuth";
+import { getT } from "@/lib/i18n/get-t";
 import { getDefaultWebinarCountdownTarget } from "@/app/lib/webinarCountdown";
 
 export type WebinarSettingsState = {
@@ -35,9 +36,10 @@ export async function getWebinarSettings(): Promise<WebinarSettingsState> {
 export async function saveWebinarSettings(payload: WebinarSettingsState) {
   await requireAdmin();
 
+  const t = await getT();
   const parsedDate = new Date(payload.webinarAt);
   if (Number.isNaN(parsedDate.getTime())) {
-    throw new Error("Data webinar invalida");
+    throw new Error(t("admin.webinar.error.date"));
   }
 
   const existing = await prisma.webinarSettings.findFirst();

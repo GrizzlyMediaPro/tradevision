@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useT } from "@/lib/i18n/I18nProvider";
 import {
   formatCountdownUnit,
 } from "../lib/webinarCountdown";
@@ -13,6 +14,7 @@ type WebinarHeroProps = {
 };
 
 export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
+  const t = useT();
   const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -36,7 +38,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
     <section className="relative isolate w-full min-h-screen overflow-hidden">
       <Image
         src="/webinarhero.png"
-        alt="Banner webinar Trade Vision"
+        alt={t("webinar.hero.bannerAlt")}
         width={1920}
         height={1080}
         priority
@@ -54,38 +56,37 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
           priority
         />
           <div className="mt-12 inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold text-yellow-300 tracking-wide sm:mt-4 sm:text-xs">
-            Webinar LIVE gratuit
+            {t("webinar.hero.badge")}
           </div>
           <h1 className="mt-4 max-w-4xl text-2xl font-bold leading-tight text-white sm:text-3xl md:text-5xl">
-            Pentru începători și traderi
+            {t("webinar.hero.titleBefore")}
             <span className="bg-linear-to-r from-purple-300 via-purple-200 to-yellow-300 bg-clip-text text-transparent">
               {" "}
-              neprofitabili
+              {t("webinar.hero.titleHighlight")}
             </span>
           </h1>
           <p className="mt-3 max-w-3xl px-2 text-sm text-white/80 sm:mt-4 sm:text-base md:text-xl">
-            Îți vom arăta întregul nostru sistem de tranzacționare, de la strategie
-            până la risk management.
+            {t("webinar.hero.subtitle")}
           </p>
           <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
             <div className="flex -space-x-3">
               <Image
                 src="/avatar1herowebinar.jpeg"
-                alt="Participant 1"
+                alt={t("webinar.hero.participantAlt", { index: 1 })}
                 width={40}
                 height={40}
                 className="h-10 w-10 rounded-full border-2 border-white/70 object-cover"
               />
               <Image
                 src="/avatar2herowebinar.JPG"
-                alt="Participant 2"
+                alt={t("webinar.hero.participantAlt", { index: 2 })}
                 width={40}
                 height={40}
                 className="h-10 w-10 rounded-full border-2 border-white/70 object-cover"
               />
               <Image
                 src="/avatar3herowebinar.JPG"
-                alt="Participant 3"
+                alt={t("webinar.hero.participantAlt", { index: 3 })}
                 width={40}
                 height={40}
                 className="h-10 w-10 rounded-full border-2 border-white/70 object-cover"
@@ -97,13 +98,13 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
             </div>
           </div>
           <p className="mt-2 text-xs font-medium text-white/85 sm:text-sm md:text-base">
-            Peste 100 de participanți în ultimul an
+            {t("webinar.hero.participants")}
           </p>
           <Link
             href="/webinar/formular"
             className="mt-6 inline-flex w-full max-w-[340px] items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 sm:px-8 sm:py-3.5 md:max-w-none md:w-auto md:px-10 md:py-4 md:text-base"
           >
-            REZERVĂ LOCUL GRATUIT!
+            {t("webinar.hero.cta")}
           </Link>
           <div className="mt-10 w-full max-w-[520px]">
             <div className="grid grid-cols-4 gap-3">
@@ -112,7 +113,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
                   {formatCountdownUnit(days)}
                 </p>
                 <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                  zile
+                  {t("webinar.countdown.days")}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-3 py-4 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
@@ -120,7 +121,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
                   {formatCountdownUnit(hours)}
                 </p>
                 <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                  ore
+                  {t("webinar.countdown.hours")}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-3 py-4 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
@@ -128,7 +129,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
                   {formatCountdownUnit(minutes)}
                 </p>
                 <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                  minute
+                  {t("webinar.countdown.minutes")}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-3 py-4 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
@@ -136,7 +137,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
                   {formatCountdownUnit(seconds)}
                 </p>
                 <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                  secunde
+                  {t("webinar.countdown.seconds")}
                 </p>
               </div>
             </div>
@@ -146,7 +147,7 @@ export function WebinarHero({ targetTimestamp }: WebinarHeroProps) {
       <div className="pointer-events-none absolute bottom-1 left-1/2 z-20 -translate-x-1/2 animate-bounce text-white/70">
         <div className="flex flex-col items-center gap-1">
           <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">
-            Scroll
+            {t("webinar.hero.scroll")}
           </span>
           <svg
             width="22"

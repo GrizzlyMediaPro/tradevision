@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { PracticalCourseShell } from "@/app/components/practical-course/PracticalCourseShell";
 
 type ConfirmPaymentResponse = {
@@ -20,6 +21,7 @@ type MultumimPageClientProps = {
 };
 
 export function MultumimPageClient({ stripeSessionId }: MultumimPageClientProps) {
+  const t = useT();
   const [loading, setLoading] = useState(true);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
@@ -43,8 +45,7 @@ export function MultumimPageClient({ stripeSessionId }: MultumimPageClientProps)
         if (!cancelled) {
           if (!confirmRes.ok) {
             setConfirmError(
-              confirmData.error ||
-                "Plata a fost înregistrată, dar confirmarea automată a întârziat.",
+              confirmData.error || t("course.thanks.confirmDelayed"),
             );
           } else if (confirmData.fulfillmentSent && confirmData.email) {
             setEmailSentTo(confirmData.email);
@@ -64,36 +65,31 @@ export function MultumimPageClient({ stripeSessionId }: MultumimPageClientProps)
     return () => {
       cancelled = true;
     };
-  }, [stripeSessionId]);
+  }, [stripeSessionId, t]);
 
   return (
     <PracticalCourseShell
-      title="Mulțumim!"
-      subtitle="Plata ta a fost înregistrată cu succes."
+      title={t("course.thanks.title")}
+      subtitle={t("course.thanks.subtitle")}
     >
       <div className="flex flex-col items-center gap-5 py-6 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-400/30">
           <FaCheckCircle className="h-8 w-8 text-emerald-400" />
         </div>
         <p className="max-w-lg text-sm leading-relaxed text-white/70">
-          Ai finalizat achiziția pentru{" "}
-          <strong className="text-white">{PRACTICAL_COURSE.title}</strong>.
-          {loading
-            ? " Se confirmă plata și se pregătește emailul de confirmare..."
-            : " În curând vei primi pe email detaliile comenzii și linkul către grupul de curs."}
+          {t("course.thanks.body", { title: t("futures.title") })}
+          {loading ? t("course.thanks.confirming") : t("course.thanks.soon")}
         </p>
         {emailSentTo ? (
           <p className="max-w-lg text-sm text-emerald-300">
             {invoiceIssued
-              ? `Am trimis emailul de mulțumire și factura la ${emailSentTo}. Verifică și folderul Spam.`
-              : `Am trimis emailul de confirmare la ${emailSentTo}. Verifică și folderul Spam.`}
+              ? t("course.thanks.sentInvoice", { email: emailSentTo })
+              : t("course.thanks.sentEmail", { email: emailSentTo })}
           </p>
         ) : null}
         {smartbillError ? (
           <p className="max-w-lg text-sm text-amber-300">
-            Factura nu a putut fi emisă automat: {smartbillError}. Corectează
-            seria SmartBill în `.env` (`SMARTBILL_INVOICE_SERIES`) și reîncarcă
-            această pagină pentru retrimitere. 
+            {t("course.thanks.invoiceError", { error: smartbillError })} 
           </p>
         ) : null}
         {confirmError ? (
@@ -104,13 +100,13 @@ export function MultumimPageClient({ stripeSessionId }: MultumimPageClientProps)
             href="/"
             className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white/30 hover:text-white"
           >
-            Înapoi acasă
+            {t("course.thanks.home")}
           </Link>
           <Link
             href="/contact"
             className="inline-flex items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-sm font-bold text-slate-900 transition hover:brightness-110"
           >
-            Contactează-ne
+            {t("course.thanks.contact")}
           </Link>
         </div>
       </div>

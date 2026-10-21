@@ -5,6 +5,7 @@ import Flag from "react-world-flags";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { FaCopy, FaStar, FaChevronDown, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { TelegramCtaAndLive } from "./TelegramCtaAndLive";
 import { firms as defaultFirms, platformImages } from "../data/firms";
 import type { FirmDetail, Challenge, ChallengeType } from "../data/firms";
@@ -31,11 +32,14 @@ type CompareDraftSlot =
   | { firmSlug: string; type: ChallengeType | ""; challengeIndex: number | null }
   | null;
 
-function formatDiscount(raw: string): string {
+function formatDiscount(
+  raw: string,
+  format: (value: number) => string,
+): string {
   if (!raw) return "";
   const numeric = Number(raw.toString().replace(/[^\d.]/g, ""));
   if (Number.isNaN(numeric)) return raw;
-  return `${numeric}% DISCOUNT`;
+  return format(numeric);
 }
 
 function formatDollar(value: string): string {
@@ -54,6 +58,7 @@ function normalizeUrl(raw?: string | null): string {
 }
 
 export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
+  const t = useT();
   const firms = useMemo(() => firmsProp && firmsProp.length > 0 ? firmsProp : defaultFirms, [firmsProp]);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
@@ -218,13 +223,13 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
     <section className="w-full max-w-[1250px] mx-auto px-4 pt-6 pb-16">
       {copied && (
         <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-4 py-1.5 text-xs font-medium text-emerald-200 shadow-lg">
-          Codul a fost copiat
+          {t("firms.copied")}
         </div>
       )}
       <div className="w-full flex flex-col items-center text-center gap-8">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Firme
+            {t("firms.title")}
           </h2>
           <div className="mt-3 h-[2px] w-[70px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         </div>
@@ -238,7 +243,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               onChange={(e) => setSizeFilter(e.target.value)}
               className="rounded-full border border-white/20 bg-black/70 px-4 py-2 pr-8 text-xs font-medium text-white/85 outline-none cursor-pointer appearance-none shadow-sm shadow-black/40"
             >
-              <option value="all">Mărime cont</option>
+              <option value="all">{t("firms.filter.size")}</option>
               <option value="25000">$25K</option>
               <option value="50000">$50K</option>
               <option value="75000">$75K</option>
@@ -257,11 +262,11 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               onChange={(e) => setDrawdownFilter(e.target.value)}
               className="rounded-full border border-white/20 bg-black/70 px-4 py-2 pr-8 text-xs font-medium text-white/85 outline-none cursor-pointer appearance-none shadow-sm shadow-black/40"
             >
-              <option value="all">Tip drawdown</option>
-              <option value="both">Both</option>
-              <option value="eod">EOD</option>
-              <option value="static">Static</option>
-              <option value="trailing">Trailing</option>
+              <option value="all">{t("firms.filter.drawdown")}</option>
+              <option value="both">{t("firms.filter.both")}</option>
+              <option value="eod">{t("firms.filter.eod")}</option>
+              <option value="static">{t("firms.filter.static")}</option>
+              <option value="trailing">{t("firms.filter.trailing")}</option>
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-white/60">
               ▼
@@ -275,12 +280,12 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               onChange={(e) => setPayoutFilter(e.target.value)}
               className="rounded-full border border-white/20 bg-black/70 px-4 py-2 pr-8 text-xs font-medium text-white/85 outline-none cursor-pointer appearance-none shadow-sm shadow-black/40"
             >
-              <option value="all">Zile payout</option>
-              <option value="1">1 Day</option>
-              <option value="3">3 Days</option>
-              <option value="5">5 Days</option>
-              <option value="8">8 Days</option>
-              <option value="11+">11+ Days</option>
+              <option value="all">{t("firms.filter.payoutDays")}</option>
+              <option value="1">{t("firms.filter.day1")}</option>
+              <option value="3">{t("firms.filter.day3")}</option>
+              <option value="5">{t("firms.filter.day5")}</option>
+              <option value="8">{t("firms.filter.day8")}</option>
+              <option value="11+">{t("firms.filter.day11")}</option>
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-white/60">
               ▼
@@ -294,7 +299,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               onChange={(e) => setPlatformFilter(e.target.value)}
               className="rounded-full border border-white/20 bg-black/70 px-4 py-2 pr-8 text-xs font-medium text-white/85 outline-none cursor-pointer appearance-none shadow-sm shadow-black/40"
             >
-              <option value="all">Platforme</option>
+              <option value="all">{t("firms.filter.platforms")}</option>
               <option value="NinjaTrader">NinjaTrader</option>
               <option value="Quantower">Quantower</option>
               <option value="Rithmic">Rithmic</option>
@@ -314,7 +319,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               onChange={(e) => setProfitSplitFilter(e.target.value)}
               className="rounded-full border border-white/20 bg-black/70 px-4 py-2 pr-8 text-xs font-medium text-white/85 outline-none cursor-pointer appearance-none shadow-sm shadow-black/40"
             >
-              <option value="all">Profit</option>
+              <option value="all">{t("firms.filter.profit")}</option>
               <option value="80">80%</option>
               <option value="90">90%</option>
             </select>
@@ -339,7 +344,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               setIsCompareModalOpen(true);
             }}
           >
-            Compară
+            {t("firms.compare.open")}
             {comparedItems.length > 0 && (
               <span className="ml-1 text-[10px] text-white/60">
                 ({comparedItems.length})
@@ -361,7 +366,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               setIsCompareModalOpen(false);
             }}
           >
-            Reset
+            {t("firms.reset")}
           </button>
         </div>
 
@@ -371,20 +376,20 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
             {/* Header */}
             <div className="hidden md:grid md:grid-cols-[2fr_1fr_1.3fr_1.3fr_0.8fr_1.2fr_1.2fr] gap-4 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-wider text-white/60">
               <button onClick={() => handleSort("name")} className="flex items-center gap-1.5 cursor-pointer">
-                Firmă <SortIcon column="name" />
+                {t("firms.col.firm")} <SortIcon column="name" />
               </button>
               <button onClick={() => handleSort("country")} className="flex items-center gap-1.5 cursor-pointer justify-center">
-                Țară <SortIcon column="country" />
+                {t("firms.col.country")} <SortIcon column="country" />
               </button>
-              <span className="text-center">Platforme</span>
+              <span className="text-center">{t("firms.col.platforms")}</span>
               <button onClick={() => handleSort("trustScore")} className="flex items-center gap-1.5 cursor-pointer justify-center">
-                Scor <SortIcon column="trustScore" />
+                {t("firms.col.score")} <SortIcon column="trustScore" />
               </button>
               <button onClick={() => handleSort("maxAccounts")} className="flex items-center gap-1.5 cursor-pointer justify-center">
-                Max conturi <SortIcon column="maxAccounts" />
+                {t("firms.col.maxAccounts")} <SortIcon column="maxAccounts" />
               </button>
-              <span className="text-center">Discount</span>
-              <span className="text-center">Acțiuni</span>
+              <span className="text-center">{t("firms.col.discount")}</span>
+              <span className="text-center">{t("firms.col.actions")}</span>
             </div>
 
             {/* Rows */}
@@ -421,7 +426,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
 
                   {/* Country */}
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-xs text-white/50 md:hidden">Țară</span>
+                    <span className="text-xs text-white/50 md:hidden">{t("firms.col.country")}</span>
                     {firm.country && firm.country.trim().length === 2 && (
                       <Flag
                         code={firm.country.trim().toUpperCase()}
@@ -448,7 +453,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                       <Stars score={firm.trustScore} />
                       <span className="text-xs font-medium text-white/80">{firm.trustScore}/5</span>
                     </div>
-                    <span className="text-[10px] text-white/40">Activă de {firm.activeYears} ani</span>
+                    <span className="text-[10px] text-white/40">{t("firms.activeFor", { years: firm.activeYears })}</span>
                   </div>
 
                   {/* Max Accounts */}
@@ -465,13 +470,13 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                       <FaCopy className="h-3 w-3" />
                       <span>{firm.code}</span>
                     </button>
-                    <span className="text-[10px] uppercase tracking-wider text-white/40">Copy Code</span>
+                    <span className="text-[10px] uppercase tracking-wider text-white/40">{t("firms.copyCodeLabel")}</span>
                   </div>
 
                   {/* Action */}
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-sm font-semibold text-emerald-400">
-                      {formatDiscount(firm.discount)}
+                      {formatDiscount(firm.discount, (value) => t("firms.discountBadge", { value }))}
                     </span>
                     <a
                       href={normalizeUrl(firm.fundingUrl || firm.website)}
@@ -479,7 +484,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                       rel={firm.fundingUrl || firm.website ? "noopener noreferrer" : undefined}
                       className="w-full max-w-[130px] inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110 cursor-pointer"
                     >
-                      Obține finanțare
+                      {t("firms.getFunding")}
                     </a>
                   </div>
                 </div>
@@ -490,21 +495,21 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
           <div className="w-full overflow-x-auto">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm md:text-base font-semibold text-white">
-                Comparație conturi selectate
+                {t("firms.comparison.title")}
               </h3>
               <button
                 type="button"
                 onClick={() => setCompareSelections(emptySlots)}
                 className="text-[11px] md:text-xs rounded-full border border-white/25 bg-white/5 px-3 py-1.5 text-white/80 hover:bg-white/10 cursor-pointer"
               >
-                Renunță la comparație
+                {t("firms.comparison.clear")}
               </button>
             </div>
             <table className="w-full text-xs md:text-sm text-white/80 border-collapse">
               <thead>
                 <tr>
                   <th className="py-2 pr-3 text-white/60 font-semibold text-left">
-                    Criteriu
+                    {t("firms.comparison.criterion")}
                   </th>
                   {comparedItems.map(({ firm }, idx) => (
                     <th
@@ -522,54 +527,68 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               </thead>
               <tbody>
                 {[
-                  { label: "Firmă", get: ({ firm }: any) => firm.name },
+                  { id: "firm", label: t("firms.row.firm"), get: ({ firm }: any) => firm.name },
                   {
-                    label: "Cont",
+                    id: "account",
+                    label: t("firms.row.account"),
                     get: ({ challenge }: any) =>
-                      challenge.accountType || "Account",
+                      challenge.accountType || t("firms.fallback.account"),
                   },
                   {
-                    label: "Tip challenge",
-                    get: ({ challenge }: any) => challenge.type ?? "Rapid",
+                    id: "type",
+                    label: t("firms.row.challengeType"),
+                    get: ({ challenge }: any) =>
+                      challenge.type ?? t("firms.fallback.rapid"),
                   },
                   {
-                    label: "Mărime cont",
+                    id: "size",
+                    label: t("firms.row.size"),
                     get: ({ challenge }: any) => formatDollar(challenge.size),
                   },
                   {
-                    label: "Activare",
+                    id: "activation",
+                    label: t("firms.row.activation"),
                     get: ({ challenge }: any) =>
                       formatDollar(challenge.activation),
                   },
                   {
-                    label: "Taxă",
+                    id: "fee",
+                    label: t("firms.row.fee"),
                     get: ({ challenge }: any) => formatDollar(challenge.fee),
                   },
                   {
-                    label: "Cost real",
+                    id: "trueCost",
+                    label: t("firms.row.trueCost"),
                     get: ({ challenge }: any) =>
                       formatDollar(challenge.trueCost),
                   },
                   {
-                    label: "Target",
+                    id: "target",
+                    label: t("firms.row.target"),
                     get: ({ challenge }: any) => formatDollar(challenge.target),
                   },
                   {
-                    label: "Drawdown",
+                    id: "drawdown",
+                    label: t("firms.row.drawdown"),
                     get: ({ challenge }: any) =>
                       formatDollar(challenge.drawdown),
                   },
                   {
-                    label: "Discount",
-                    get: ({ firm }: any) => formatDiscount(firm.discount),
+                    id: "discount",
+                    label: t("firms.row.discount"),
+                    get: ({ firm }: any) =>
+                      formatDiscount(firm.discount, (value) =>
+                        t("firms.discountBadge", { value }),
+                      ),
                   },
                   {
-                    label: "Payout",
+                    id: "payout",
+                    label: t("firms.row.payout"),
                     get: ({ firm }: any) => firm.payout,
                   },
                 ].map((row) => (
                   <tr
-                    key={row.label}
+                    key={row.id}
                     className="border-t border-white/10 last:border-b-0"
                   >
                     <td className="py-2 pr-3 font-semibold text-white/70 align-top">
@@ -605,11 +624,10 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                 ✕
               </button>
               <h3 className="text-lg font-semibold text-white mb-1">
-                Selectează 2 conturi pentru comparație
+                {t("firms.compare.title")}
               </h3>
               <p className="text-xs text-white/55 mb-4">
-                Alege firma și apoi contul (challenge) pe care vrei să îl
-                compari.
+                {t("firms.compare.body")}
               </p>
               <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
               {compareDraft.map((slot, idx) => {
@@ -638,7 +656,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                       className="flex flex-col md:flex-row md:items-center gap-2 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5"
                     >
                       <span className="text-[11px] font-semibold uppercase tracking-wider text-white/50 md:w-16">
-                        Slot {idx + 1}
+                        {t("firms.compare.slot", { n: idx + 1 })}
                       </span>
                   <div className="flex-1 flex flex-col md:flex-row gap-2">
                         <select
@@ -669,7 +687,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                           }}
                           className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/60 cursor-pointer [&>option]:bg-zinc-900"
                         >
-                          <option value="">Alege firmă</option>
+                          <option value="">{t("firms.compare.chooseFirm")}</option>
                           {firms.map((f) => (
                             <option key={f.slug} value={f.slug}>
                               {f.name}
@@ -697,12 +715,12 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                     >
                       <option value="">
                         {selectedFirm
-                          ? "Tip challenge (toate)"
-                          : "Alege mai întâi firma"}
+                          ? t("firms.compare.typeAll")
+                          : t("firms.compare.chooseFirmFirst")}
                       </option>
-                      {availableTypes.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
+                      {availableTypes.map((challengeType) => (
+                        <option key={challengeType} value={challengeType}>
+                          {challengeType}
                         </option>
                       ))}
                     </select>
@@ -734,8 +752,8 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                         >
                           <option value="">
                             {selectedFirm
-                              ? "Alege cont"
-                              : "Alege mai întâi firma"}
+                              ? t("firms.compare.chooseAccount")
+                              : t("firms.compare.chooseFirmFirst")}
                           </option>
                           {availableChallenges.map((ch, cIdx) => {
                             const globalIndex =
@@ -761,7 +779,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                           }
                           className="self-start md:self-center text-[11px] text-red-300 hover:text-red-200 cursor-pointer"
                         >
-                          Golește
+                          {t("firms.compare.clearSlot")}
                         </button>
                       )}
                     </div>
@@ -770,8 +788,9 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
               </div>
               <div className="mt-4 flex items-center justify-between gap-3">
                 <span className="text-[11px] text-white/45">
-                  Sloturi selectate:{" "}
-                  {compareDraft.filter((slot) => slot !== null).length} / 2
+                  {t("firms.compare.selected", {
+                    count: compareDraft.filter((slot) => slot !== null).length,
+                  })}
                 </span>
                 <button
                   type="button"
@@ -793,7 +812,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
                   }}
                   className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-sky-600 px-6 py-2 text-xs md:text-sm font-semibold text-white shadow-[0_10px_24px_rgba(14,165,233,0.4)] hover:brightness-110 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Compara
+                  {t("firms.compare.submit")}
                 </button>
               </div>
             </div>

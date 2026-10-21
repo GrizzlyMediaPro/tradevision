@@ -10,6 +10,7 @@ import {
   getWebinarRegistrations,
   type WebinarRegistrationRow,
 } from '../actions/webinar';
+import { useI18n, useT } from '@/lib/i18n/I18nProvider';
 
 function toLocalDateTimeInputValue(isoDate: string) {
   const date = new Date(isoDate);
@@ -57,6 +58,9 @@ function rowMatchesRegistrationSearch(
 }
 
 export default function AdminWebinarPage() {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === 'ro' ? 'ro-RO' : 'en-GB';
   const [tab, setTab] = useState<AdminTab>('settings');
   const [webinarAtInput, setWebinarAtInput] = useState('');
   const [loading, setLoading] = useState(true);
@@ -106,7 +110,7 @@ export default function AdminWebinarPage() {
     setSavedMessage('');
     try {
       await saveWebinarSettings({ webinarAt: toIsoDate(webinarAtInput) });
-      setSavedMessage('Setarile webinarului au fost salvate.');
+      setSavedMessage(t('admin.webinar.saved'));
     } finally {
       setSaving(false);
     }
@@ -120,7 +124,7 @@ export default function AdminWebinarPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Inapoi la Admin</span>
+          <span>{t('admin.webinar.back')}</span>
         </Link>
       </div>
 
@@ -131,12 +135,11 @@ export default function AdminWebinarPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Webinar
+          {t('admin.webinar.title')}
         </h1>
         <div className="mt-3 h-[2px] w-[120px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Setări pentru data webinarului live și lista persoanelor înscrise din
-          formularul public.
+          {t('admin.webinar.subtitle')}
         </p>
       </div>
 
@@ -151,7 +154,7 @@ export default function AdminWebinarPage() {
           }`}
         >
           <FaClock className="h-3.5 w-3.5" />
-          Setări
+          {t('admin.webinar.settings')}
         </button>
         <button
           type="button"
@@ -163,7 +166,7 @@ export default function AdminWebinarPage() {
           }`}
         >
           <FaUsers className="h-3.5 w-3.5" />
-          Înscriși
+          {t('admin.webinar.registrations')}
         </button>
       </div>
 
@@ -171,7 +174,7 @@ export default function AdminWebinarPage() {
         <section className="rounded-3xl border border-white/10 bg-linear-to-b from-white/[0.07] to-white/[0.02] px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-              Data si ora webinar (ora locala)
+              {t('admin.webinar.datetime')}
             </label>
             <input
               type="datetime-local"
@@ -184,14 +187,14 @@ export default function AdminWebinarPage() {
 
             <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[11px] text-white/45">
-                Countdown-ul va expira exact la data selectata.
+                {t('admin.webinar.countdownHelp')}
               </p>
               <button
                 type="submit"
                 disabled={saving || loading || !webinarAtInput}
                 className="inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
               >
-                {saving ? 'Se salveaza...' : 'Salveaza setari'}
+                {saving ? t('admin.webinar.saving') : t('admin.webinar.save')}
               </button>
             </div>
 
@@ -209,18 +212,17 @@ export default function AdminWebinarPage() {
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
                     <div className="min-w-0 flex-1">
                       <h2 className="text-sm font-semibold uppercase tracking-wider text-white/80">
-                        Persoane înscrise
+                        {t('admin.webinar.people')}
                       </h2>
                       <p className="mt-1.5 text-[11px] leading-relaxed text-white/45">
-                        Numărătoare fără „test” în câmpuri și fără emailuri care
-                        conțin rizon, grizzlymediapro sau platinum.
+                        {t('admin.webinar.countHelp')}
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-wrap items-stretch gap-3 sm:gap-4">
                       <div className="flex min-w-0 flex-1 divide-x divide-white/10 rounded-xl border border-white/10 bg-black/25 sm:flex-initial">
                         <div className="flex min-w-[5.5rem] flex-1 flex-col justify-center px-4 py-2.5 sm:flex-initial sm:min-w-[6.25rem]">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/40">
-                            Numărate
+                            {t('admin.webinar.counted')}
                           </span>
                           <span className="mt-0.5 text-xl font-semibold tabular-nums tracking-tight text-white sm:text-2xl">
                             {regSearch.trim() ? countedInSearch : countedRegistrations.length}
@@ -228,7 +230,9 @@ export default function AdminWebinarPage() {
                         </div>
                         <div className="flex min-w-[5.5rem] flex-1 flex-col justify-center px-4 py-2.5 sm:flex-initial sm:min-w-[6.25rem]">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/40">
-                            {regSearch.trim() ? 'Rezultate' : 'În listă'}
+                            {regSearch.trim()
+                              ? t('admin.webinar.results')
+                              : t('admin.webinar.inList')}
                           </span>
                           <span className="mt-0.5 text-xl font-semibold tabular-nums tracking-tight text-white/75 sm:text-2xl">
                             {regSearch.trim() ? filteredRegRows.length : regRows.length}
@@ -246,7 +250,7 @@ export default function AdminWebinarPage() {
                       type="search"
                       value={regSearch}
                       onChange={(e) => setRegSearch(e.target.value)}
-                      placeholder="Caută după prenume, email, telefon sau dată..."
+                      placeholder={t('admin.webinar.search')}
                       className="w-full rounded-xl border border-white/10 bg-black/30 py-2.5 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-purple-400/45 focus:bg-black/40 focus:ring-1 focus:ring-purple-400/25"
                       autoComplete="off"
                       spellCheck={false}
@@ -255,20 +259,19 @@ export default function AdminWebinarPage() {
                 </div>
               ) : (
                 <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/80">
-                  Persoane înscrise
+                  {t('admin.webinar.people')}
                 </h2>
               )}
 
               {regLoading ? (
-                <p className="text-sm text-white/50">Se încarcă...</p>
+                <p className="text-sm text-white/50">{t('admin.common.loading')}</p>
               ) : regRows.length === 0 ? (
                 <p className="text-sm text-white/50">
-                  Nu există înscrieri momentan.
+                  {t('admin.webinar.empty')}
                 </p>
               ) : filteredRegRows.length === 0 ? (
                 <p className="text-sm text-white/50">
-                  Nicio înscriere nu se potrivește căutării. Încearcă alt termen
-                  sau șterge filtrul.
+                  {t('admin.webinar.noMatch')}
                 </p>
               ) : (
                 <div className="overflow-x-auto rounded-xl border border-white/10">
@@ -276,19 +279,19 @@ export default function AdminWebinarPage() {
                     <thead>
                       <tr className="border-b border-white/10 bg-white/5">
                         <th className="px-3 py-3 font-semibold text-white/70">
-                          Data
+                          {t('admin.common.date')}
                         </th>
                         <th className="px-3 py-3 font-semibold text-white/70">
-                          Prenume
+                          {t('admin.webinar.firstName')}
                         </th>
                         <th className="px-3 py-3 font-semibold text-white/70">
-                          Email
+                          {t('admin.common.email')}
                         </th>
                         <th className="px-3 py-3 font-semibold text-white/70">
-                          Telefon
+                          {t('admin.common.phone')}
                         </th>
                         <th className="px-3 py-3 font-semibold text-white/70">
-                          Termeni
+                          {t('admin.webinar.terms')}
                         </th>
                       </tr>
                     </thead>
@@ -299,7 +302,7 @@ export default function AdminWebinarPage() {
                           className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]"
                         >
                           <td className="px-3 py-3 whitespace-nowrap text-white/65">
-                            {new Date(row.createdAt).toLocaleString('ro-RO', {
+                            {new Date(row.createdAt).toLocaleString(dateLocale, {
                               dateStyle: 'short',
                               timeStyle: 'short',
                             })}
@@ -308,7 +311,9 @@ export default function AdminWebinarPage() {
                           <td className="px-3 py-3 break-all">{row.email}</td>
                           <td className="px-3 py-3 whitespace-nowrap">{row.phone}</td>
                           <td className="px-3 py-3">
-                            {row.acceptedTerms ? 'Da' : 'Nu'}
+                            {row.acceptedTerms
+                              ? t('admin.common.yes')
+                              : t('admin.common.no')}
                           </td>
                         </tr>
                       ))}
@@ -321,11 +326,10 @@ export default function AdminWebinarPage() {
             <aside className="w-full shrink-0 lg:max-w-[420px] lg:sticky lg:top-24 lg:self-start">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-white/80">
-                  Înscriere manuală
+                  {t('admin.webinar.manual')}
                 </h2>
                 <p className="mt-1.5 text-[11px] leading-relaxed text-white/45">
-                  Formular WebinarJam: adaugă participanți direct la seminar;
-                  lista din stânga reflectă înscrierile din site.
+                  {t('admin.webinar.manualHelp')}
                 </p>
                 <div
                   className="wj-embed-wrapper mt-4 min-h-[200px] rounded-xl bg-white p-2"

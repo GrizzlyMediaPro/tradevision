@@ -26,6 +26,15 @@ import {
 import { getFirms, createOrUpdateFirm, deleteFirm } from '../actions/firms';
 import { UploadButton } from '@/lib/uploadthing';
 import Flag from 'react-world-flags';
+import { useT } from '@/lib/i18n/I18nProvider';
+
+const PAYMENT_LABELS: Record<string, string> = {
+  'Credit Card': 'admin.firms.pay.card',
+  'Debit Card': 'admin.firms.pay.debit',
+  Crypto: 'admin.firms.pay.crypto',
+  'Bank Transfer': 'admin.firms.pay.bank',
+  PayPal: 'admin.firms.pay.paypal',
+};
 
 /* ─── constants ─── */
 
@@ -75,6 +84,7 @@ type SectionId =
 
 /* ─── component ─── */
 export default function AdminFirmePage() {
+  const t = useT();
   /* ── firms state ── */
   const [firmsList, setFirmsList] = useState<FirmDetail[]>([]);
   const [loading, setLoading] = useState(true);
@@ -343,7 +353,7 @@ export default function AdminFirmePage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t('admin.common.back')}</span>
         </Link>
       </div>
 
@@ -355,13 +365,11 @@ export default function AdminFirmePage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Firme
+          {t('admin.firms.title')}
         </h1>
         <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Creează, editează sau șterge firmele de prop trading. Datele sunt
-          folosite atât pe pagina principală (widget firme), cât și pe pagina
-          dedicată fiecărei firme.
+          {t('admin.firms.subtitle')}
         </p>
       </div>
 
@@ -375,11 +383,10 @@ export default function AdminFirmePage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
-                {editingSlug ? 'Editează firmă' : 'Adaugă firmă'}
+                {editingSlug ? t('admin.firms.edit') : t('admin.firms.add')}
               </h2>
               <p className="mt-1 text-xs text-white/45">
-                Completează secțiunile de mai jos. Secțiunile pot fi
-                expandate/restrânse.
+                {t('admin.firms.formHelp')}
               </p>
             </div>
             {editingSlug && (
@@ -388,28 +395,28 @@ export default function AdminFirmePage() {
                 onClick={resetForm}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
               >
-                <FaTimes className="h-3 w-3" /> Anulează editarea
+                <FaTimes className="h-3 w-3" /> {t('admin.firms.cancelEdit')}
               </button>
             )}
           </div>
 
           {/* ── 1. Basic Info ── */}
-          <SectionHeader id="basic" title="Informații de bază" />
+          <SectionHeader id="basic" title={t('admin.firms.section.basic')} />
           {openSections.basic && (
             <div className="flex flex-col gap-4 pl-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Nume firmă *</label>
+                  <label className={labelCls}>{t('admin.firms.name')}</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Ex: Apex Trader Funding"
+                    placeholder={t('admin.firms.namePlaceholder')}
                     className={inputCls}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Website</label>
+                  <label className={labelCls}>{t('admin.firms.website')}</label>
                   <input
                     type="text"
                     value={website}
@@ -419,12 +426,12 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Link Obține finanțare</label>
+                  <label className={labelCls}>{t('admin.firms.funding')}</label>
                   <input
                     type="text"
                     value={fundingUrl}
                     onChange={(e) => setFundingUrl(e.target.value)}
-                    placeholder="https://link-afiliat..."
+                    placeholder={t('admin.firms.fundingPlaceholder')}
                     className={inputCls}
                   />
                 </div>
@@ -432,7 +439,7 @@ export default function AdminFirmePage() {
 
               {/* Logo upload */}
               <div className="flex flex-col gap-2">
-                <label className={labelCls}>Logo firmă</label>
+                <label className={labelCls}>{t('admin.firms.logo')}</label>
                 <div
                   className="group relative flex h-28 items-center justify-center rounded-xl border border-dashed border-white/20 bg-black/30 text-xs text-white/60 hover:border-sky-400/60 hover:bg-white/5 transition cursor-pointer"
                 >
@@ -461,7 +468,7 @@ export default function AdminFirmePage() {
                         }}
                       />
                       <span className="text-[11px] text-white/45 text-center">
-                        Încarcă un fișier imagine (max 4MB)
+                        {t('admin.firms.uploadHint')}
                       </span>
                     </div>
                   ) : (
@@ -470,7 +477,7 @@ export default function AdminFirmePage() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={logo}
-                          alt="Preview logo"
+                          alt={t('admin.firms.logoAlt')}
                           className="h-10 w-10 object-contain"
                         />
                       </div>
@@ -479,7 +486,7 @@ export default function AdminFirmePage() {
                         onClick={() => setLogo('')}
                         className="text-[10px] text-red-300 hover:text-red-200 transition"
                       >
-                        Șterge
+                        {t('admin.firms.remove')}
                       </button>
                     </div>
                   )}
@@ -488,12 +495,12 @@ export default function AdminFirmePage() {
 
               {/* Description */}
               <div className="flex flex-col gap-2">
-                <label className={labelCls}>Descriere</label>
+                <label className={labelCls}>{t('admin.firms.description')}</label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Descriere scurtă a firmei..."
+                  placeholder={t('admin.firms.descriptionPlaceholder')}
                   className={`${inputCls} resize-none`}
                 />
               </div>
@@ -501,12 +508,12 @@ export default function AdminFirmePage() {
           )}
 
           {/* ── 2. Details ── */}
-          <SectionHeader id="details" title="Detalii firmă" />
+          <SectionHeader id="details" title={t('admin.firms.section.details')} />
           {openSections.details && (
             <div className="flex flex-col gap-4 pl-1">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Țară (cod)</label>
+                  <label className={labelCls}>{t('admin.firms.country')}</label>
                   <input
                     type="text"
                     value={country}
@@ -516,17 +523,17 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Payout</label>
+                  <label className={labelCls}>{t('admin.firms.payout')}</label>
                   <input
                     type="text"
                     value={payout}
                     onChange={(e) => setPayout(e.target.value)}
-                    placeholder="Daily Payouts"
+                    placeholder={t('admin.firms.payoutPlaceholder')}
                     className={inputCls}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Trust Score (1-5)</label>
+                  <label className={labelCls}>{t('admin.firms.trust')}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -538,7 +545,7 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Active Years</label>
+                  <label className={labelCls}>{t('admin.firms.years')}</label>
                   <input
                     type="number"
                     min="0"
@@ -548,7 +555,7 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Max Accounts</label>
+                  <label className={labelCls}>{t('admin.firms.maxAccounts')}</label>
                   <input
                     type="text"
                     value={maxAccounts}
@@ -558,7 +565,7 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Discount (%)</label>
+                  <label className={labelCls}>{t('admin.firms.discount')}</label>
                   <input
                     type="number"
                     min="0"
@@ -572,7 +579,7 @@ export default function AdminFirmePage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Cod discount</label>
+                  <label className={labelCls}>{t('admin.firms.discountCode')}</label>
                   <input
                     type="text"
                     value={code}
@@ -582,7 +589,7 @@ export default function AdminFirmePage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className={labelCls}>Steag țară (din cod)</label>
+                  <label className={labelCls}>{t('admin.firms.flag')}</label>
                   <div className="flex items-center gap-3 rounded-xl border border-dashed border-white/20 bg-black/30 px-3 py-2.5 text-xs text-white/60">
                     {country.trim().length === 2 ? (
                       <>
@@ -591,13 +598,12 @@ export default function AdminFirmePage() {
                           style={{ width: 32, height: 20, borderRadius: 4 }}
                         />
                         <span className="text-[10px] text-white/45">
-                          Steagul este generat automat din codul țării (ex: US).
+                          {t('admin.firms.flagAuto')}
                         </span>
                       </>
                     ) : (
                       <span className="text-[10px] text-white/45">
-                        Introdu un cod de țară valid (ex: US) în câmpul de mai sus pentru a vedea
-                        steagul.
+                        {t('admin.firms.flagHint')}
                       </span>
                     )}
                   </div>
@@ -607,11 +613,14 @@ export default function AdminFirmePage() {
           )}
 
           {/* ── 3. Platforms & Payment ── */}
-          <SectionHeader id="platforms" title="Platforme & Metode de plată" />
+          <SectionHeader
+            id="platforms"
+            title={t('admin.firms.section.platforms')}
+          />
           {openSections.platforms && (
             <div className="flex flex-col gap-4 pl-1">
               <div className="flex flex-col gap-2">
-                <label className={labelCls}>Platforme de trading</label>
+                <label className={labelCls}>{t('admin.firms.platforms')}</label>
                 <div className="flex flex-wrap gap-2">
                   {AVAILABLE_PLATFORMS.map((p) => (
                     <button
@@ -640,7 +649,7 @@ export default function AdminFirmePage() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <label className={labelCls}>Metode de plată</label>
+                <label className={labelCls}>{t('admin.firms.payments')}</label>
                 <div className="flex flex-wrap gap-2">
                   {COMMON_PAYMENT_METHODS.map((m) => (
                     <button
@@ -653,7 +662,7 @@ export default function AdminFirmePage() {
                           : 'bg-white/5 text-white/60 border-white/15 hover:bg-white/10'
                       }`}
                     >
-                      {m}
+                      {t(PAYMENT_LABELS[m] ?? m)}
                     </button>
                   ))}
                 </div>
@@ -664,7 +673,7 @@ export default function AdminFirmePage() {
           {/* ── 4. Key Features ── */}
           <SectionHeader
             id="features"
-            title="Key Features"
+            title={t('admin.firms.section.features')}
             count={keyFeatures.length}
           />
           {openSections.features && (
@@ -682,7 +691,7 @@ export default function AdminFirmePage() {
                       updated[idx] = { ...updated[idx], label: e.target.value };
                       setKeyFeatures(updated);
                     }}
-                    placeholder="Label (ex: Daily Payouts)"
+                    placeholder={t('admin.firms.featurePlaceholder')}
                     className="flex-1 min-w-[120px] rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                   />
                   <button
@@ -707,7 +716,9 @@ export default function AdminFirmePage() {
                     ) : (
                       <FaTimesCircle className="h-2.5 w-2.5" />
                     )}
-                    {feat.value}
+                    {feat.enabled
+                      ? t('admin.common.yesToken')
+                      : t('admin.common.noToken')}
                   </button>
                   <button
                     type="button"
@@ -729,7 +740,7 @@ export default function AdminFirmePage() {
                 }
                 className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
               >
-                <FaPlus className="h-2.5 w-2.5" /> Adaugă feature
+                <FaPlus className="h-2.5 w-2.5" /> {t('admin.firms.addFeature')}
               </button>
             </div>
           )}
@@ -737,14 +748,14 @@ export default function AdminFirmePage() {
           {/* ── 5. Challenges ── */}
           <SectionHeader
             id="challenges"
-            title="Challenges (conturi)"
+            title={t('admin.firms.section.challenges')}
             count={challenges.length}
           />
           {openSections.challenges && (
             <div className="flex flex-col gap-4 pl-1">
               {/* Add challenge type */}
               <div className="flex flex-col gap-2 rounded-xl border border-dashed border-white/20 bg-black/30 px-3 py-3">
-                <label className={labelCls}>Adaugă tip de challenge</label>
+                <label className={labelCls}>{t('admin.firms.addType')}</label>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
@@ -756,7 +767,7 @@ export default function AdminFirmePage() {
                         addChallengeType();
                       }
                     }}
-                    placeholder="Ex: Rapid, Legacy, Lucid Pro, Direct..."
+                    placeholder={t('admin.firms.typePlaceholder')}
                     className={`${inputCls} sm:flex-1`}
                   />
                   <button
@@ -765,20 +776,18 @@ export default function AdminFirmePage() {
                     disabled={!newChallengeType.trim()}
                     className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
                   >
-                    <FaPlus className="h-2.5 w-2.5" /> Adaugă tip
+                    <FaPlus className="h-2.5 w-2.5" /> {t('admin.firms.addTypeButton')}
                   </button>
                 </div>
                 <p className="text-[10px] text-white/40">
-                  Mai întâi definești tipul de challenge, apoi poți adăuga unul sau mai multe
-                  conturi (challenges) sub acel tip.
+                  {t('admin.firms.typeHelp')}
                 </p>
               </div>
 
               {/* No types yet */}
               {challengeTypes.length === 0 && (
                 <p className="text-xs text-white/45">
-                  Nu există încă niciun tip de challenge. Adaugă un tip mai sus, apoi vei putea
-                  adăuga conturi sub el.
+                  {t('admin.firms.noTypes')}
                 </p>
               )}
 
@@ -798,7 +807,7 @@ export default function AdminFirmePage() {
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                          Tip challenge
+                          {t('admin.firms.typeLabel')}
                         </span>
                         <input
                           type="text"
@@ -821,11 +830,13 @@ export default function AdminFirmePage() {
                               ),
                             );
                           }}
-                          placeholder="Ex: Rapid"
+                          placeholder={t('admin.firms.typeExample')}
                           className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                         />
                         <span className="text-[10px] text-white/40">
-                          ({challengesForType.length} conturi)
+                          {t('admin.firms.accountCount', {
+                            count: challengesForType.length,
+                          })}
                         </span>
                       </div>
                       <button
@@ -844,13 +855,13 @@ export default function AdminFirmePage() {
                         className="inline-flex items-center gap-1 rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 text-[11px] font-medium text-red-300 hover:bg-red-500/20 transition cursor-pointer"
                       >
                         <FaTrash className="h-2.5 w-2.5" />
-                        Șterge tip
+                        {t('admin.firms.deleteType')}
                       </button>
                     </div>
 
                     {challengesForType.length === 0 && (
                       <p className="text-[11px] text-white/45">
-                        Nu există încă niciun cont pentru acest tip. Adaugă un challenge mai jos.
+                        {t('admin.firms.noAccounts')}
                       </p>
                     )}
 
@@ -863,7 +874,7 @@ export default function AdminFirmePage() {
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                              Challenge #{idx + 1}
+                              {t('admin.firms.challengeNumber', { n: idx + 1 })}
                             </span>
                             <button
                               type="button"
@@ -889,7 +900,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="Account Type"
+                              placeholder={t('admin.firms.accountType')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                             <select
@@ -904,10 +915,10 @@ export default function AdminFirmePage() {
                               }}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/50 cursor-pointer [&>option]:bg-zinc-900"
                             >
-                              <option value="purple">Purple</option>
-                              <option value="emerald">Emerald</option>
-                              <option value="sky">Sky</option>
-                              <option value="yellow">Yellow</option>
+                              <option value="purple">{t('admin.firms.color.purple')}</option>
+                              <option value="emerald">{t('admin.firms.color.emerald')}</option>
+                              <option value="sky">{t('admin.firms.color.sky')}</option>
+                              <option value="yellow">{t('admin.firms.color.yellow')}</option>
                             </select>
                             <input
                               type="text"
@@ -920,7 +931,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="Size ($50K)"
+                              placeholder={t('admin.firms.size')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                             <input
@@ -934,7 +945,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="Activation"
+                              placeholder={t('admin.firms.activation')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                             <input
@@ -948,7 +959,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="Fee"
+                              placeholder={t('admin.firms.fee')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                             <input
@@ -962,7 +973,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="True Cost"
+                              placeholder={t('admin.firms.trueCost')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                             <input
@@ -976,7 +987,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="Target"
+                              placeholder={t('admin.firms.target')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                             <input
@@ -990,7 +1001,7 @@ export default function AdminFirmePage() {
                                 };
                                 setChallenges(updated);
                               }}
-                              placeholder="Drawdown"
+                              placeholder={t('admin.firms.drawdown')}
                               className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                             />
                           </div>
@@ -998,7 +1009,7 @@ export default function AdminFirmePage() {
                           {/* Rules per challenge */}
                           <div className="mt-2 flex flex-col gap-2">
                             <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
-                              Reguli pentru acest challenge
+                              {t('admin.firms.rules')}
                             </span>
                             {rulesForChallenge.map((rule, rIdx) => (
                               <div
@@ -1023,7 +1034,7 @@ export default function AdminFirmePage() {
                                       updated[idx] = current;
                                       setChallenges(updated);
                                     }}
-                                    placeholder="Titlu tab (ex: Evaluation Guidelines)"
+                                    placeholder={t('admin.firms.ruleTitle')}
                                     className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-semibold text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                                   />
                                   <button
@@ -1062,7 +1073,7 @@ export default function AdminFirmePage() {
                                     updated[idx] = current;
                                     setChallenges(updated);
                                   }}
-                                  placeholder="O regulă pe fiecare linie..."
+                                  placeholder={t('admin.firms.ruleContent')}
                                   className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] text-white placeholder-white/30 outline-none focus:border-sky-400/50 resize-none font-mono"
                                 />
                               </div>
@@ -1080,7 +1091,7 @@ export default function AdminFirmePage() {
                               }}
                               className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
                             >
-                              <FaPlus className="h-2.5 w-2.5" /> Adaugă tab regulă
+                              <FaPlus className="h-2.5 w-2.5" /> {t('admin.firms.addRule')}
                             </button>
                           </div>
                         </div>
@@ -1097,7 +1108,7 @@ export default function AdminFirmePage() {
                       }
                       className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
                     >
-                      <FaPlus className="h-2.5 w-2.5" /> Adaugă challenge în acest tip
+                      <FaPlus className="h-2.5 w-2.5" /> {t('admin.firms.addChallenge')}
                     </button>
                   </div>
                 );
@@ -1108,7 +1119,7 @@ export default function AdminFirmePage() {
           {/* ── 6. Payout Timeline ── */}
           <SectionHeader
             id="payout"
-            title="Payout Timeline"
+            title={t('admin.firms.section.payout')}
             count={payoutTimeline.length}
           />
           {openSections.payout && (
@@ -1133,7 +1144,7 @@ export default function AdminFirmePage() {
                         };
                         setPayoutTimeline(updated);
                       }}
-                      placeholder="Titlu pas"
+                      placeholder={t('admin.firms.stepTitle')}
                       className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                     />
                     <input
@@ -1147,7 +1158,7 @@ export default function AdminFirmePage() {
                         };
                         setPayoutTimeline(updated);
                       }}
-                      placeholder="Descriere pas"
+                      placeholder={t('admin.firms.stepDescription')}
                       className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50"
                     />
                   </div>
@@ -1174,7 +1185,7 @@ export default function AdminFirmePage() {
                 }
                 className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
               >
-                <FaPlus className="h-2.5 w-2.5" /> Adaugă pas
+                <FaPlus className="h-2.5 w-2.5" /> {t('admin.firms.addStep')}
               </button>
             </div>
           )}
@@ -1182,7 +1193,7 @@ export default function AdminFirmePage() {
           {/* ── 7. Excluded Countries ── */}
           <SectionHeader
             id="countries"
-            title="Țări excluse"
+            title={t('admin.firms.section.countries')}
             count={excludedCountries.length}
           />
           {openSections.countries && (
@@ -1219,7 +1230,7 @@ export default function AdminFirmePage() {
                       addExcludedCountry();
                     }
                   }}
-                  placeholder="Cod țară (ex: RU)"
+                  placeholder={t('admin.firms.countryPlaceholder')}
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:border-sky-400/50 w-36"
                 />
                 <button
@@ -1227,11 +1238,11 @@ export default function AdminFirmePage() {
                   onClick={addExcludedCountry}
                   className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
                 >
-                  <FaPlus className="h-2.5 w-2.5" /> Adaugă
+                  <FaPlus className="h-2.5 w-2.5" /> {t('admin.common.add')}
                 </button>
               </div>
               <p className="text-[10px] text-white/40">
-                Introdu codul ISO al țării (2 litere) și apasă Enter sau butonul Adaugă.
+                {t('admin.firms.countryHelp')}
               </p>
             </div>
           )}
@@ -1239,7 +1250,7 @@ export default function AdminFirmePage() {
           {/* ── Submit ── */}
           <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
             <p className="text-[11px] text-white/40 max-w-xs">
-              Modificările sunt salvate în baza de date și folosite pe site.
+              {t('admin.firms.savedNote')}
             </p>
             <button
               type="submit"
@@ -1249,12 +1260,12 @@ export default function AdminFirmePage() {
               {editingSlug ? (
                 <>
                   <FaEdit className="h-4 w-4" />
-                  <span>Salvează modificările</span>
+                  <span>{t('admin.firms.save')}</span>
                 </>
               ) : (
                 <>
                   <FaPlus className="h-4 w-4" />
-                  <span>Adaugă firmă</span>
+                  <span>{t('admin.firms.add')}</span>
                 </>
               )}
             </button>
@@ -1265,15 +1276,15 @@ export default function AdminFirmePage() {
         <section className="flex flex-col rounded-3xl border border-white/10 bg-linear-to-b from-white/5 to-white/2 px-6 py-6 md:px-7 md:py-7 shadow-[0_16px_40px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 mb-4">
             <h2 className="text-sm md:text-base font-semibold text-white">
-              Firme existente ({firmsList.length})
+              {t('admin.firms.existing', { count: firmsList.length })}
             </h2>
           </div>
 
           {loading ? (
-            <p className="text-sm text-white/45">Se încarcă...</p>
+            <p className="text-sm text-white/45">{t('admin.common.loading')}</p>
           ) : firmsList.length === 0 ? (
             <p className="text-sm text-white/45">
-              Nu există încă nicio firmă. Adaugă una din formularul din stânga.
+              {t('admin.firms.empty')}
             </p>
           ) : (
             <div className="mt-1 flex flex-col gap-3 max-h-[700px] overflow-y-auto pr-1">
@@ -1343,19 +1354,24 @@ export default function AdminFirmePage() {
                     </div>
                     <div className="mt-1.5 flex flex-wrap gap-1">
                       <span className="text-[9px] text-white/40">
-                        {firm.challenges.length} challenges
+                        {t('admin.firms.challengesCount', {
+                          count: firm.challenges.length,
+                        })}
                       </span>
                       <span className="text-[9px] text-white/30">·</span>
                       <span className="text-[9px] text-white/40">
-                        {firm.platforms.length} platforme
+                        {t('admin.firms.platformsCount', {
+                          count: firm.platforms.length,
+                        })}
                       </span>
                       <span className="text-[9px] text-white/30">·</span>
                       <span className="text-[9px] text-white/40">
-                        {firm.challenges.reduce(
-                          (sum, ch) => sum + ((ch.rules?.length ?? 0)),
-                          0,
-                        )}{' '}
-                        tab-uri reguli
+                        {t('admin.firms.ruleTabs', {
+                          count: firm.challenges.reduce(
+                            (sum, ch) => sum + (ch.rules?.length ?? 0),
+                            0,
+                          ),
+                        })}
                       </span>
                     </div>
                   </div>

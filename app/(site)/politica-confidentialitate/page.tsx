@@ -1,151 +1,146 @@
 import { LegalPage, LegalSection } from "@/app/components/LegalPage";
+import { getLocale, getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Politica de confidențialitate",
-  description:
-    "Cum prelucrăm datele cu caracter personal în cadrul Trade Vision România — TRADE VISION HUB TRADING SRL.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("legal.privacy.metaTitle"),
+    description: t("legal.privacy.metaDescription"),
+  };
+}
 
-export default function PoliticaConfidentialitatePage() {
+function formatLegalDate(iso: string, locale: "en" | "ro") {
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(
+    locale === "ro" ? "ro-RO" : "en-GB",
+    { day: "numeric", month: "long", year: "numeric" },
+  );
+}
+
+export default async function PoliticaConfidentialitatePage() {
+  const t = await getT();
+  const locale = await getLocale();
+
   return (
     <LegalPage
-      title="Politica de confidențialitate"
-      description="Informații despre prelucrarea datelor cu caracter personal conform GDPR și legislației române."
+      title={t("legal.privacy.title")}
+      description={t("legal.privacy.description")}
     >
       <p className="text-sm text-white/55">
-        Ultima actualizare: <time dateTime="2026-04-03">3 aprilie 2026</time>
+        {t("legal.updated")}
+        <time dateTime="2026-04-03">{formatLegalDate("2026-04-03", locale)}</time>
       </p>
 
-      <LegalSection title="1. Operatorul de date">
+      <LegalSection title={t("legal.privacy.s1.title")}>
         <p>
-          <strong>Operator:</strong> TRADE VISION HUB TRADING SRL, CUI{" "}
-          <strong>54265198</strong>.
+          <strong>{t("legal.privacy.s1.operatorLabel")}</strong> TRADE VISION HUB
+          TRADING SRL, CUI <strong>54265198</strong>.
         </p>
         <p>
-          <strong>Contact:</strong>{" "}
+          <strong>{t("legal.privacy.s1.contactLabel")}</strong>{" "}
           <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>
         </p>
         <p>
-          Prezentul document descrie modul în care prelucrăm datele cu caracter
-          personal în legătură cu site-ul și serviciile{" "}
-          <strong>Trade Vision România</strong>. Documentul completează{" "}
-          <Link href="/termeni-conditii">Termenii și condițiile</Link> și{" "}
-          <Link href="/politica-cookies">Politica de cookies</Link>.
+          {t("legal.privacy.s1.before")}
+          <strong>{t("legal.privacy.s1.brand")}</strong>
+          {t("legal.privacy.s1.mid")}
+          <Link href="/termeni-conditii">{t("legal.privacy.s1.terms")}</Link>
+          {t("legal.privacy.s1.and")}
+          <Link href="/politica-cookies">{t("legal.privacy.s1.cookies")}</Link>
+          {t("legal.privacy.s1.after")}
         </p>
       </LegalSection>
 
-      <LegalSection title="2. Principii și temeiuri legale">
+      <LegalSection title={t("legal.privacy.s2.title")}>
         <p>
-          Prelucrăm datele în conformitate cu{" "}
-          <strong>Regulamentul (UE) 2016/679 (GDPR)</strong> și legislația
-          română aplicabilă. Temeiurile pot include: executarea unui contract
-          sau a unor măsuri precontractuale, interes legitim (ex.: securitate,
-          îmbunătățirea serviciilor, măsurători agregate unde este cazul),
-          obligație legală și, acolo unde este necesar,{" "}
-          <strong>consimțământul</strong> dumneavoastră (ex.: newsletter,
-          anumite module de marketing).
+          {t("legal.privacy.s2.p1.before")}
+          <strong>{t("legal.privacy.s2.gdpr")}</strong>
+          {t("legal.privacy.s2.p1.after")}
+          <strong>{t("legal.privacy.s2.consent")}</strong>
+          {t("legal.privacy.s2.p1.end")}
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Ce categorii de date colectăm?">
+      <LegalSection title={t("legal.privacy.s3.title")}>
         <p>
-          <strong>Date furnizate direct de dumneavoastră</strong>, de exemplu:
+          <strong>{t("legal.privacy.s3.direct")}</strong>
+          {t("legal.privacy.s3.directRest")}
         </p>
         <ul>
           <li>
-            prin <strong>formularul de contact</strong>: nume (dacă îl
-            furnizați), adresă de e-mail, telefon (dacă îl furnizați), conținutul
-            mesajului;
+            {t("legal.privacy.s3.liPrefix")}
+            <strong>{t("legal.privacy.s3.contactLabel")}</strong>
+            {t("legal.privacy.s3.contactRest")}
           </li>
           <li>
-            prin <strong>newsletter / abonare la comunicări</strong>: adresă
-            de e-mail și, după caz, preferințe;
+            {t("legal.privacy.s3.liPrefix")}
+            <strong>{t("legal.privacy.s3.newsLabel")}</strong>
+            {t("legal.privacy.s3.newsRest")}
           </li>
           <li>
-            prin <strong>cont de utilizator</strong> (dacă este disponibil, inclusiv
-            prin furnizori terți de autentificare): identificatori de cont,
-            adresă de e-mail, nume afișat, în funcție de configurare.
+            {t("legal.privacy.s3.liPrefix")}
+            <strong>{t("legal.privacy.s3.accountLabel")}</strong>
+            {t("legal.privacy.s3.accountRest")}
           </li>
         </ul>
         <p>
-          <strong>Date tehnice și de utilizare</strong> (inclusiv prin cookie-uri
-          și instrumente de analiză / marketing, după caz): adresă IP, tip de
-          browser, dispozitiv, pagini vizitate, evenimente de navigare, sursa
-          traficului, identificatori anonimi sau pseudonimi legați de
-          campanii.
+          <strong>{t("legal.privacy.s3.technical")}</strong>
+          {t("legal.privacy.s3.technicalRest")}
         </p>
         <p>
-          <strong>Date stocate local pe dispozitiv</strong> (ex.:{" "}
-          <strong>localStorage</strong> pentru progres la cursuri gratuite): le
-          folosim doar dacă ați ales în bannerul de cookie-uri opțiunea{" "}
-          <strong>Doar necesare</strong> sau <strong>Acceptă tot</strong>, nu
-          dacă ați ales <strong>Deloc</strong>. Aceste date rămân în browser;
-          nu sunt trimise automat serverelor noastre, cu excepția cazului în
-          care folosiți și formulare sau cont (date transmise separat).
+          <strong>{t("legal.privacy.s3.local")}</strong>
+          {t("legal.privacy.s3.localMid")}
+          <strong>{t("legal.privacy.s3.localStorage")}</strong>
+          {t("legal.privacy.s3.localRest")}
+          <strong>{t("legal.privacy.s3.essential")}</strong>
+          {t("legal.privacy.s3.or")}
+          <strong>{t("legal.privacy.s3.all")}</strong>
+          {t("legal.privacy.s3.localEnd")}
+          <strong>{t("legal.privacy.s3.none")}</strong>
+          {t("legal.privacy.s3.localTail")}
         </p>
       </LegalSection>
 
-      <LegalSection title="4. În ce scopuri utilizăm datele?">
+      <LegalSection title={t("legal.privacy.s4.title")}>
         <ul>
-          <li>răspuns la solicitările trimise prin formulare sau e-mail;</li>
-          <li>trimiterea de newsletter și comunicări de marketing (cu acord);</li>
-          <li>
-            administrarea contului și a funcționalităților Site-ului (dacă
-            există autentificare);
-          </li>
-          <li>
-            măsurarea traficului, îmbunătățirea conținutului și a experienței
-            utilizatorului;
-          </li>
-          <li>prevenirea abuzurilor și securitatea IT;</li>
-          <li>îndeplinirea obligațiilor legale (ex.: evidențe fiscale, dacă e cazul).</li>
+          <li>{t("legal.privacy.s4.li1")}</li>
+          <li>{t("legal.privacy.s4.li2")}</li>
+          <li>{t("legal.privacy.s4.li3")}</li>
+          <li>{t("legal.privacy.s4.li4")}</li>
+          <li>{t("legal.privacy.s4.li5")}</li>
+          <li>{t("legal.privacy.s4.li6")}</li>
         </ul>
       </LegalSection>
 
-      <LegalSection title="5. Destinatari și împuterniciți">
+      <LegalSection title={t("legal.privacy.s5.title")}>
         <p>
-          Putem împărtăși date cu furnizori care ne prestează servicii strict
-          necesare (ex.: <strong>găzduire</strong>, <strong>e-mail
-          tranzacțional</strong>, <strong>autentificare</strong>,{" "}
-          <strong>analiză și publicitate</strong> — precum Google și Meta, în
-          măsura în care aceste instrumente sunt activate pe Site), numai în
-          limitele contractuale și legale.
+          {t("legal.privacy.s5.p1.before")}
+          <strong>{t("legal.privacy.s5.hosting")}</strong>
+          {t("legal.privacy.s5.p1.a")}
+          <strong>{t("legal.privacy.s5.email")}</strong>
+          {t("legal.privacy.s5.p1.b")}
+          <strong>{t("legal.privacy.s5.auth")}</strong>
+          {t("legal.privacy.s5.p1.c")}
+          <strong>{t("legal.privacy.s5.ads")}</strong>
+          {t("legal.privacy.s5.p1.after")}
         </p>
-        <p>
-          Nu vindem datele dumneavoastră personale. Transferurile în afara SEE
-          pot avea loc pe baza unor garanții adecvate (ex.: clauze contractuale
-          tip), acolo unde furnizorii sunt situați în astfel de jurisdicții.
-        </p>
+        <p>{t("legal.privacy.s5.p2")}</p>
       </LegalSection>
 
-      <LegalSection title="6. Durata păstrării">
-        <p>
-          Păstrăm datele atât timp cât este necesar pentru scopurile pentru
-          care au fost colectate, inclusiv pentru respectarea termenelor
-          legale de arhivare. Mesajele de contact și datele de newsletter sunt
-          păstrate conform politicilor interne și până la retragerea
-          consimțământului sau ștergerea contului, după caz.
-        </p>
+      <LegalSection title={t("legal.privacy.s6.title")}>
+        <p>{t("legal.privacy.s6.p1")}</p>
       </LegalSection>
 
-      <LegalSection title="7. Drepturile dumneavoastră">
+      <LegalSection title={t("legal.privacy.s7.title")}>
+        <p>{t("legal.privacy.s7.p1")}</p>
         <p>
-          În condițiile GDPR aveți dreptul la informare, acces, rectificare,
-          ștergere, restricționare, opoziție (inclusiv la marketing), portabilitate
-          (unde este aplicabil) și dreptul de a vă retrage consimțământul
-          fără a afecta legalitatea prelucrării anterioare.
-        </p>
-        <p>
-          Vă puteți exercita drepturile prin e-mail la{" "}
-          <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>.
-          De asemenea, aveți dreptul de a depune o plângere la{" "}
-          <strong>
-            Autoritatea Națională de Supraveghere a Prelucrării Datelor cu
-            Caracter Personal (ANSPDCP)
-          </strong>
-          , București —{" "}
+          {t("legal.privacy.s7.before")}
+          <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>
+          {t("legal.privacy.s7.mid")}
+          <strong>{t("legal.privacy.s7.authority")}</strong>
+          {t("legal.privacy.s7.after")}
           <a
             href="https://www.dataprotection.ro/"
             target="_blank"
@@ -157,19 +152,12 @@ export default function PoliticaConfidentialitatePage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Securitate">
-        <p>
-          Aplicăm măsuri tehnice și organizatorice rezonabile pentru a proteja
-          datele. Nicio transmisie pe internet nu este complet sigură;
-          vă rugăm să protejați și dumneavoastră credențialele și dispozitivele.
-        </p>
+      <LegalSection title={t("legal.privacy.s8.title")}>
+        <p>{t("legal.privacy.s8.p1")}</p>
       </LegalSection>
 
-      <LegalSection title="9. Modificări">
-        <p>
-          Putem actualiza această politică. În cazul unor modificări esențiale,
-          putem notifica prin Site sau prin alte canale adecvate.
-        </p>
+      <LegalSection title={t("legal.privacy.s9.title")}>
+        <p>{t("legal.privacy.s9.p1")}</p>
       </LegalSection>
     </LegalPage>
   );

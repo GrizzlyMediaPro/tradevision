@@ -2,8 +2,10 @@
 
 import { FaShieldAlt, FaUsers } from "react-icons/fa";
 import Link from "next/link";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 export function Hero() {
+  const t = useT();
 
   return (
     <section className="relative w-full min-h-[calc(100vh-72px)] flex items-center overflow-hidden">
@@ -24,20 +26,20 @@ export function Hero() {
           {/* Badge */}
           <span className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold text-yellow-300 tracking-wide">
             <span className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
-            15 lecții video &middot; 100% gratuit
+            {t("hero.badge")}
           </span>
 
           {/* Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] text-white">
-            Învață să citești piața{" "}
+            {t("hero.title.start")}{" "}
             <span className="bg-linear-to-r from-purple-400 via-purple-300 to-yellow-300 bg-clip-text text-transparent">
-              ca un trader profesionist
+              {t("hero.title.highlight")}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-sm md:text-base text-white/60 max-w-lg leading-relaxed">
-            15 lecții video de la un trader cu o experiență de 6 ani în tranzacționare. Fără promisiuni, doar lucruri testate și care funcționează pe grafice.
+            {t("hero.subtitle")}
           </p>
 
           {/* CTA button */}
@@ -45,7 +47,7 @@ export function Hero() {
             href="/curs"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer mt-1"
           >
-            Accesează cursul gratuit
+            {t("hero.cta")}
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -55,11 +57,11 @@ export function Hero() {
           <div className="flex flex-wrap items-center gap-5 mt-1 text-xs text-white/50">
             <span className="inline-flex items-center gap-1.5">
               <FaShieldAlt className="h-3.5 w-3.5 text-yellow-400/70" />
-              Fără card, fără obligații
+              {t("hero.noCard")}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <FaUsers className="h-3.5 w-3.5 text-purple-400/70" />
-              500+ cursanți activi
+              {t("hero.students")}
             </span>
           </div>
         </div>
@@ -70,7 +72,7 @@ export function Hero() {
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
               <iframe
                 src="https://www.youtube.com/embed/EfMrp8MdvDw"
-                title="Video prezentare Trade Vision"
+                title={t("hero.videoTitle")}
                 className="absolute inset-0 h-full w-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -81,7 +83,7 @@ export function Hero() {
             <div className="mt-3 mb-1 flex justify-center">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-3.5 py-1.5 text-[11px] font-semibold text-yellow-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                Sesiuni live săptămânal
+                {t("hero.liveBadge")}
               </span>
             </div>
 

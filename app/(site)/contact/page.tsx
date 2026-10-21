@@ -1,8 +1,10 @@
 import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
 import { getLinkWidget } from "@/app/admin/actions/linkwidget";
+import { getT } from "@/lib/i18n/get-t";
 import { ContactForm } from "./ContactForm";
 
 export default async function ContactPage() {
+  const t = await getT();
   const linkWidget = await getLinkWidget();
 
   return (
@@ -10,11 +12,11 @@ export default async function ContactPage() {
       {/* Heading */}
       <div className="text-center mb-10 md:mb-14">
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Contact
+          {t("contact.title")}
         </h1>
         <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-md mx-auto">
-          Ai o întrebare sau vrei să colaborăm? Trimite-ne un mesaj și îți vom răspunde cât mai curând.
+          {t("contact.subtitle")}
         </p>
       </div>
 

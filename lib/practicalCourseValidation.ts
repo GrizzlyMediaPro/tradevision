@@ -77,55 +77,56 @@ export function getBillingEmail(
   return String((billingData as Record<string, string>).email ?? "").trim();
 }
 
+/** Returns a message id, resolved with t() / getT() where the error is shown. */
 export function validateBillingPayload(body: BillingPayload): string | null {
   if (body.personType !== "PF" && body.personType !== "PJ") {
-    return "Tipul de persoană nu este valid.";
+    return "course.validation.personType";
   }
   if (!body.acceptedTerms) {
-    return "Trebuie să accepți termenii și condițiile.";
+    return "course.validation.terms";
   }
   if (!body.acceptedPrivacy) {
-    return "Trebuie să accepți politica de confidențialitate.";
+    return "course.validation.privacy";
   }
 
   const data = body.billingData;
   if (body.personType === "PF") {
     const pf = data as BillingDataPF;
     if (!pf.firstName?.trim() || pf.firstName.trim().length < 2) {
-      return "Prenumele trebuie să aibă cel puțin 2 caractere.";
+      return "course.validation.firstName";
     }
     if (!pf.lastName?.trim() || pf.lastName.trim().length < 2) {
-      return "Numele trebuie să aibă cel puțin 2 caractere.";
+      return "course.validation.lastName";
     }
     if (!isValidCnp(pf.cnp ?? "")) {
-      return "CNP-ul nu este valid.";
+      return "course.validation.cnp";
     }
     if (!pf.birthDate?.trim()) {
-      return "Data nașterii este obligatorie.";
+      return "course.validation.birthDate";
     }
   } else {
     const pj = data as BillingDataPJ;
     if (!pj.companyName?.trim()) {
-      return "Denumirea firmei este obligatorie.";
+      return "course.validation.company";
     }
     if (!isValidCui(pj.cui ?? "")) {
-      return "CUI-ul nu este valid.";
+      return "course.validation.cui";
     }
     if (!pj.registrationNumber?.trim()) {
-      return "Numărul Reg. Com. este obligatoriu.";
+      return "course.validation.regCom";
     }
     if (!pj.legalRepresentative?.trim()) {
-      return "Reprezentantul legal este obligatoriu.";
+      return "course.validation.representative";
     }
   }
 
   const email = (data as { email?: string }).email?.trim() ?? "";
   const phone = (data as { phone?: string }).phone?.trim() ?? "";
   if (!email || !isValidEmail(email)) {
-    return "Adresa de email nu este validă.";
+    return "course.validation.email";
   }
   if (!phone || !isValidPhone(phone)) {
-    return "Numărul de telefon nu este valid.";
+    return "course.validation.phone";
   }
 
   const street = (data as { street?: string }).street?.trim() ?? "";
@@ -133,14 +134,14 @@ export function validateBillingPayload(body: BillingPayload): string | null {
   const county = (data as { county?: string }).county?.trim() ?? "";
   const postalCode = (data as { postalCode?: string }).postalCode?.trim() ?? "";
 
-  if (!street) return "Strada este obligatorie.";
+  if (!street) return "course.validation.street";
   if (body.personType === "PF") {
     const pf = data as BillingDataPF;
-    if (!pf.streetNumber?.trim()) return "Numărul străzii este obligatoriu.";
+    if (!pf.streetNumber?.trim()) return "course.validation.streetNumber";
   }
-  if (!city) return "Localitatea este obligatorie.";
-  if (!county) return "Județul este obligatoriu.";
-  if (!postalCode) return "Codul poștal este obligatoriu.";
+  if (!city) return "course.validation.city";
+  if (!county) return "course.validation.county";
+  if (!postalCode) return "course.validation.postalCode";
 
   return null;
 }

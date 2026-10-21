@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n/get-t";
 import { getCoursePricesForAdmin } from "@/lib/courseProductPricing";
 import { AdminCoursePricesClient } from "./AdminCoursePricesClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCoursePricesPage() {
+  const t = await getT();
   const courses = await getCoursePricesForAdmin();
 
   return (
@@ -12,11 +14,11 @@ export default async function AdminCoursePricesPage() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <Link href="/admin" className="text-sm text-white/50 hover:text-white">
-            ← Admin
+            {t("admin.common.backArrow")}
           </Link>
-          <h1 className="mt-2 text-3xl font-bold">Prețuri cursuri</h1>
+          <h1 className="mt-2 text-3xl font-bold">{t("admin.prices.title")}</h1>
           <p className="mt-2 text-sm text-white/60">
-            Modifică prețurile cursurilor plătite afișate pe site.
+            {t("admin.prices.subtitle")}
           </p>
         </div>
         <AdminCoursePricesClient initialCourses={courses} />

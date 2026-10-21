@@ -2,12 +2,21 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { signPlaybackTokens, isMuxSigningConfigured } from "@/lib/mux";
 import { requireCourseAccess } from "@/lib/privateCourseAccess";
+import { getT } from "@/lib/i18n/get-t";
+
+function accessStatus(message: string) {
+  if (message.startsWith("Unauthorized")) return 401;
+  if (message.startsWith("Forbidden")) return 403;
+  if (message.startsWith("Course not found")) return 404;
+  return 500;
+}
 
 export async function GET(req: Request) {
+  const t = await getT();
   const { searchParams } = new URL(req.url);
   const lessonId = searchParams.get("lessonId");
   if (!lessonId) {
-    return NextResponse.json({ error: "lessonId lipsă" }, { status: 400 });
+    return NextResponse.json({ error: t("private.api.missingLesson") }, { status: 400 });
   }
 
   try {
@@ -16,7 +25,7 @@ export async function GET(req: Request) {
     });
     if (!lesson || !lesson.muxPlaybackId || lesson.status !== "ready") {
       return NextResponse.json(
-        { error: "Video indisponibil" },
+        { error: t("private.api.videoUnavailable") },
         { status: 404 },
       );
     }
@@ -25,7 +34,7 @@ export async function GET(req: Request) {
 
     if (!isMuxSigningConfigured()) {
       return NextResponse.json(
-        { error: "Mux signing keys lipsesc" },
+        { error: t("private.api.muxKeys") },
         { status: 503 },
       );
     }
@@ -37,12 +46,16 @@ export async function GET(req: Request) {
       durationSeconds: lesson.durationSeconds,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Eroare";
-    const status = message.startsWith("Unauthorized")
-      ? 401
-      : message.startsWith("Forbidden")
-        ? 403
-        : 500;
-    return NextResponse.json({ error: message }, { status });
+    const message = err instanceof Error ? err.message : "";
+    const status = accessStatus(message);
+    const error =
+      status === 401
+        ? t("private.api.unauthorized")
+        : status === 403
+          ? t("private.api.forbidden")
+          : status === 404
+            ? t("private.api.courseNotFound")
+            : t("private.api.generic");
+    return NextResponse.json({ error }, { status });
   }
 }

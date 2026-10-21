@@ -6,25 +6,28 @@ import {
   type BillingPayload,
 } from "@/lib/practicalCourseValidation";
 import { getBasePriceEur } from "@/lib/practicalCoursePricing";
+import { getLocale, getT } from "@/lib/i18n/get-t";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: Request, context: RouteContext) {
+  const t = await getT();
+  const locale = await getLocale();
   try {
     const { id } = await context.params;
     if (!(await assertOrderAccess(id))) {
-      return NextResponse.json({ error: "Acces neautorizat." }, { status: 403 });
+      return NextResponse.json({ error: t("course.api.unauthorized") }, { status: 403 });
     }
 
     const order = await prisma.practicalCourseOrder.findUnique({
       where: { id },
     });
     if (!order) {
-      return NextResponse.json({ error: "Comanda nu a fost găsită." }, { status: 404 });
+      return NextResponse.json({ error: t("course.api.notFound") }, { status: 404 });
     }
     if (!isOrderReadyForCheckout(order.status)) {
       return NextResponse.json(
-        { error: "Comanda nu mai poate fi modificată." },
+        { error: t("course.api.locked") },
         { status: 400 },
       );
     }
@@ -32,7 +35,7 @@ export async function PATCH(req: Request, context: RouteContext) {
     const body = (await req.json()) as BillingPayload;
     const validationError = validateBillingPayload(body);
     if (validationError) {
-      return NextResponse.json({ error: validationError }, { status: 400 });
+      return NextResponse.json({ error: t(validationError) }, { status: 400 });
     }
 
     const basePriceEur = await getBasePriceEur();
@@ -40,7 +43,7 @@ export async function PATCH(req: Request, context: RouteContext) {
       where: { id },
       data: {
         personType: body.personType,
-        billingData: body.billingData,
+        billingData: { ...body.billingData, locale },
         acceptedTerms: body.acceptedTerms,
         acceptedPrivacy: body.acceptedPrivacy,
         status: "pending_payment",
@@ -55,7 +58,7 @@ export async function PATCH(req: Request, context: RouteContext) {
   } catch (err) {
     console.error("Eroare la salvarea facturării curs practic", err);
     return NextResponse.json(
-      { error: "Eroare internă. Te rugăm să încerci din nou." },
+      { error: t("course.api.internalRetry") },
       { status: 500 },
     );
   }

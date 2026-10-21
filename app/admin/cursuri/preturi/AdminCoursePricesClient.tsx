@@ -11,6 +11,7 @@ import {
   formatCoursePrice,
   type CoursePriceRow,
 } from "@/lib/courseProductPricing";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 
 type AdminCoursePricesClientProps = {
   initialCourses: CoursePriceRow[];
@@ -20,6 +21,9 @@ export function AdminCoursePricesClient({
   initialCourses,
 }: AdminCoursePricesClientProps) {
   const router = useRouter();
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const [isPending, startTransition] = useTransition();
   const [drafts, setDrafts] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -38,19 +42,17 @@ export function AdminCoursePricesClient({
         setError(null);
         setSuccess(null);
         await saveCoursePrice({ slug, priceAmount });
-        setSuccess("Prețul a fost actualizat.");
+        setSuccess(t("admin.prices.success.saved"));
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Eroare la salvare.");
+        setError(err instanceof Error ? err.message : t("admin.prices.error.save"));
       }
     });
   };
 
   const handleReset = (slug: string, defaultPrice: number) => {
     if (
-      !confirm(
-        "Resetezi prețul la valoarea implicită din catalog? Modificările salvate vor fi șterse.",
-      )
+      !confirm(t("admin.prices.confirmReset"))
     ) {
       return;
     }
@@ -64,21 +66,17 @@ export function AdminCoursePricesClient({
           ...current,
           [slug]: String(defaultPrice),
         }));
-        setSuccess("Prețul a fost resetat la valoarea implicită.");
+        setSuccess(t("admin.prices.success.reset"));
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Eroare la resetare.");
+        setError(err instanceof Error ? err.message : t("admin.prices.error.reset"));
       }
     });
   };
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-white/60">
-        Prețurile se aplică imediat pe paginile de achiziție și în calculele de
-        discount pentru comenzile noi. Comenzile deja create păstrează prețul de
-        la momentul înscrierii.
-      </p>
+      <p className="text-sm text-white/60">{t("admin.prices.help")}</p>
 
       <div className="space-y-4">
         {initialCourses.map((course) => {
@@ -95,11 +93,12 @@ export function AdminCoursePricesClient({
                   </h2>
                   <p className="mt-1 text-sm text-white/55">{course.subtitle}</p>
                   <p className="mt-3 text-xs text-white/40">
-                    Slug: <span className="text-white/60">{course.slug}</span>
+                    {t("admin.prices.slug")}{" "}
+                    <span className="text-white/60">{course.slug}</span>
                     {course.adminPath ? (
                       <>
                         {" "}
-                        · Pagină:{" "}
+                        · {t("admin.prices.page")}{" "}
                         <Link
                           href={course.adminPath}
                           className="text-yellow-300 hover:underline"
@@ -111,21 +110,28 @@ export function AdminCoursePricesClient({
                     ) : null}
                   </p>
                   <p className="mt-2 text-xs text-white/45">
-                    Preț implicit catalog:{" "}
-                    {formatCoursePrice(
-                      course.defaultPriceAmount,
-                      course.priceCurrency,
-                    )}
+                    {t("admin.prices.defaultCatalog", {
+                      price: formatCoursePrice(
+                        course.defaultPriceAmount,
+                        course.priceCurrency,
+                      ),
+                    })}
                     {isCustomPrice && course.updatedAt
-                      ? ` · Ultima modificare: ${new Date(course.updatedAt).toLocaleString("ro-RO")}`
-                      : " · Folosești prețul implicit"}
+                      ? ` · ${t("admin.prices.updatedAt", {
+                          date: new Date(course.updatedAt).toLocaleString(
+                            dateLocale,
+                          ),
+                        })}`
+                      : ` · ${t("admin.prices.usingDefault")}`}
                   </p>
                 </div>
 
                 <div className="flex w-full flex-col gap-3 sm:w-[280px]">
                   <label className="flex flex-col gap-2">
                     <span className="text-xs uppercase tracking-wider text-white/50">
-                      Preț ({course.priceCurrency})
+                      {t("admin.prices.priceLabel", {
+                        currency: course.priceCurrency,
+                      })}
                     </span>
                     <input
                       type="number"
@@ -149,7 +155,7 @@ export function AdminCoursePricesClient({
                       disabled={isPending}
                       className="rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-slate-900 disabled:opacity-50"
                     >
-                      {isPending ? "Se salvează..." : "Salvează"}
+                      {isPending ? t("admin.prices.saving") : t("admin.prices.save")}
                     </button>
                     {isCustomPrice ? (
                       <button
@@ -160,7 +166,7 @@ export function AdminCoursePricesClient({
                         disabled={isPending}
                         className="rounded-xl border border-white/15 px-4 py-2.5 text-sm text-white/70 disabled:opacity-50"
                       >
-                        Resetează
+                        {t("admin.prices.reset")}
                       </button>
                     ) : null}
                   </div>

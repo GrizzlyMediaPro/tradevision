@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FaChevronLeft, FaPen } from 'react-icons/fa';
 import { getLinkWidget, saveLinkWidget } from '../actions/linkwidget';
 import { UploadDropzone } from '@/lib/uploadthing';
+import { useT } from '@/lib/i18n/I18nProvider';
 
 type LinkWidgetState = {
   badge: string;
@@ -25,6 +26,7 @@ const DEFAULT_STATE: LinkWidgetState = {
 };
 
 export default function AdminLinkWidgetPage() {
+  const t = useT();
   const [values, setValues] = useState<LinkWidgetState>(DEFAULT_STATE);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>(
     DEFAULT_STATE.thumbnail,
@@ -78,7 +80,7 @@ export default function AdminLinkWidgetPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t('admin.common.back')}</span>
         </Link>
       </div>
 
@@ -90,12 +92,11 @@ export default function AdminLinkWidgetPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Link Widget
+          {t('admin.link.title')}
         </h1>
         <div className="mt-3 h-[2px] w-[130px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Editează textele și thumbnail-ul pentru secțiunea de live trading de
-          pe homepage. Modificările sunt salvate în baza de date.
+          {t('admin.link.subtitle')}
         </p>
       </div>
 
@@ -106,11 +107,10 @@ export default function AdminLinkWidgetPage() {
           <div className="flex items-center justify-between gap-3 mb-5">
             <div>
               <h2 className="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
-                <span>Configurare Live Widget</span>
+                <span>{t('admin.link.configTitle')}</span>
               </h2>
               <p className="mt-1 text-xs text-white/45">
-                Actualizează badge-ul, titlul, descrierea, butonul și
-                thumbnail-ul.
+                {t('admin.link.configHelp')}
               </p>
             </div>
             <button
@@ -118,7 +118,7 @@ export default function AdminLinkWidgetPage() {
               onClick={handleReset}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
             >
-              Reset la default
+              {t('admin.link.resetDefault')}
             </button>
           </div>
 
@@ -127,7 +127,7 @@ export default function AdminLinkWidgetPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Live badge
+                  {t('admin.link.badge')}
                 </label>
                 <input
                   type="text"
@@ -138,7 +138,7 @@ export default function AdminLinkWidgetPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Text buton
+                  {t('admin.link.buttonText')}
                 </label>
                 <input
                   type="text"
@@ -152,7 +152,7 @@ export default function AdminLinkWidgetPage() {
             {/* Title */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Titlu
+                {t('admin.link.heading')}
               </label>
               <input
                 type="text"
@@ -165,7 +165,7 @@ export default function AdminLinkWidgetPage() {
             {/* Description */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Descriere
+                {t('admin.link.description')}
               </label>
               <textarea
                 rows={4}
@@ -178,7 +178,7 @@ export default function AdminLinkWidgetPage() {
             {/* YouTube URL */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Link YouTube (videoclip)
+                {t('admin.link.youtube')}
               </label>
               <input
                 type="url"
@@ -188,14 +188,14 @@ export default function AdminLinkWidgetPage() {
                 className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-400/60 focus:bg-white/8 focus:ring-1 focus:ring-purple-400/30"
               />
               <p className="text-[11px] text-white/40">
-                Acesta este link-ul către live / videoclipul YouTube care se deschide când utilizatorii apasă pe buton.
+                {t('admin.link.youtubeHelp')}
               </p>
             </div>
 
             {/* Thumbnail upload (UploadThing – URL permanent, nu blob) */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Thumbnail YouTube
+                {t('admin.link.thumbnail')}
               </label>
               {thumbnailPreview && !thumbnailPreview.startsWith('blob:') ? (
                 <div className="flex flex-col gap-3">
@@ -203,7 +203,7 @@ export default function AdminLinkWidgetPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={thumbnailPreview}
-                      alt="Preview thumbnail"
+                      alt={t('admin.link.thumbnailAlt')}
                       className="h-full w-full object-cover"
                     />
                   </div>
@@ -231,7 +231,7 @@ export default function AdminLinkWidgetPage() {
                     onClick={() => setThumbnailPreview(DEFAULT_STATE.thumbnail)}
                     className="text-[11px] text-white/50 hover:text-white/80"
                   >
-                    Resetează la thumbnail implicit
+                    {t('admin.link.resetThumbnail')}
                   </button>
                 </div>
               ) : (
@@ -263,7 +263,7 @@ export default function AdminLinkWidgetPage() {
                 disabled={saving || loading}
                 className="inline-flex items-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer disabled:opacity-50"
               >
-                {saving ? 'Se salvează...' : 'Salvează'}
+                {saving ? t('admin.common.saving') : t('admin.common.save')}
               </button>
             </div>
           </form>
@@ -297,7 +297,7 @@ export default function AdminLinkWidgetPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={thumbnailPreview}
-                  alt="Preview widget thumbnail"
+                  alt={t('admin.link.widgetAlt')}
                   className="h-full w-full object-cover"
                 />
               </div>

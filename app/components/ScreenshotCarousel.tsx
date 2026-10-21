@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCompress, FaSearchPlus } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 const GAP = 32;
 
@@ -13,6 +14,7 @@ type ScreenshotCarouselProps = {
 };
 
 export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarouselProps) {
+  const t = useT();
   const TOTAL = images.length;
   const [isMobile, setIsMobile] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -160,11 +162,11 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                         type="button"
                         onClick={() => setLightboxIndex(idx % TOTAL)}
                         className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30 cursor-zoom-in"
-                        aria-label={`Vezi imaginea ${((idx % TOTAL) + 1).toString()} mărită`}
+                        aria-label={t("carousel.zoom", { n: (idx % TOTAL) + 1 })}
                       >
                         <Image
                           src={src}
-                          alt={`Screenshot ${(idx % TOTAL) + 1}`}
+                          alt={t("carousel.alt", { n: (idx % TOTAL) + 1 })}
                           fill
                           className="object-cover"
                           sizes="(min-width: 768px) 33vw, 100vw"
@@ -172,7 +174,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                       </button>
                     ) : (
                       <div className="w-full aspect-4/3 rounded-2xl bg-black/30 border border-white/5 flex items-center justify-center">
-                        <span className="text-xs text-white/20">Screenshot</span>
+                        <span className="text-xs text-white/20">{t("carousel.empty")}</span>
                       </div>
                     )}
                   </article>
@@ -184,7 +186,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
               <button
                 onClick={handlePrev}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/40 text-xl text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
-                aria-label="Previous"
+                aria-label={t("carousel.previous")}
               >
                 ‹
               </button>
@@ -198,14 +200,14 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                         ? "w-7 bg-purple-500"
                         : "w-2.5 bg-white/30 hover:bg-white/60"
                     }`}
-                    aria-label={`Go to screenshot ${idx + 1}`}
+                    aria-label={t("carousel.goto", { n: idx + 1 })}
                   />
                 ))}
               </div>
               <button
                 onClick={handleNext}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/40 text-xl text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
-                aria-label="Next"
+                aria-label={t("carousel.next")}
               >
                 ›
               </button>
@@ -223,11 +225,11 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                     type="button"
                     onClick={() => setLightboxIndex(idx)}
                     className="relative w-full aspect-4/3 overflow-hidden rounded-2xl bg-black/30 cursor-zoom-in"
-                    aria-label={`Vezi imaginea ${(idx + 1).toString()} mărită`}
+                    aria-label={t("carousel.zoom", { n: idx + 1 })}
                   >
                     <Image
                       src={src}
-                      alt={`Screenshot ${idx + 1}`}
+                      alt={t("carousel.alt", { n: idx + 1 })}
                       fill
                       className="object-cover"
                       sizes="(min-width: 768px) 33vw, 100vw"
@@ -235,7 +237,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                   </button>
                 ) : (
                   <div className="w-full aspect-4/3 rounded-2xl bg-black/30 border border-white/5 flex items-center justify-center">
-                    <span className="text-xs text-white/20">Screenshot</span>
+                    <span className="text-xs text-white/20">{t("carousel.empty")}</span>
                   </div>
                 )}
               </article>
@@ -249,7 +251,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
           className="fixed inset-0 z-50 flex flex-col bg-black/92"
           role="dialog"
           aria-modal="true"
-          aria-label="Vizualizare screenshot"
+          aria-label={t("carousel.dialog")}
           onClick={() => setLightboxIndex(null)}
         >
           <div
@@ -269,7 +271,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
             >
               <Image
                 src={images[lightboxIndex]}
-                alt={`Screenshot ${lightboxIndex + 1} mărit`}
+                alt={t("carousel.altZoom", { n: lightboxIndex + 1 })}
                 fill
                 className="object-contain select-none pointer-events-none"
                 sizes="100vw"
@@ -287,7 +289,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
               onClick={() => setLightboxZoom((z) => !z)}
               className="inline-flex h-10 items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 text-sm font-medium text-white hover:bg-white/15 transition cursor-pointer"
               aria-pressed={lightboxZoom}
-              aria-label={lightboxZoom ? "Potrivește în ecran" : "Mărește imaginea"}
+              aria-label={lightboxZoom ? t("carousel.fit") : t("carousel.enlarge")}
             >
               {lightboxZoom ? (
                 <FaCompress className="h-4 w-4" />
@@ -295,7 +297,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                 <FaSearchPlus className="h-4 w-4" />
               )}
               <span className="hidden sm:inline">
-                {lightboxZoom ? "Potrivește" : "Zoom"}
+                {lightboxZoom ? t("carousel.fitShort") : t("carousel.zoomShort")}
               </span>
             </button>
             <button
@@ -306,7 +308,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                 )
               }
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-lg text-white/90 hover:bg-white/10 transition cursor-pointer"
-              aria-label="Imaginea anterioară"
+              aria-label={t("carousel.prevImage")}
             >
               ‹
             </button>
@@ -318,18 +320,18 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                 )
               }
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-lg text-white/90 hover:bg-white/10 transition cursor-pointer"
-              aria-label="Imaginea următoare"
+              aria-label={t("carousel.nextImage")}
             >
               ›
             </button>
             <span className="text-xs text-white/45 tabular-nums">
-              {lightboxIndex + 1} / {TOTAL}
+              {t("carousel.counter", { current: lightboxIndex + 1, total: TOTAL })}
             </span>
             <button
               type="button"
               onClick={() => setLightboxIndex(null)}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-xl text-white/90 hover:bg-white/10 transition cursor-pointer"
-              aria-label="Închide imaginea"
+              aria-label={t("carousel.close")}
             >
               ×
             </button>

@@ -3,6 +3,7 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/adminAuth";
+import { getT } from "@/lib/i18n/get-t";
 import { prisma } from "@/lib/db";
 import {
   ensurePrivateCourse,
@@ -171,7 +172,8 @@ export async function createPrivateLesson(data: {
     where: { id: data.chapterId },
   });
   if (!chapter || chapter.courseId !== course.id) {
-    throw new Error("Capitol invalid");
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.chapter"));
   }
   const count = await prisma.privateCourseLesson.count({
     where: { chapterId: data.chapterId },
@@ -214,13 +216,17 @@ export async function deletePrivateLesson(lessonId: string) {
 export async function createMuxUploadForLesson(lessonId: string) {
   await requireAdmin();
   if (!isMuxConfigured()) {
-    throw new Error("Mux nu este configurat");
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.mux"));
   }
 
   const lesson = await prisma.privateCourseLesson.findUnique({
     where: { id: lessonId },
   });
-  if (!lesson) throw new Error("Lecție inexistentă");
+  if (!lesson) {
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.lessonMissing"));
+  }
 
   const origin = (
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
@@ -245,13 +251,17 @@ export async function createMuxUploadForLesson(lessonId: string) {
 export async function syncLessonFromMux(lessonId: string) {
   await requireAdmin();
   if (!isMuxConfigured()) {
-    throw new Error("Mux nu este configurat");
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.mux"));
   }
 
   const lesson = await prisma.privateCourseLesson.findUnique({
     where: { id: lessonId },
   });
-  if (!lesson) throw new Error("Lecție inexistentă");
+  if (!lesson) {
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.lessonMissing"));
+  }
 
   let assetId = lesson.muxAssetId;
 
@@ -269,7 +279,8 @@ export async function syncLessonFromMux(lessonId: string) {
   }
 
   if (!assetId) {
-    throw new Error("Nu există asset Mux pentru această lecție");
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.noAsset"));
   }
 
   const asset = await retrieveAsset(assetId);
@@ -299,7 +310,10 @@ export async function grantCourseAccess(input: {
   const admin = await requireAdmin();
   const course = await ensurePrivateCourse();
   const query = input.emailOrUserId.trim();
-  if (!query) throw new Error("Email sau user ID obligatoriu");
+  if (!query) {
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.emailRequired"));
+  }
 
   const client = await clerkClient();
   let clerkUserId: string | null = null;
@@ -322,7 +336,8 @@ export async function grantCourseAccess(input: {
   }
 
   if (!clerkUserId) {
-    throw new Error("Utilizatorul nu a fost găsit în Clerk");
+    const t = await getT();
+    throw new Error(t("admin.mentor.error.userMissing"));
   }
 
   await prisma.courseEntitlement.upsert({

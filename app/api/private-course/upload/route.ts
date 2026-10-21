@@ -2,31 +2,33 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { prisma } from "@/lib/db";
 import { createDirectUpload, isMuxConfigured } from "@/lib/mux";
+import { getT } from "@/lib/i18n/get-t";
 
 export async function POST(req: Request) {
+  const t = await getT();
   try {
     await requireAdmin();
   } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: t("private.api.unauthorized") }, { status: 401 });
   }
 
   if (!isMuxConfigured()) {
     return NextResponse.json(
-      { error: "Mux nu este configurat" },
+      { error: t("private.api.muxOff") },
       { status: 503 },
     );
   }
 
   const body = (await req.json().catch(() => ({}))) as { lessonId?: string };
   if (!body.lessonId) {
-    return NextResponse.json({ error: "lessonId lipsă" }, { status: 400 });
+    return NextResponse.json({ error: t("private.api.missingLesson") }, { status: 400 });
   }
 
   const lesson = await prisma.privateCourseLesson.findUnique({
     where: { id: body.lessonId },
   });
   if (!lesson) {
-    return NextResponse.json({ error: "Lecție inexistentă" }, { status: 404 });
+    return NextResponse.json({ error: t("private.api.lessonMissing") }, { status: 404 });
   }
 
   const originHeader = req.headers.get("origin");
@@ -54,7 +56,7 @@ export async function POST(req: Request) {
       uploadId: upload.id,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Upload eșuat";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("Private course upload failed", err);
+    return NextResponse.json({ error: t("private.api.uploadFailed") }, { status: 500 });
   }
 }

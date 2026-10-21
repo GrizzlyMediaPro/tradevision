@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
-import { TESTIMONIAL_DISCLOSURE } from "@/app/data/ninjaTrader";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 const testimonials = [
   { videoId: "rouZMXnAUnU" },
@@ -12,6 +12,7 @@ const testimonials = [
 ];
 
 function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
+  const t = useT();
   const [playing, setPlaying] = useState(false);
 
   return (
@@ -19,7 +20,7 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
       <div className="relative w-full aspect-9/16">
         <iframe
           src={`https://www.youtube.com/embed/${item.videoId}${playing ? "?autoplay=1" : ""}`}
-          title={`Mărturie video din comunitate (${item.videoId})`}
+          title={t("testimonials.frameTitle", { id: item.videoId })}
           className="absolute inset-0 h-full w-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -29,7 +30,7 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
           <button
             type="button"
             onClick={() => setPlaying(true)}
-            aria-label="Redă mărturie video"
+            aria-label={t("testimonials.play")}
             className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 cursor-pointer transition hover:bg-black/40"
           >
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-yellow-400 via-amber-300 to-yellow-500 shadow-[0_12px_30px_rgba(250,204,21,0.4)] hover:brightness-110 transition">
@@ -43,17 +44,18 @@ function TestimonialCard({ item }: { item: (typeof testimonials)[number] }) {
 }
 
 export function TestimonialsSection() {
+  const t = useT();
+
   return (
     <section className="w-full max-w-[1250px] mx-auto px-4 pt-20 pb-16">
       <div className="w-full flex flex-col items-center text-center gap-10">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Oameni reali, rezultate reale
+            {t("testimonials.title")}
           </h2>
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-5 text-sm md:text-base text-white/55 max-w-lg mx-auto">
-            Testimoniale video de la membrii comunității care au parcurs cursul
-            și au început tranzacționarea.
+            {t("testimonials.subtitle")}
           </p>
         </div>
 
@@ -64,7 +66,7 @@ export function TestimonialsSection() {
         </div>
 
         <p className="text-[10px] md:text-[11px] leading-relaxed text-white/45 max-w-3xl mx-auto text-center">
-          {TESTIMONIAL_DISCLOSURE}
+          {t("disclosure.testimonial")}
         </p>
       </div>
     </section>

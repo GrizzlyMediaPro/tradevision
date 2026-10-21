@@ -1,127 +1,103 @@
 import { LegalPage, LegalSection } from "@/app/components/LegalPage";
+import { getLocale, getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Politica de cookies",
-  description:
-    "Modul în care Trade Vision România utilizează cookie-uri și tehnologii similare pe site.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("legal.cookies.metaTitle"),
+    description: t("legal.cookies.metaDescription"),
+  };
+}
 
-export default function PoliticaCookiesPage() {
+function formatLegalDate(iso: string, locale: "en" | "ro") {
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(
+    locale === "ro" ? "ro-RO" : "en-GB",
+    { day: "numeric", month: "long", year: "numeric" },
+  );
+}
+
+export default async function PoliticaCookiesPage() {
+  const t = await getT();
+  const locale = await getLocale();
+
   return (
     <LegalPage
-      title="Politica de cookies"
-      description="Informații despre cookie-uri și tehnologii similare utilizate pe site-ul operat de TRADE VISION HUB TRADING SRL."
+      title={t("legal.cookies.title")}
+      description={t("legal.cookies.description")}
     >
       <p className="text-sm text-white/55">
-        Ultima actualizare: <time dateTime="2026-04-03">3 aprilie 2026</time>
+        {t("legal.updated")}
+        <time dateTime="2026-04-03">{formatLegalDate("2026-04-03", locale)}</time>
       </p>
 
-      <LegalSection title="1. Operator">
+      <LegalSection title={t("legal.cookies.s1.title")}>
+        <p>{t("legal.cookies.s1.p1")}</p>
         <p>
-          Prezenta politică este emisă de{" "}
-          <strong>TRADE VISION HUB TRADING SRL</strong>, CUI{" "}
-          <strong>54265198</strong> (în continuare „Operatorul”), în legătură
-          cu site-ul <strong>Trade Vision România</strong> și serviciile
-          aferente.
-        </p>
-        <p>
-          Pentru prelucrarea datelor cu caracter personal, consultați și{" "}
-          <Link href="/politica-confidentialitate">
-            Politica de confidențialitate
-          </Link>
-          .
+          {t("legal.cookies.s1.before")}
+          <Link href="/politica-confidentialitate">{t("legal.cookies.s1.link")}</Link>
+          {t("legal.cookies.s1.after")}
         </p>
       </LegalSection>
 
-      <LegalSection title="2. Ce sunt cookie-urile?">
+      <LegalSection title={t("legal.cookies.s2.title")}>
+        <p>{t("legal.cookies.s2.p1")}</p>
+        <p>{t("legal.cookies.s2.p2")}</p>
+      </LegalSection>
+
+      <LegalSection title={t("legal.cookies.s3.title")}>
         <p>
-          Cookie-urile sunt fișiere text de mici dimensiuni stocate pe
-          dispozitivul dumneavoastră de către browser atunci când vizitați un
-          site. Ele pot fi folosite pentru funcționarea site-ului, pentru
-          securitate, pentru memorarea preferințelor sau pentru măsurarea
-          audienței și publicitate.
+          <strong>{t("legal.cookies.s3.essentialLabel")}</strong>
+          {t("legal.cookies.s3.essentialRest")}
         </p>
         <p>
-          Tehnologii similare (ex.: stocare locală, pixeli de urmărire) pot
-          avea roluri asemănătoare; în această politică le tratăm împreună cu
-          „cookie-urile” acolo unde este relevant pentru transparență.
+          <strong>{t("legal.cookies.s3.optionalLabel")}</strong>
+          {t("legal.cookies.s3.optionalRest")}
+        </p>
+        <p>
+          {t("legal.cookies.s3.durationBefore")}
+          <strong>{t("legal.cookies.s3.sessionLabel")}</strong>
+          {t("legal.cookies.s3.durationMid")}
+          <strong>{t("legal.cookies.s3.persistentLabel")}</strong>
+          {t("legal.cookies.s3.durationAfter")}
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Tipuri de cookie-uri">
-        <p>
-          <strong>Cookie-uri esențiale</strong> — necesare pentru funcții de
-          bază (ex.: securitate, încărcarea corectă a paginilor, gestionarea
-          sesiunii acolo unde există). Fără ele, unele părți ale site-ului ar
-          putea să nu funcționeze.
-        </p>
-        <p>
-          <strong>Cookie-uri neesențiale</strong> — nu sunt strict necesare
-          pentru funcționarea de bază; includ de regulă module pentru
-          analiză, publicitate sau personalizare. Acestea pot fi plasate doar
-          în măsura în care legea și setările dumneavoastră permit (inclusiv
-          prin mecanisme de consimțământ unde este cazul).
-        </p>
-        <p>
-          Cookie-urile pot fi de <strong>sesiune</strong> (șterse la închiderea
-          browserului) sau <strong>persistente</strong> (rămân până la expirare
-          sau ștergere manuală).
-        </p>
-      </LegalSection>
-
-      <LegalSection title="4. Ce folosim pe acest site?">
-        <p>
-          În funcție de configurația tehnică activă, Site-ul poate include:
-        </p>
+      <LegalSection title={t("legal.cookies.s4.title")}>
+        <p>{t("legal.cookies.s4.intro")}</p>
         <ul>
           <li>
-            <strong>Google Tag Manager / Google Analytics</strong> (sau
-            servicii echivalente administrate prin GTM) — pentru măsurarea
-            traficului și îmbunătățirea experienței;
+            <strong>{t("legal.cookies.s4.gtmLabel")}</strong>
+            {t("legal.cookies.s4.gtmRest")}
           </li>
           <li>
-            <strong>Meta (Facebook) Pixel</strong> — pentru măsurarea
-            eficienței campaniilor și, după caz, pentru publicitate
-            personalizată pe platformele Meta.
+            <strong>{t("legal.cookies.s4.metaLabel")}</strong>
+            {t("legal.cookies.s4.metaRest")}
           </li>
         </ul>
+        <p>{t("legal.cookies.s4.p2")}</p>
         <p>
-          Furnizorii terți pot seta propriile cookie-uri și pot prelucra date
-          conform politicilor lor. Vă încurajăm să consultați documentația
-          Google și Meta pentru detalii suplimentare.
-        </p>
-        <p>
-          <strong>Stocare în browser (localStorage)</strong> folosită pentru
-          funcții precum progres la cursuri pe dispozitivul dumneavoastră nu
-          este în toate cazurile un „cookie” clasic, dar poate stoca informații
-          local; detalii despre datele personale transmise serverelor noastre
-          se regăsesc în{" "}
-          <Link href="/politica-confidentialitate">
-            Politica de confidențialitate
-          </Link>
-          .
+          <strong>{t("legal.cookies.s4.storageLabel")}</strong>
+          {t("legal.cookies.s4.storageBefore")}
+          <Link href="/politica-confidentialitate">{t("legal.cookies.s4.link")}</Link>
+          {t("legal.cookies.s4.after")}
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Cum vă puteți gestiona preferințele">
+      <LegalSection title={t("legal.cookies.s5.title")}>
         <p>
-          La prima vizită, un banner vă permite să alegeți:{" "}
-          <strong>Deloc</strong> — nu folosim localStorage pentru progres la
-          curs și nu încărcăm Google Tag Manager sau Meta Pixel;{" "}
-          <strong>Doar necesare</strong> — putem salva progresul cursului în
-          browser, fără module de analiză și marketing;{" "}
-          <strong>Acceptă tot</strong> — include și analiză / marketing. Alegerea
-          este memorată local (o cheie dedicată) ca să nu vi se afișeze mereu
-          bannerul.
+          {t("legal.cookies.s5.before")}
+          <strong>{t("legal.cookies.s5.none")}</strong>
+          {t("legal.cookies.s5.noneRest")}
+          <strong>{t("legal.cookies.s5.essential")}</strong>
+          {t("legal.cookies.s5.essentialRest")}
+          <strong>{t("legal.cookies.s5.all")}</strong>
+          {t("legal.cookies.s5.allRest")}
         </p>
-        <p>
-          Puteți controla sau șterge cookie-urile din setările browserului.
-          Dezactivarea anumitor cookie-uri poate afecta funcționalitatea
-          Site-ului.
-        </p>
-        <p>Instrucțiuni pentru browsere frecvent utilizate:</p>
+        <p>{t("legal.cookies.s5.p2")}</p>
+        <p>{t("legal.cookies.s5.browsers")}</p>
         <ul>
           <li>
             <a
@@ -151,21 +127,14 @@ export default function PoliticaCookiesPage() {
             </a>
           </li>
         </ul>
-        <p>
-          Pentru publicitate personalizată, puteți consulta și instrumentele
-          oferite de terți (ex.: setări Google și Meta pentru reclame).
-        </p>
+        <p>{t("legal.cookies.s5.ads")}</p>
       </LegalSection>
 
-      <LegalSection title="6. Modificări">
-        <p>
-          Putem actualiza această politică pentru a reflecta schimbări
-          tehnice sau legale. Data ultimei actualizări este indicată la
-          începutul paginii.
-        </p>
+      <LegalSection title={t("legal.cookies.s6.title")}>
+        <p>{t("legal.cookies.s6.p1")}</p>
       </LegalSection>
 
-      <LegalSection title="7. Contact">
+      <LegalSection title={t("legal.cookies.s7.title")}>
         <p>
           <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>
         </p>

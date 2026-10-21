@@ -1,11 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getT } from "@/lib/i18n/get-t";
 
 export async function GET(req: Request) {
+  const t = await getT();
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Neautorizat." }, { status: 401 });
+    return NextResponse.json({ error: t("payout.api.unauthorized") }, { status: 401 });
   }
 
   const full = new URL(req.url).searchParams.get("full") === "1";
@@ -27,7 +29,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error("Eroare la citirea istoricului Payout Tracker", error);
     return NextResponse.json(
-      { error: "Istoricul nu a putut fi încărcat." },
+      { error: t("payout.api.historyFailed") },
       { status: 500 },
     );
   }

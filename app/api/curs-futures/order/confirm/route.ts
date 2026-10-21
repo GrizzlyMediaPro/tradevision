@@ -7,12 +7,14 @@ import {
   confirmPracticalCoursePayment,
   confirmPracticalCoursePaymentBySession,
 } from "@/lib/practicalCoursePayment";
+import { getT } from "@/lib/i18n/get-t";
 
 type ConfirmBody = {
   sessionId?: string;
 };
 
 export async function POST(req: Request) {
+  const t = await getT();
   try {
     const body = (await req.json().catch(() => ({}))) as ConfirmBody;
     const sessionId = body.sessionId?.trim();
@@ -24,7 +26,7 @@ export async function POST(req: Request) {
 
     const orderId = await getOrderCookieOrderId();
     if (!orderId || !(await assertOrderAccess(orderId))) {
-      return NextResponse.json({ error: "Acces neautorizat." }, { status: 403 });
+      return NextResponse.json({ error: t("course.api.unauthorized") }, { status: 403 });
     }
 
     const result = await confirmPracticalCoursePayment(orderId);
@@ -32,12 +34,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Eroare la confirmarea plății curs futures", err);
     return NextResponse.json(
-      {
-        error:
-          err instanceof Error
-            ? err.message
-            : "Nu am putut finaliza confirmarea plății.",
-      },
+      { error: t("course.api.confirmFailed") },
       { status: 500 },
     );
   }

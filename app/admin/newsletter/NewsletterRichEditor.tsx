@@ -21,6 +21,7 @@ import {
   FaRedo,
 } from 'react-icons/fa';
 import { UploadButton } from '@/lib/uploadthing';
+import { useT } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   value: string;
@@ -95,6 +96,7 @@ const CustomFontSize = Extension.create({
 });
 
 export default function NewsletterRichEditor({ value, onChange }: Props) {
+  const t = useT();
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [linkValue, setLinkValue] = useState('https://');
   const [currentAlign, setCurrentAlign] = useState<TextAlignValue>('left');
@@ -298,7 +300,7 @@ export default function NewsletterRichEditor({ value, onChange }: Props) {
             allowedContent: 'hidden',
           }}
           content={{
-            button: 'Adaugă imagine',
+            button: t('admin.newsletter.addImage'),
           }}
         />
       </div>
@@ -306,13 +308,13 @@ export default function NewsletterRichEditor({ value, onChange }: Props) {
         <div className="rounded-xl border border-white/15 bg-slate-950/95 p-3">
           <div className="flex flex-col gap-2">
             <label className="text-[11px] font-medium uppercase tracking-wider text-white/60">
-              Link URL
+              {t('admin.newsletter.linkUrl')}
             </label>
             <input
               type="text"
               value={linkValue}
               onChange={(e) => setLinkValue(e.target.value)}
-              placeholder="https://exemplu.ro"
+              placeholder={t('admin.newsletter.linkPlaceholder')}
               className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs text-white placeholder-white/35 outline-none focus:border-orange-300/70 focus:ring-1 focus:ring-orange-300/40"
             />
             <div className="flex items-center gap-2">
@@ -321,14 +323,14 @@ export default function NewsletterRichEditor({ value, onChange }: Props) {
                 onClick={applyLink}
                 className="rounded-lg border border-orange-300/35 bg-orange-400/15 px-3 py-1.5 text-xs font-semibold text-orange-200 hover:bg-orange-400/25 transition"
               >
-                Adaugă link
+                {t('admin.newsletter.addLink')}
               </button>
               <button
                 type="button"
                 onClick={() => setIsLinkModalOpen(false)}
                 className="rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 transition"
               >
-                Anulează
+                {t('admin.common.cancel')}
               </button>
             </div>
           </div>

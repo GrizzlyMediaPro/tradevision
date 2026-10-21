@@ -7,12 +7,33 @@ import {
   NINJATRADER_LANDING,
   NINJATRADER_MEDIA_KIT_URL,
 } from "@/app/data/ninjaTrader";
+import { getT } from "@/lib/i18n/get-t";
 
-export const metadata: Metadata = {
-  title: "NinjaTrader & Kinetick — Platformă și date de piață",
-  description:
-    "Platforma noastră recomandată NinjaTrader și feed-ul de date Kinetick. Charting gratuit, simulator, date futures, forex și EOD.",
-};
+const PLATFORM_BENEFITS = [
+  "nt.platform.benefit.futures",
+  "nt.platform.benefit.charting",
+  "nt.platform.benefit.simulator",
+  "nt.platform.benefit.strategy",
+] as const;
+
+const PLATFORM_LINK_IDS = {
+  platform: "nt.platform.link.platform",
+  download: "nt.platform.link.download",
+  simulator: "nt.platform.link.simulator",
+} as const;
+
+const KINETICK_LINK_IDS = {
+  data: "nt.kinetick.link.data",
+  historical: "nt.kinetick.link.historical",
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("nt.meta.title"),
+    description: t("nt.meta.description"),
+  };
+}
 
 function LandingLinks({
   links,
@@ -22,7 +43,7 @@ function LandingLinks({
   return (
     <ul className="space-y-2">
       {links.map((link) => (
-        <li key={link.label}>
+        <li key={link.href}>
           <a
             href={link.href}
             target="_blank"
@@ -37,8 +58,17 @@ function LandingLinks({
   );
 }
 
-export default function NinjaTraderPage() {
+export default async function NinjaTraderPage() {
+  const t = await getT();
   const { platform, kinetick } = NINJATRADER_LANDING;
+  const platformLinks = platform.links.map((link) => ({
+    label: t(PLATFORM_LINK_IDS[link.id]),
+    href: link.href,
+  }));
+  const kinetickLinks = kinetick.links.map((link) => ({
+    label: t(KINETICK_LINK_IDS[link.id]),
+    href: link.href,
+  }));
 
   return (
     <main className="page-gradient min-h-screen">
@@ -50,7 +80,7 @@ export default function NinjaTraderPage() {
               <header className="space-y-4">
                 <Image
                   src={NINJATRADER_ASSETS.wordmark}
-                  alt="NinjaTrader"
+                  alt={t("nt.wordmarkAlt")}
                   width={2376}
                   height={300}
                   className="h-8 md:h-10 w-auto max-w-[240px] md:max-w-[280px] object-contain object-left"
@@ -58,48 +88,46 @@ export default function NinjaTraderPage() {
                 />
                 <div>
                   <h1 className="text-xl md:text-2xl font-semibold text-white tracking-wide uppercase">
-                    {platform.eyebrow}
+                    {t("nt.platform.eyebrow")}
                   </h1>
                   <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full" />
                 </div>
               </header>
 
               <p className="text-sm md:text-base text-white/70 leading-relaxed">
-                {platform.intro}
+                {t("nt.platform.intro")}
               </p>
 
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {platform.benefits.map((benefit) => (
+                {PLATFORM_BENEFITS.map((id) => (
                   <li
-                    key={benefit}
+                    key={id}
                     className="flex items-start gap-2 text-sm text-white/80"
                   >
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-300" />
-                    {benefit}
+                    {t(id)}
                   </li>
                 ))}
               </ul>
 
               <div className="space-y-4">
-                {platform.body.map((paragraph) => (
-                  <p
-                    key={paragraph.slice(0, 40)}
-                    className="text-sm md:text-base text-white/65 leading-relaxed"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
+                <p className="text-sm md:text-base text-white/65 leading-relaxed">
+                  {t("nt.platform.body1")}
+                </p>
+                <p className="text-sm md:text-base text-white/65 leading-relaxed">
+                  {t("nt.platform.body2")}
+                </p>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 pt-2">
-                <LandingLinks links={platform.links} />
+                <LandingLinks links={platformLinks} />
                 <a
-                  href={platform.cta.href}
+                  href={platform.ctaHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex shrink-0 items-center justify-center rounded-full bg-yellow-400 px-8 py-3 text-sm font-semibold uppercase tracking-wider text-black hover:bg-yellow-300 transition"
                 >
-                  {platform.cta.label}
+                  {t("nt.platform.cta")}
                 </a>
               </div>
             </div>
@@ -107,7 +135,7 @@ export default function NinjaTraderPage() {
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40">
               <Image
                 src={NINJATRADER_ASSETS.monitor}
-                alt="NinjaTrader trading platform"
+                alt={t("nt.platform.imageAlt")}
                 width={1200}
                 height={675}
                 className="w-full h-auto object-cover"
@@ -123,32 +151,32 @@ export default function NinjaTraderPage() {
               <header className="space-y-4">
                 <Image
                   src={NINJATRADER_ASSETS.kinetickLogo}
-                  alt="Kinetick"
+                  alt={t("nt.kinetick.alt")}
                   width={800}
                   height={280}
                   className="h-14 md:h-16 w-auto max-w-[220px] md:max-w-[260px] object-contain object-left"
                 />
                 <div>
                   <h2 className="text-xl md:text-2xl font-semibold text-white tracking-wide uppercase">
-                    {kinetick.eyebrow}
+                    {t("nt.kinetick.eyebrow")}
                   </h2>
                   <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-sky-400 via-sky-300 to-sky-500 rounded-full" />
                 </div>
               </header>
 
               <p className="text-sm md:text-base text-white/70 leading-relaxed">
-                {kinetick.intro}
+                {t("nt.kinetick.intro")}
               </p>
 
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 pt-2">
-                <LandingLinks links={kinetick.links} />
+                <LandingLinks links={kinetickLinks} />
                 <a
-                  href={kinetick.cta.href}
+                  href={kinetick.ctaHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex shrink-0 items-center justify-center rounded-full border border-sky-400/50 bg-sky-500/15 px-8 py-3 text-sm font-semibold uppercase tracking-wider text-sky-200 hover:bg-sky-500/25 transition"
                 >
-                  {kinetick.cta.label}
+                  {t("nt.kinetick.cta")}
                 </a>
               </div>
             </div>
@@ -156,7 +184,7 @@ export default function NinjaTraderPage() {
             <div className="flex justify-center lg:justify-end">
               <Image
                 src={NINJATRADER_ASSETS.kinetickBadge}
-                alt="Kinetick badge"
+                alt={t("nt.kinetick.badgeAlt")}
                 width={200}
                 height={200}
                 className="h-24 md:h-28 w-auto object-contain opacity-90"
@@ -166,20 +194,20 @@ export default function NinjaTraderPage() {
         </section>
 
         <p className="text-center text-[11px] md:text-xs text-white/40 leading-relaxed">
-          Content provided in accordance with{" "}
+          {t("nt.footer.before")}
           <a
             href={NINJATRADER_MEDIA_KIT_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/55 underline underline-offset-2 hover:text-white/75 transition"
           >
-            NinjaTrader Vendor Guidelines
+            {t("nt.footer.guidelines")}
           </a>
-          . Back to{" "}
+          {t("nt.footer.middle")}
           <Link href="/" className="text-purple-300 hover:text-purple-200 transition">
-            homepage
+            {t("nt.footer.home")}
           </Link>
-          .
+          {t("nt.footer.after")}
         </p>
       </div>
     </main>

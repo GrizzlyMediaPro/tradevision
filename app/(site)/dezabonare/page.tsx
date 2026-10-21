@@ -1,16 +1,22 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 import Link from "next/link";
+import { getT } from "@/lib/i18n/get-t";
 
-export const metadata = {
-  title: "Dezabonare",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("unsub.metaTitle"),
+  };
+}
 
 export default async function DezabonarePage({
   searchParams,
 }: {
   searchParams: Promise<{ email?: string; token?: string }>;
 }) {
+  const t = await getT();
   const params = await searchParams;
   const email = params.email?.trim().toLowerCase();
   const token = params.token?.trim();
@@ -36,11 +42,10 @@ export default async function DezabonarePage({
           <>
             <div className="text-4xl mb-4">✓</div>
             <h1 className="text-xl font-semibold text-white mb-3">
-              Te-ai dezabonat cu succes
+              {t("unsub.successTitle")}
             </h1>
             <p className="text-sm text-white/55 leading-relaxed">
-              Nu vei mai primi emailuri de la Trade Vision. Dacă te
-              răzgândești, te poți reabona oricând.
+              {t("unsub.successBody")}
             </p>
           </>
         )}
@@ -49,10 +54,10 @@ export default async function DezabonarePage({
           <>
             <div className="text-4xl mb-4">✕</div>
             <h1 className="text-xl font-semibold text-white mb-3">
-              Link invalid
+              {t("unsub.invalidTitle")}
             </h1>
             <p className="text-sm text-white/55 leading-relaxed">
-              Linkul de dezabonare nu este valid sau a expirat.
+              {t("unsub.invalidBody")}
             </p>
           </>
         )}
@@ -61,10 +66,10 @@ export default async function DezabonarePage({
           <>
             <div className="text-4xl mb-4">!</div>
             <h1 className="text-xl font-semibold text-white mb-3">
-              Eroare
+              {t("unsub.errorTitle")}
             </h1>
             <p className="text-sm text-white/55 leading-relaxed">
-              A apărut o eroare la dezabonare. Încearcă din nou mai târziu.
+              {t("unsub.errorBody")}
             </p>
           </>
         )}
@@ -73,7 +78,7 @@ export default async function DezabonarePage({
           href="/"
           className="inline-block mt-6 text-sm text-purple-400 hover:text-purple-300 transition-colors"
         >
-          ← Înapoi pe Trade Vision
+          {t("unsub.back")}
         </Link>
       </div>
     </section>

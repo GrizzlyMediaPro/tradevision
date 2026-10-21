@@ -8,6 +8,7 @@ export const PRACTICAL_COURSE_OPERATOR = SITE_OPERATOR;
 export const PRACTICAL_COURSE = {
   slug: "curs-futures",
   path: "/curs-futures",
+  checkoutPath: "/curs-futures/inscriere",
   thanksPath: "/curs-futures/multumim",
   apiPath: "/api/curs-futures",
   title: "Curs Futures",

@@ -9,7 +9,7 @@ type CachedQuote = {
   expiresAt: number;
 };
 
-const BNR_RATES_URL = "https://www.bnr.ro/nbrfxrates.xml";
+const BNR_RATES_URL = "https://curs.bnr.ro/nbrfxrates.xml";
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 let cachedQuote: CachedQuote | null = null;

@@ -14,6 +14,7 @@ import {
   FaKey,
 } from "react-icons/fa";
 import Flag from "react-world-flags";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { platformImages } from "@/app/data/firms";
 import type {
   FirmDetail,
@@ -29,11 +30,14 @@ function formatDollar(value: string): string {
   return `$${trimmed}`;
 }
 
-function formatDiscount(raw: string): string {
+function formatDiscount(
+  raw: string,
+  format: (value: number) => string,
+): string {
   if (!raw) return "";
   const numeric = Number(raw.toString().replace(/[^\d.]/g, ""));
   if (Number.isNaN(numeric)) return raw;
-  return `${numeric}% DISCOUNT`;
+  return format(numeric);
 }
 
 function normalizeUrl(raw?: string | null): string {
@@ -64,10 +68,10 @@ const accountColors: Record<string, string> = {
   yellow: "bg-yellow-500/20 text-yellow-300",
 };
 
-function translateYesNo(value: string): string {
+function translateYesNo(value: string, yes: string, no: string): string {
   const lower = value.trim().toLowerCase();
-  if (lower === "yes" || lower === "y" || lower === "da") return "Da";
-  if (lower === "no" || lower === "n" || lower === "nu") return "Nu";
+  if (lower === "yes" || lower === "y" || lower === "da") return yes;
+  if (lower === "no" || lower === "n" || lower === "nu") return no;
   return value;
 }
 
@@ -87,6 +91,7 @@ export function FirmPageClient({
   firm: FirmDetail;
   firms: FirmDetail[];
 }) {
+  const t = useT();
   const availableChallengeTypes = useMemo<ChallengeType[]>(
     () =>
       Array.from(
@@ -177,7 +182,7 @@ export function FirmPageClient({
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-20 pb-16">
       {copied && (
         <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-400/40 bg-black/80 px-4 py-1.5 text-xs font-medium text-emerald-200 shadow-lg">
-          Codul a fost copiat
+          {t("firms.copied")}
         </div>
       )}
       <Link
@@ -185,7 +190,7 @@ export function FirmPageClient({
         className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition mb-8"
       >
         <FaChevronLeft className="h-3 w-3" />
-        <span>Înapoi la firme</span>
+        <span>{t("firms.detail.back")}</span>
       </Link>
 
       {/* ── Header ── */}
@@ -224,7 +229,7 @@ export function FirmPageClient({
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition"
                   >
-                    Vezi site-ul <FaExternalLinkAlt className="h-2.5 w-2.5" />
+                    {t("firms.detail.visitSite")} <FaExternalLinkAlt className="h-2.5 w-2.5" />
                   </a>
                 )}
               </div>
@@ -232,7 +237,7 @@ export function FirmPageClient({
                 <Stars score={firm.trustScore} />
                 <span className="text-sm font-medium text-white/80">{firm.trustScore}/5</span>
               </div>
-              <span className="text-xs text-white/40">Activă de {firm.activeYears} ani</span>
+              <span className="text-xs text-white/40">{t("firms.activeFor", { years: firm.activeYears })}</span>
             </div>
           </div>
 
@@ -243,7 +248,7 @@ export function FirmPageClient({
 
         <div className="w-full md:w-72 rounded-2xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 px-6 py-6 flex flex-col items-center gap-4">
           <span className="text-2xl font-bold text-emerald-400">
-            {formatDiscount(firm.discount)}
+            {formatDiscount(firm.discount, (value) => t("firms.discountBadge", { value }))}
           </span>
           <div className="w-full h-px bg-white/10" />
           <button
@@ -253,14 +258,14 @@ export function FirmPageClient({
             <FaCopy className="h-3.5 w-3.5" />
             <span>{firm.code}</span>
           </button>
-          <span className="text-[11px] text-white/50">Copiază codul</span>
+          <span className="text-[11px] text-white/50">{t("firms.copyTheCode")}</span>
           <a
             href={normalizeUrl(firm.fundingUrl || firm.website)}
             target={firm.fundingUrl || firm.website ? "_blank" : undefined}
             rel={firm.fundingUrl || firm.website ? "noopener noreferrer" : undefined}
             className="w-full inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(147,51,234,0.35)] hover:brightness-110 transition cursor-pointer"
           >
-            Obține finanțare
+            {t("firms.getFunding")}
           </a>
         </div>
       </div>
@@ -268,14 +273,14 @@ export function FirmPageClient({
       {/* ── Overview ── */}
       <div className="mt-14">
         <h2 className="text-xl md:text-2xl font-semibold text-white flex items-center gap-3">
-          Prezentare generală
+          {t("firms.detail.overview")}
           <div className="flex-1 h-px bg-linear-to-r from-yellow-400/50 to-transparent" />
         </h2>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-white/10 bg-white/3 px-6 py-5">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-4 flex items-center gap-2">
-              <span>📊</span> Platforme de tranzacționare
+              <span>📊</span> {t("firms.detail.platforms")}
             </h3>
             <div className="flex flex-wrap gap-2">
               {firm.platforms.map((p) => (
@@ -294,7 +299,7 @@ export function FirmPageClient({
 
           <div className="rounded-2xl border border-white/10 bg-white/3 px-6 py-5">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-4 flex items-center gap-2">
-              <FaCreditCard className="h-3.5 w-3.5" /> Metode de plată
+              <FaCreditCard className="h-3.5 w-3.5" /> {t("firms.detail.payments")}
             </h3>
             <div className="flex flex-wrap gap-2">
               {firm.paymentMethods.map((m) => (
@@ -313,7 +318,7 @@ export function FirmPageClient({
       {/* ── Key Features ── */}
       <div className="mt-10">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50 text-center mb-5 flex items-center gap-2 justify-center">
-          <FaKey className="h-3 w-3" /> Caracteristici cheie
+          <FaKey className="h-3 w-3" /> {t("firms.detail.features")}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {firm.keyFeatures.map((f) => (
@@ -331,7 +336,7 @@ export function FirmPageClient({
                   <FaTimesCircle className="h-3.5 w-3.5 text-red-400" />
                 )}
                 <span className={`text-xs font-semibold ${f.enabled ? "text-emerald-300" : "text-red-300"}`}>
-                  {translateYesNo(f.value)}
+                  {translateYesNo(f.value, t("firms.yes"), t("firms.no"))}
                 </span>
               </div>
             </div>
@@ -342,19 +347,19 @@ export function FirmPageClient({
       {/* ── Challenges ── */}
       <div className="mt-14">
         <h2 className="text-xl md:text-2xl font-semibold text-white flex items-center gap-3">
-          Challenges
+          {t("firms.detail.challenges")}
           <div className="flex-1 h-px bg-linear-to-r from-yellow-400/50 to-transparent" />
         </h2>
 
         <p className="mt-3 text-xs text-white/60">
-          Ca să vezi regulile pentru un challenge, apasă pe titlul lui din tabel.
+          {t("firms.detail.rulesHint")}
         </p>
 
         {/* Tip de challenge + Compare */}
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className={`w-full sm:w-auto flex ${isMobile && availableChallengeTypes.length > 3 ? 'flex-col' : 'items-center'} gap-3`}>
             <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
-              Tip de challenge
+              {t("firms.detail.challengeType")}
             </span>
             {isMobile && availableChallengeTypes.length > 3 ? (
               <select
@@ -404,7 +409,7 @@ export function FirmPageClient({
             }}
             className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-[11px] font-semibold text-white/85 hover:bg-white/10 cursor-pointer"
           >
-            Compara conturi
+            {t("firms.detail.compareAccounts")}
           </button>
         </div>
 
@@ -412,14 +417,14 @@ export function FirmPageClient({
         {comparedItems.length === 0 ? (
           <div className="mt-6 flex flex-col gap-3">
             <div className="hidden md:grid md:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr_1.5fr] gap-3 px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-[11px] font-semibold uppercase tracking-wider text-white/50">
-              <span>Cont</span>
-              <span className="text-center">Mărime</span>
-              <span className="text-center">Activare</span>
-              <span className="text-center">Taxă</span>
-              <span className="text-center">Cost real</span>
-              <span className="text-center">Target</span>
-              <span className="text-center">Drawdown</span>
-              <span className="text-center">Acțiune</span>
+              <span>{t("firms.detail.col.account")}</span>
+              <span className="text-center">{t("firms.detail.col.size")}</span>
+              <span className="text-center">{t("firms.detail.col.activation")}</span>
+              <span className="text-center">{t("firms.detail.col.fee")}</span>
+              <span className="text-center">{t("firms.detail.col.trueCost")}</span>
+              <span className="text-center">{t("firms.detail.col.target")}</span>
+              <span className="text-center">{t("firms.detail.col.drawdown")}</span>
+              <span className="text-center">{t("firms.detail.col.action")}</span>
             </div>
 
             {filteredChallenges.map((ch, idx) => (
@@ -450,43 +455,43 @@ export function FirmPageClient({
                       }}
                       className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${accountColors[ch.accountColor] || "bg-purple-500/20 text-purple-300"} cursor-pointer hover:brightness-110`}
                     >
-                      {ch.accountType || "Challenge"}
+                      {ch.accountType || t("firms.fallback.challenge")}
                     </button>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-white/40 md:hidden">Mărime</span>
+                  <span className="text-[10px] text-white/40 md:hidden">{t("firms.detail.col.size")}</span>
                   <span className="text-sm font-semibold text-white">
                     {formatDollar(ch.size)}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-white/40 md:hidden">Activare</span>
+                  <span className="text-[10px] text-white/40 md:hidden">{t("firms.detail.col.activation")}</span>
                   <span className="text-sm text-white/70">
                     {formatDollar(ch.activation)}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-white/40 md:hidden">Taxă</span>
+                  <span className="text-[10px] text-white/40 md:hidden">{t("firms.detail.col.fee")}</span>
                   <span className="text-sm text-white/70">
                     {formatDollar(ch.fee)}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-white/40 md:hidden">Cost real</span>
+                  <span className="text-[10px] text-white/40 md:hidden">{t("firms.detail.col.trueCost")}</span>
                   <span className="text-sm font-semibold text-emerald-400">
                     {formatDollar(ch.trueCost)}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-white/40 md:hidden">Target</span>
+                  <span className="text-[10px] text-white/40 md:hidden">{t("firms.detail.col.target")}</span>
                   <span className="text-sm text-white/70">
                     {formatDollar(ch.target)}
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                <span className="text-[10px] text-white/40 md:hidden">Drawdown</span>
+                <span className="text-[10px] text-white/40 md:hidden">{t("firms.detail.col.drawdown")}</span>
                   <span className="text-sm text-white/70">
                     {formatDollar(ch.drawdown)}
                   </span>
@@ -504,7 +509,7 @@ export function FirmPageClient({
                     rel={firm.fundingUrl || firm.website ? "noopener noreferrer" : undefined}
                     className="inline-flex items-center justify-center rounded-full bg-linear-to-r from-purple-500 to-purple-600 px-4 py-1.5 text-[11px] font-semibold text-white hover:brightness-110 transition cursor-pointer"
                   >
-                    Obține finanțare
+                    {t("firms.getFunding")}
                   </a>
                 </div>
               </div>
@@ -514,21 +519,21 @@ export function FirmPageClient({
           <div className="mt-6 w-full overflow-x-auto">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm md:text-base font-semibold text-white">
-                Comparație conturi selectate
+                {t("firms.comparison.title")}
               </h3>
               <button
                 type="button"
                 onClick={() => setCompareSelections(emptySlots)}
                 className="text-[11px] md:text-xs rounded-full border border-white/25 bg-white/5 px-3 py-1.5 text-white/80 hover:bg-white/10 cursor-pointer"
               >
-                Renunță la comparație
+                {t("firms.comparison.clear")}
               </button>
             </div>
             <table className="w-full text-xs md:text-sm text-white/80 border-collapse">
               <thead>
                 <tr>
                   <th className="py-2 pr-3 text-white/60 font-semibold text-left">
-                    Criteriu
+                    {t("firms.comparison.criterion")}
                   </th>
                   {comparedItems.map(({ firm: colFirm, challenge }, idx) => (
                     <th
@@ -540,7 +545,7 @@ export function FirmPageClient({
                           {colFirm.name}
                         </span>
                         <span className="text-xs font-semibold text-white">
-                          {challenge.accountType || "Account"}{" "}
+                          {challenge.accountType || t("firms.fallback.account")}{" "}
                           {challenge.size && (
                             <span className="text-[10px] text-white/70">
                               ({challenge.size})
@@ -555,52 +560,66 @@ export function FirmPageClient({
               <tbody>
                 {[
                   {
-                    label: "Cont",
+                    id: "account",
+                    label: t("firms.row.account"),
                     get: ({ challenge }: any) =>
-                      challenge.accountType || "Account",
+                      challenge.accountType || t("firms.fallback.account"),
                   },
                   {
-                    label: "Tip challenge",
-                    get: ({ challenge }: any) => challenge.type ?? "Rapid",
+                    id: "type",
+                    label: t("firms.row.challengeType"),
+                    get: ({ challenge }: any) =>
+                      challenge.type ?? t("firms.fallback.rapid"),
                   },
                   {
-                    label: "Mărime cont",
+                    id: "size",
+                    label: t("firms.row.size"),
                     get: ({ challenge }: any) => formatDollar(challenge.size),
                   },
                   {
-                    label: "Activare",
+                    id: "activation",
+                    label: t("firms.row.activation"),
                     get: ({ challenge }: any) =>
                       formatDollar(challenge.activation),
                   },
                   {
-                    label: "Taxă",
+                    id: "fee",
+                    label: t("firms.row.fee"),
                     get: ({ challenge }: any) => formatDollar(challenge.fee),
                   },
                   {
-                    label: "Cost real",
+                    id: "trueCost",
+                    label: t("firms.row.trueCost"),
                     get: ({ challenge }: any) =>
                       formatDollar(challenge.trueCost),
                   },
                   {
-                    label: "Target",
+                    id: "target",
+                    label: t("firms.row.target"),
                     get: ({ challenge }: any) => formatDollar(challenge.target),
                   },
                   {
-                    label: "Drawdown",
+                    id: "drawdown",
+                    label: t("firms.row.drawdown"),
                     get: ({ challenge }: any) =>
                       formatDollar(challenge.drawdown),
                   },
                   {
-                    label: "Discount",
-                    get: ({ firm }: any) => formatDiscount(firm.discount),
+                    id: "discount",
+                    label: t("firms.row.discount"),
+                    get: ({ firm }: any) =>
+                      formatDiscount(firm.discount, (value) =>
+                        t("firms.discountBadge", { value }),
+                      ),
                   },
                   {
-                    label: "Payout",
+                    id: "payout",
+                    label: t("firms.row.payout"),
                     get: ({ firm }: any) => firm.payout,
                   },
                 ].map((row) => (
                   <tr
-                    key={row.label}
+                    key={row.id}
                     className="border-t border-white/10 last:border-b-0"
                   >
                     <td className="py-2 pr-3 font-semibold text-white/70 align-top">
@@ -624,7 +643,7 @@ export function FirmPageClient({
       {/* ── Payout Timeline ── */}
       <div className="mt-14">
         <h2 className="text-xl md:text-2xl font-semibold text-white flex items-center gap-3">
-          Calendar payout
+          {t("firms.detail.payoutCalendar")}
           <div className="flex-1 h-px bg-linear-to-r from-yellow-400/50 to-transparent" />
         </h2>
 
@@ -647,7 +666,7 @@ export function FirmPageClient({
       {firm.excludedCountries.length > 0 && (
         <div className="mt-14">
           <h2 className="text-xl md:text-2xl font-semibold text-white flex items-center gap-3">
-            Țări excluse
+            {t("firms.detail.excluded")}
             <div className="flex-1 h-px bg-linear-to-r from-yellow-400/50 to-transparent" />
           </h2>
           <div className="mt-6 rounded-2xl border border-white/10 bg-white/3 px-6 py-6">
@@ -678,10 +697,12 @@ export function FirmPageClient({
               ✕
             </button>
             <h3 className="text-lg font-semibold text-white mb-1">
-              Reguli - {openChallenge.accountType || "Challenge"}
+              {t("firms.detail.rulesTitle", {
+                name: openChallenge.accountType || t("firms.fallback.challenge"),
+              })}
             </h3>
             <p className="text-xs text-white/50 mb-4">
-              Reguli specifice pentru acest tip de challenge.
+              {t("firms.detail.rulesIntro")}
             </p>
             {openChallenge.rules && openChallenge.rules.length > 0 ? (
               <>
@@ -698,7 +719,7 @@ export function FirmPageClient({
                       }`}
                     >
                       <span>📊</span>
-                      {tab.label || `Tab ${idx + 1}`}
+                      {tab.label || t("firms.detail.tab", { n: idx + 1 })}
                     </button>
                   ))}
                 </div>
@@ -741,7 +762,7 @@ export function FirmPageClient({
               </>
             ) : (
               <p className="text-sm text-white/60">
-                Nu există reguli configurate pentru acest challenge încă.
+                {t("firms.detail.noRules")}
               </p>
             )}
           </div>
@@ -760,11 +781,10 @@ export function FirmPageClient({
               ✕
             </button>
             <h3 className="text-lg font-semibold text-white mb-1">
-              Selectează 2 conturi pentru comparație
+              {t("firms.compare.title")}
             </h3>
             <p className="text-xs text-white/55 mb-4">
-              Alege firma și apoi contul (challenge) pe care vrei să îl
-              compari.
+              {t("firms.compare.body")}
             </p>
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
               {compareDraft.map((slot, idx) => {
@@ -793,7 +813,7 @@ export function FirmPageClient({
                     className="flex flex-col md:flex-row md:items-center gap-2 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5"
                   >
                     <span className="text-[11px] font-semibold uppercase tracking-wider text-white/50 md:w-16">
-                      Slot {idx + 1}
+                      {t("firms.compare.slot", { n: idx + 1 })}
                     </span>
                     <div className="flex-1 flex flex-col md:flex-row gap-2">
                       <select
@@ -824,7 +844,7 @@ export function FirmPageClient({
                         }}
                         className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/60 cursor-pointer [&>option]:bg-zinc-900"
                       >
-                        <option value="">Alege firmă</option>
+                        <option value="">{t("firms.compare.chooseFirm")}</option>
                         {allFirms.map((f) => (
                           <option key={f.slug} value={f.slug}>
                             {f.name}
@@ -852,12 +872,12 @@ export function FirmPageClient({
                       >
                         <option value="">
                           {selectedFirm
-                            ? "Tip challenge (toate)"
-                            : "Alege mai întâi firma"}
+                            ? t("firms.compare.typeAll")
+                            : t("firms.compare.chooseFirmFirst")}
                         </option>
-                        {availableTypes.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
+                        {availableTypes.map((challengeType) => (
+                          <option key={challengeType} value={challengeType}>
+                            {challengeType}
                           </option>
                         ))}
                       </select>
@@ -888,9 +908,9 @@ export function FirmPageClient({
                         className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white outline-none focus:border-sky-400/60 cursor-pointer [&>option]:bg-zinc-900 disabled:opacity-40"
                       >
                         <option value="">
-                          {selectedFirm
-                            ? "Alege cont"
-                            : "Alege mai întâi firma"}
+                            {selectedFirm
+                            ? t("firms.compare.chooseAccount")
+                            : t("firms.compare.chooseFirmFirst")}
                         </option>
                         {availableChallenges.map((ch, cIdx) => {
                           const globalIndex =
@@ -916,7 +936,7 @@ export function FirmPageClient({
                         }
                         className="self-start md:self-center text-[11px] text-red-300 hover:text-red-200 cursor-pointer"
                       >
-                        Golește
+                        {t("firms.compare.clearSlot")}
                       </button>
                     )}
                   </div>
@@ -925,8 +945,9 @@ export function FirmPageClient({
             </div>
             <div className="mt-4 flex items-center justify-between gap-3">
               <span className="text-[11px] text-white/45">
-                Sloturi selectate:{" "}
-                {compareDraft.filter((slot) => slot !== null).length} / 2
+                {t("firms.compare.selected", {
+                  count: compareDraft.filter((slot) => slot !== null).length,
+                })}
               </span>
               <button
                 type="button"
@@ -948,7 +969,7 @@ export function FirmPageClient({
                 }}
                 className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-sky-600 px-6 py-2 text-xs md:text-sm font-semibold text-white shadow-[0_10px_24px_rgba(14,165,233,0.4)] hover:brightness-110 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Compara
+                {t("firms.compare.submit")}
               </button>
             </div>
           </div>

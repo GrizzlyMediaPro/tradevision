@@ -9,6 +9,7 @@ import {
   WEBINAR_CONFIRM_MAX_AGE_SEC,
 } from "@/lib/webinarConfirmCookie";
 import { sendWebinarRegistrationConfirmationEmail } from "@/lib/webinarConfirmationEmail";
+import { getLocale, getT } from "@/lib/i18n/get-t";
 import {
   isWebinarJamConfigured,
   registerAttendeeWithWebinarJam,
@@ -23,6 +24,8 @@ function isValidPhone(value: string) {
 }
 
 export async function POST(req: Request) {
+  const t = await getT();
+  const locale = await getLocale();
   try {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -32,7 +35,7 @@ export async function POST(req: Request) {
     });
     if (!success) {
       return NextResponse.json(
-        { error: "Prea multe cereri. Încearcă din nou într-un minut." },
+        { error: t("api.rateLimit") },
         { status: 429 },
       );
     }
@@ -51,25 +54,25 @@ export async function POST(req: Request) {
 
     if (firstName.length < 2) {
       return NextResponse.json(
-        { error: "Prenumele trebuie să aibă cel puțin 2 caractere." },
+        { error: t("webinar.api.firstName") },
         { status: 400 },
       );
     }
     if (!email || !isValidEmail(email)) {
       return NextResponse.json(
-        { error: "Adresa de email nu este validă." },
+        { error: t("webinar.api.email") },
         { status: 400 },
       );
     }
     if (!phone || !isValidPhone(phone)) {
       return NextResponse.json(
-        { error: "Numărul de telefon nu este valid." },
+        { error: t("webinar.api.phone") },
         { status: 400 },
       );
     }
     if (!acceptedTerms) {
       return NextResponse.json(
-        { error: "Trebuie să accepți termenii pentru a continua." },
+        { error: t("webinar.api.terms") },
         { status: 400 },
       );
     }
@@ -80,8 +83,7 @@ export async function POST(req: Request) {
     if (existing) {
       return NextResponse.json(
         {
-          error:
-            "Acest email este deja înscris la webinar. Verifică inboxul sau folosește altă adresă.",
+          error: t("webinar.api.duplicate"),
         },
         { status: 409 },
       );
@@ -99,7 +101,7 @@ export async function POST(req: Request) {
           console.error("WebinarJam register:", wj.logDetail);
         }
         return NextResponse.json(
-          { error: wj.userMessage },
+          { error: t(wj.userMessage, wj.userMessageVars) },
           { status: wj.alreadyRegistered ? 409 : 502 },
         );
       }
@@ -121,8 +123,7 @@ export async function POST(req: Request) {
       ) {
         return NextResponse.json(
           {
-            error:
-              "Acest email este deja înscris la webinar. Verifică inboxul sau folosește altă adresă.",
+            error: t("webinar.api.duplicate"),
           },
           { status: 409 },
         );
@@ -140,7 +141,7 @@ export async function POST(req: Request) {
       console.error("Newsletter subscribe after webinar signup", newsErr);
     }
 
-    await sendWebinarRegistrationConfirmationEmail(firstName, email);
+    await sendWebinarRegistrationConfirmationEmail(firstName, email, locale);
 
     revalidatePath("/admin/webinar");
     revalidatePath("/admin/newsletter");
@@ -158,7 +159,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Eroare la înscrierea webinar", err);
     return NextResponse.json(
-      { error: "Eroare internă la înscriere. Te rugăm să încerci din nou." },
+      { error: t("webinar.api.internal") },
       { status: 500 },
     );
   }

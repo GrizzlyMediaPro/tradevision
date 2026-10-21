@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useT } from "@/lib/i18n/I18nProvider";
 import {
   formatCountdownUnit,
 } from "../lib/webinarCountdown";
@@ -13,6 +14,7 @@ type WebinarValueSectionProps = {
 };
 
 export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProps) {
+  const t = useT();
   const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -46,19 +48,19 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
         <div className="relative grid grid-cols-1 gap-8 p-6 sm:p-10 md:grid-cols-2 md:gap-10 md:p-12">
           <div className="flex flex-col items-start justify-center gap-5 text-left">
             <span className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-yellow-300">
-              Bonus pentru participanți
+              {t("webinar.value.badge")}
             </span>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-white">
-              După 2 ore...
+              {t("webinar.value.title")}
             </h2>
 
             <div className="h-[2px] w-[80px] rounded-full bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500" />
 
             <p className="max-w-lg text-sm md:text-base text-white/65 leading-relaxed">
-              Vei primi acces la un{" "}
-              <span className="font-semibold text-white">curs gratuit</span>{" "}
-              cu tot ce ai nevoie pentru a face primul payout.
+              {t("webinar.value.bodyBefore")}
+              <span className="font-semibold text-white">{t("webinar.value.bodyHighlight")}</span>
+              {t("webinar.value.bodyAfter")}
             </p>
 
             <Link
@@ -66,10 +68,10 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
               className="mt-1 inline-flex w-full max-w-[340px] flex-col items-center justify-center rounded-2xl bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 sm:max-w-none sm:w-auto sm:px-8 sm:py-3.5"
             >
               <span className="text-sm font-bold tracking-wide sm:text-base">
-                ÎNSCRIE-TE ACUM
+                {t("webinar.value.cta")}
               </span>
               <span className="text-[11px] font-medium text-slate-900/80 sm:text-xs">
-                Înscriere la webinar live
+                {t("webinar.value.ctaNote")}
               </span>
             </Link>
 
@@ -79,7 +81,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                   {formatCountdownUnit(days)}
                 </p>
                 <p className="mt-1 text-center text-[11px] font-medium text-white/65">
-                  zile
+                  {t("webinar.countdown.days")}
                 </p>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/30 px-2 py-2.5 sm:px-3">
@@ -87,7 +89,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                   {formatCountdownUnit(hours)}
                 </p>
                 <p className="mt-1 text-center text-[11px] font-medium text-white/65">
-                  ore
+                  {t("webinar.countdown.hours")}
                 </p>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/30 px-2 py-2.5 sm:px-3">
@@ -95,7 +97,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                   {formatCountdownUnit(minutes)}
                 </p>
                 <p className="mt-1 text-center text-[11px] font-medium text-white/65">
-                  minute
+                  {t("webinar.countdown.minutes")}
                 </p>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/30 px-2 py-2.5 sm:px-3">
@@ -103,7 +105,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                   {formatCountdownUnit(seconds)}
                 </p>
                 <p className="mt-1 text-center text-[11px] font-medium text-white/65">
-                  secunde
+                  {t("webinar.countdown.seconds")}
                 </p>
               </div>
             </div>
@@ -115,7 +117,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                 <div className="relative mx-auto aspect-[3/4] w-full max-w-[220px] overflow-hidden rounded-2xl sm:max-w-[240px] md:max-w-[260px]">
                   <Image
                     src="/ChatGPT Image May 1, 2026, 01_20_56 PM.png"
-                    alt="Participanți la sesiune Trade Vision"
+                    alt={t("webinar.value.imageAlt")}
                     fill
                     className="object-cover object-center"
                     sizes="260px"
@@ -124,7 +126,7 @@ export function WebinarValueSection({ targetTimestamp }: WebinarValueSectionProp
                 <div className="mb-1 mt-3 flex justify-center">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-3.5 py-1.5 text-[11px] font-semibold text-yellow-300">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-400" />
-                    Sesiuni live săptămânale
+                    {t("webinar.value.liveBadge")}
                   </span>
                 </div>
                 <div className="pointer-events-none absolute -inset-px rounded-3xl bg-linear-to-b from-purple-500/20 via-transparent to-transparent opacity-40" />

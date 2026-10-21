@@ -1,16 +1,12 @@
 "use client";
 
 import { FaTimes } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
-const notForYou = [
-  "Ai salariul minim și nu ai posibilitatea de a economisi lunar nici măcar $100.",
-  "Nu ai deloc bani puși deoparte și speri că tradingul te va „salva” financiar peste noapte.",
-  "Cauți metode rapide de îmbogățire, fără disciplină sau efort susținut.",
-  "Refuzi să urmezi un sistem clar și vrei să „simți piața” sau să te bazezi doar pe intuiție.",
-  "Nu ești dispus să investești timp zilnic pentru învățare, analiză și aplicare practică.",
-];
+const ITEM_IDS = ["1", "2", "3", "4", "5"] as const;
 
 export function WebinarNotForYouSection() {
+  const t = useT();
   return (
     <section className="relative w-full overflow-hidden">
       <div
@@ -29,28 +25,24 @@ export function WebinarNotForYouSection() {
         <div className="w-full flex flex-col items-center text-center gap-10">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Pentru cine NU este potrivit acest workshop?
+            {t("webinar.notForYou.title")}
           </h2>
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-5 text-sm md:text-base text-white/55 max-w-2xl mx-auto leading-relaxed">
-            Acest workshop este dedicat celor care vor să învețe trading serios,
-            cu o strategie reală, disciplină și mentalitate corectă.{" "}
-            <span className="text-white/80">
-              Nu este pentru tine dacă te regăsești în una dintre situațiile de
-              mai jos:
-            </span>
+            {t("webinar.notForYou.intro")}
+            <span className="text-white/80">{t("webinar.notForYou.highlight")}</span>
           </p>
         </div>
 
           <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-6 py-8 md:px-10 md:py-10 shadow-[0_8px_18px_rgba(0,0,0,0.45)] text-left">
             <ul className="flex flex-col gap-4">
-              {notForYou.map((item) => (
-                <li key={item} className="flex items-start gap-3">
+              {ITEM_IDS.map((id) => (
+                <li key={id} className="flex items-start gap-3">
                   <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500/15 border border-red-400/30">
                     <FaTimes className="h-2.5 w-2.5 text-red-400" />
                   </span>
                   <p className="text-xs md:text-sm text-white/65 leading-relaxed">
-                    {item}
+                    {t(`webinar.notForYou.${id}`)}
                   </p>
                 </li>
               ))}

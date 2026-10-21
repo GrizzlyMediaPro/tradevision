@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa6";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { trackMetaPixelCustomEvent } from "@/lib/metaPixel";
 import { WEBINAR_WHATSAPP_INVITE_URL } from "@/lib/webinarWhatsAppInvite";
 
@@ -15,13 +16,13 @@ type WebinarConfirmationContentProps = {
 export function WebinarConfirmationContent({
   firstName,
 }: WebinarConfirmationContentProps) {
+  const t = useT();
   const greeting = firstName ? `, ${firstName}` : "";
 
   return (
     <div className="flex flex-col items-center">
       <p className="max-w-2xl text-center text-base font-semibold text-white sm:text-lg md:text-xl">
-        Ca să primești reminder-ele și materialele promise{greeting}, intră
-        acum în grupul nostru de WhatsApp.
+        {t("webinar.confirm.intro", { name: greeting })}
       </p>
 
       <div className="relative mt-8 w-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)] sm:p-10">
@@ -35,8 +36,7 @@ export function WebinarConfirmationContent({
 
         <div className="relative flex flex-col items-center text-center">
           <h1 className="max-w-2xl text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
-            Felicitări! Ești la un pas de a înțelege cum gândesc traderii
-            profitabili.
+            {t("webinar.confirm.title")}
           </h1>
 
           <div className="mt-3 h-[2px] w-[80px] rounded-full bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500" />
@@ -46,7 +46,7 @@ export function WebinarConfirmationContent({
               <div className="relative w-full aspect-video overflow-hidden rounded-xl">
                 <iframe
                   src={`https://www.youtube.com/embed/${WEBINAR_CONFIRMATION_YOUTUBE_ID}?autoplay=1&playsinline=1&rel=0`}
-                  title="Felicitări pentru înscriere"
+                  title={t("webinar.confirm.videoTitle")}
                   className="absolute inset-0 h-full w-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -56,7 +56,7 @@ export function WebinarConfirmationContent({
           </div>
 
           <span className="mt-10 inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-yellow-300">
-            Ultimul pas
+            {t("webinar.confirm.lastStep")}
           </span>
 
           <a
@@ -67,12 +67,11 @@ export function WebinarConfirmationContent({
             className="mt-4 inline-flex w-full max-w-md items-center justify-center gap-3 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-4 text-sm font-bold uppercase tracking-wider text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 sm:text-base"
           >
             <FaWhatsapp className="h-5 w-5" />
-            Hai în grupul de WhatsApp
+            {t("webinar.confirm.whatsapp")}
           </a>
 
           <p className="mt-6 max-w-lg text-[11px] font-semibold uppercase tracking-wider text-white/45 sm:text-xs">
-            Dacă butonul nu merge, verifică să fii logat(ă) în WhatsApp pe
-            acest dispozitiv.
+            {t("webinar.confirm.whatsappHint")}
           </p>
 
           <p className="mt-8 text-center text-xs text-white/50">
@@ -80,7 +79,7 @@ export function WebinarConfirmationContent({
               href="/webinar"
               className="text-white/70 underline decoration-white/30 underline-offset-2 transition hover:text-yellow-300"
             >
-              Înapoi la pagina webinar
+              {t("webinar.confirm.back")}
             </Link>
           </p>
         </div>

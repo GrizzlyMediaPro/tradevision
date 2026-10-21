@@ -16,9 +16,11 @@ import {
   communityResultsScreenshots,
   ourResultsScreenshots,
 } from "@/app/lib/screenshotResultsImages";
+import { getT } from "@/lib/i18n/get-t";
 
 export default async function Home() {
   const linkWidget = await getLinkWidget();
+  const t = await getT();
 
   return (
     <div className="page-gradient min-h-screen">
@@ -37,16 +39,16 @@ export default async function Home() {
       <FoundersSection />
 
       <ScreenshotCarousel
-        title="Rezultatele noastre"
-        subtitle="Rezultate reale din conturile noastre de trading, documentate transparent."
+        title={t("results.ours.title")}
+        subtitle={t("results.ours.subtitle")}
         images={ourResultsScreenshots}
       />
 
       <TestimonialsSection />
 
       <ScreenshotCarousel
-        title="Rezultate din comunitate"
-        subtitle="Screenshot-uri trimise de membrii comunității Trade Vision care au aplicat ce au învățat."
+        title={t("results.community.title")}
+        subtitle={t("results.community.subtitle")}
         images={communityResultsScreenshots}
       />
 

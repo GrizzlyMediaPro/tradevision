@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FaSearch } from "react-icons/fa";
 import { reconcileStuckCourseOrder, deleteStuckCourseOrder } from "@/app/admin/actions/practicalCourse";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 
 export type PaidCourseClientRow = {
   id: string;
@@ -41,6 +42,9 @@ export function AdminPracticalCourseClientsClient({
   stuckOrders,
 }: AdminPracticalCourseClientsClientProps) {
   const router = useRouter();
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const [searchTerm, setSearchTerm] = useState("");
   const [reconcileMessage, setReconcileMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -58,20 +62,20 @@ export function AdminPracticalCourseClientsClient({
         if (result.status === "paid") {
           setReconcileMessage(
             result.fulfillmentSent
-              ? `Comanda ${orderId} a fost marcată plătită și emailul a fost trimis.`
-              : `Comanda ${orderId} a fost marcată plătită, dar emailul nu s-a trimis încă.`,
+              ? t("admin.clients.reconcile.paidSent", { id: orderId })
+              : t("admin.clients.reconcile.paidNoEmail", { id: orderId }),
           );
         } else if (result.status === "pending") {
           setReconcileMessage(
-            `Comanda ${orderId} nu este încă plătită în Stripe.`,
+            t("admin.clients.reconcile.pending", { id: orderId }),
           );
         } else {
-          setReconcileMessage(`Comanda ${orderId} nu a fost găsită.`);
+          setReconcileMessage(t("admin.clients.reconcile.missing", { id: orderId }));
         }
         router.refresh();
       } catch (err) {
         setReconcileMessage(
-          err instanceof Error ? err.message : "Reconcilierea a eșuat.",
+          err instanceof Error ? err.message : t("admin.clients.reconcile.failed"),
         );
       }
     });
@@ -79,7 +83,7 @@ export function AdminPracticalCourseClientsClient({
 
   const handleDelete = (orderId: string, clientName: string) => {
     const confirmed = window.confirm(
-      `Ștergi comanda pentru ${clientName}? Folosește doar dacă ai verificat în Stripe că plata NU s-a făcut.`,
+      t("admin.clients.delete.confirm", { name: clientName }),
     );
     if (!confirmed) return;
 
@@ -89,13 +93,13 @@ export function AdminPracticalCourseClientsClient({
         const result = await deleteStuckCourseOrder(orderId);
         setReconcileMessage(
           result.alreadyGone
-            ? `Comanda pentru ${clientName} nu mai există în baza de date — a fost eliminată din listă.`
-            : `Comanda pentru ${clientName} a fost ștearsă.`,
+            ? t("admin.clients.delete.gone", { name: clientName })
+            : t("admin.clients.delete.done", { name: clientName }),
         );
         router.refresh();
       } catch (err) {
         setReconcileMessage(
-          err instanceof Error ? err.message : "Ștergerea a eșuat.",
+          err instanceof Error ? err.message : t("admin.clients.delete.failed"),
         );
       }
     });
@@ -107,12 +111,10 @@ export function AdminPracticalCourseClientsClient({
         <section className="space-y-3">
           <div>
             <h2 className="text-lg font-semibold text-amber-300">
-              Comenzi blocate la plată
+              {t("admin.clients.stuckTitle")}
             </h2>
             <p className="mt-1 text-sm text-white/55">
-              Checkout inițiat, dar nefinalizat în sistem. Dacă plata apare în
-              Stripe, apasă Reconciliază. Dacă ai verificat că nu s-a plătit,
-              poți șterge comanda.
+              {t("admin.clients.stuckHelp")}
             </p>
           </div>
           {reconcileMessage ? (
@@ -122,11 +124,11 @@ export function AdminPracticalCourseClientsClient({
             <table className="min-w-full text-left text-sm">
               <thead className="border-b border-amber-400/15 text-white/50">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Client</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Sumă</th>
-                  <th className="px-4 py-3 font-medium">Ultima actualizare</th>
-                  <th className="px-4 py-3 font-medium">Acțiune</th>
+                  <th className="px-4 py-3 font-medium">{t("admin.common.client")}</th>
+                  <th className="px-4 py-3 font-medium">{t("admin.common.email")}</th>
+                  <th className="px-4 py-3 font-medium">{t("admin.common.amount")}</th>
+                  <th className="px-4 py-3 font-medium">{t("admin.clients.updated")}</th>
+                  <th className="px-4 py-3 font-medium">{t("admin.common.action")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -140,7 +142,7 @@ export function AdminPracticalCourseClientsClient({
                         : order.paidAmount}
                     </td>
                     <td className="px-4 py-3">
-                      {new Date(order.updatedAt).toLocaleString("ro-RO")}
+                      {new Date(order.updatedAt).toLocaleString(dateLocale)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-2">
@@ -150,7 +152,7 @@ export function AdminPracticalCourseClientsClient({
                           onClick={() => handleReconcile(order.id)}
                           className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-200 transition hover:bg-amber-400/20 disabled:opacity-50"
                         >
-                          Reconciliază
+                          {t("admin.clients.reconcile")}
                         </button>
                         <button
                           type="button"
@@ -158,7 +160,7 @@ export function AdminPracticalCourseClientsClient({
                           onClick={() => handleDelete(order.id, order.clientName)}
                           className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-1.5 text-xs font-semibold text-red-200 transition hover:bg-red-400/20 disabled:opacity-50"
                         >
-                          Șterge
+                          {t("admin.common.delete")}
                         </button>
                       </div>
                     </td>
@@ -180,7 +182,7 @@ export function AdminPracticalCourseClientsClient({
           type="search"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Caută după nume..."
+          placeholder={t("admin.clients.search")}
           className="w-full rounded-xl border border-white/10 bg-black/30 py-2.5 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-purple-400/45 focus:bg-black/40 focus:ring-1 focus:ring-purple-400/25"
           autoComplete="off"
           spellCheck={false}
@@ -189,7 +191,10 @@ export function AdminPracticalCourseClientsClient({
 
       {searchTerm.trim() ? (
         <p className="text-xs text-white/45">
-          {filteredClients.length} din {clients.length} clienți
+          {t("admin.clients.filtered", {
+            shown: filteredClients.length,
+            total: clients.length,
+          })}
         </p>
       ) : null}
 
@@ -197,26 +202,25 @@ export function AdminPracticalCourseClientsClient({
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-white/10 text-white/50">
             <tr>
-              <th className="px-4 py-3 font-medium">Client</th>
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Tip</th>
-              <th className="px-4 py-3 font-medium">Discount</th>
-              <th className="px-4 py-3 font-medium">Sumă plătită</th>
-              <th className="px-4 py-3 font-medium">Data plății</th>
+              <th className="px-4 py-3 font-medium">{t("admin.common.client")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.common.email")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.clients.personType")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.common.discount")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.clients.paidAmount")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.clients.paidAt")}</th>
             </tr>
           </thead>
           <tbody>
             {clients.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-white/50">
-                  Nu există clienți plătitori încă.
+                  {t("admin.clients.empty")}
                 </td>
               </tr>
             ) : filteredClients.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-white/50">
-                  Niciun client nu se potrivește căutării. Încearcă alt nume sau
-                  șterge filtrul.
+                  {t("admin.clients.noMatch")}
                 </td>
               </tr>
             ) : (
@@ -228,7 +232,7 @@ export function AdminPracticalCourseClientsClient({
                   <td className="px-4 py-3">{client.discountCode ?? "-"}</td>
                   <td className="px-4 py-3">{client.paidAmount}</td>
                   <td className="px-4 py-3">
-                    {new Date(client.paidAt).toLocaleString("ro-RO")}
+                    {new Date(client.paidAt).toLocaleString(dateLocale)}
                   </td>
                 </tr>
               ))

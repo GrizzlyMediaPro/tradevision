@@ -17,6 +17,7 @@ import {
   updateTrackerPartner,
   type TrackerPartner,
 } from "../actions/trackerPartners";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 type FormState = {
   mode: "create" | "edit";
@@ -33,6 +34,7 @@ const EMPTY_FORM: FormState = {
 };
 
 export default function AdminTrackingFirmsPage() {
+  const t = useT();
   const [partners, setPartners] = useState<TrackerPartner[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,7 +66,7 @@ export default function AdminTrackingFirmsPage() {
   };
 
   const handleDelete = async (partner: TrackerPartner) => {
-    if (!confirm(`Ștergi firma „${partner.name}” din lista de pe tracker?`)) {
+    if (!confirm(t("admin.tracker.confirmDelete", { name: partner.name }))) {
       return;
     }
     await deleteTrackerPartner(partner.id);
@@ -82,7 +84,7 @@ export default function AdminTrackingFirmsPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t("admin.common.back")}</span>
         </Link>
       </div>
 
@@ -93,12 +95,11 @@ export default function AdminTrackingFirmsPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Firme Tracker
+          {t("admin.tracker.title")}
         </h1>
         <div className="mt-3 h-[2px] w-[90px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Gestionează lista „Firmele pe care noi le folosim” afișată pe pagina
-          Payout Tracker — nume și link de afiliere.
+          {t("admin.tracker.subtitle")}
         </p>
       </div>
 
@@ -107,7 +108,9 @@ export default function AdminTrackingFirmsPage() {
         <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 mb-5">
             <h2 className="text-lg md:text-xl font-semibold text-white">
-              {form.mode === "create" ? "Adaugă firmă" : "Editează firma"}
+              {form.mode === "create"
+                ? t("admin.tracker.addTitle")
+                : t("admin.tracker.editTitle")}
             </h2>
             {form.mode === "edit" && (
               <button
@@ -116,7 +119,7 @@ export default function AdminTrackingFirmsPage() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
               >
                 <FaTimes className="h-3 w-3" />
-                <span>Renunță</span>
+                <span>{t("admin.common.giveUp")}</span>
               </button>
             )}
           </div>
@@ -124,21 +127,21 @@ export default function AdminTrackingFirmsPage() {
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Nume firmă
+                {t("admin.tracker.name")}
               </label>
               <input
                 value={form.name}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="ex: Tradeify"
+                placeholder={t("admin.tracker.namePlaceholder")}
                 className="rounded-xl border border-white/15 bg-black/40 px-4 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-purple-400/60 focus:ring-1 focus:ring-purple-400/40"
               />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Link (cu ref de afiliere)
+                {t("admin.tracker.link")}
               </label>
               <input
                 value={form.url}
@@ -156,10 +159,10 @@ export default function AdminTrackingFirmsPage() {
               className="mt-2 inline-flex items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving
-                ? "Se salvează..."
+                ? t("admin.common.saving")
                 : form.mode === "create"
-                  ? "Adaugă firma"
-                  : "Salvează modificările"}
+                  ? t("admin.tracker.addButton")
+                  : t("admin.tracker.save")}
             </button>
           </form>
         </section>
@@ -167,15 +170,14 @@ export default function AdminTrackingFirmsPage() {
         {/* Listă */}
         <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] px-6 py-7 md:px-8 md:py-9 shadow-[0_18px_45px_rgba(0,0,0,0.55)] backdrop-blur-sm">
           <h2 className="text-lg md:text-xl font-semibold text-white mb-5">
-            Firme afișate ({partners.length})
+            {t("admin.tracker.shown", { count: partners.length })}
           </h2>
 
           {loading ? (
-            <p className="text-sm text-white/40">Se încarcă...</p>
+            <p className="text-sm text-white/40">{t("admin.common.loading")}</p>
           ) : partners.length === 0 ? (
             <p className="text-sm leading-relaxed text-white/40">
-              Nu există firme în baza de date — pagina de tracking afișează
-              lista implicită. Adaugă o firmă pentru a prelua controlul listei.
+              {t("admin.tracker.empty")}
             </p>
           ) : (
             <div className="flex flex-col gap-2.5">
@@ -209,14 +211,14 @@ export default function AdminTrackingFirmsPage() {
                           url: partner.url,
                         })
                       }
-                      title="Editează"
+                      title={t("admin.common.edit")}
                       className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition cursor-pointer"
                     >
                       <FaEdit className="h-3 w-3" />
                     </button>
                     <button
                       onClick={() => void handleDelete(partner)}
-                      title="Șterge"
+                      title={t("admin.common.delete")}
                       className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 hover:bg-red-400/15 hover:text-red-300 transition cursor-pointer"
                     >
                       <FaTrash className="h-3 w-3" />

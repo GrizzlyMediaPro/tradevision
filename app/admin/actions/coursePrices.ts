@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/adminAuth";
+import { getT } from "@/lib/i18n/get-t";
 import {
   getCourseCatalogItem,
   LEGACY_PRACTICAL_COURSE_SLUG,
@@ -25,17 +26,18 @@ export async function saveCoursePrice(input: {
 }) {
   await requireAdmin();
 
+  const t = await getT();
   const catalogItem = getCourseCatalogItem(input.slug);
   if (!catalogItem) {
-    throw new Error("Cursul selectat nu există.");
+    throw new Error(t("admin.prices.error.missing"));
   }
 
   if (!Number.isFinite(input.priceAmount) || input.priceAmount <= 0) {
-    throw new Error("Prețul trebuie să fie un număr pozitiv.");
+    throw new Error(t("admin.prices.error.positive"));
   }
 
   if (input.priceAmount > 100_000) {
-    throw new Error("Prețul pare prea mare. Verifică valoarea introdusă.");
+    throw new Error(t("admin.prices.error.tooHigh"));
   }
 
   const roundedPrice = Math.round(input.priceAmount * 100) / 100;
@@ -65,9 +67,10 @@ export async function saveCoursePrice(input: {
 export async function resetCoursePrice(slug: string) {
   await requireAdmin();
 
+  const t = await getT();
   const catalogItem = getCourseCatalogItem(slug);
   if (!catalogItem) {
-    throw new Error("Cursul selectat nu există.");
+    throw new Error(t("admin.prices.error.missing"));
   }
 
   await prisma.courseProductPrice.deleteMany({

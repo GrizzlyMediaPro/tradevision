@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
+import { getT } from "@/lib/i18n/get-t";
 import { redirect } from "next/navigation";
 import { getTrackerPartners } from "@/app/admin/actions/trackerPartners";
 import { isValidSnapshotDate } from "@/lib/payoutTracker/validation";
@@ -7,11 +8,13 @@ import { TrackingClient } from "./TrackingClient";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Payout Tracker",
-  description:
-    "Urmărește-ți conturile de prop firm: balanțe, profit actual, profit necesar pentru payout și zile profitabile rămase — totul într-un singur loc.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("payout.metaTitle"),
+    description: t("payout.metaDescription"),
+  };
+}
 
 export default async function TrackingPage({
   searchParams,

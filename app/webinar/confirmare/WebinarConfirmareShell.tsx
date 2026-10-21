@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { WebinarConfirmationContent } from "../../components/WebinarConfirmationContent";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { trackMetaPixelEvent } from "@/lib/metaPixel";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function WebinarConfirmareShell({ firstName }: Props) {
+  const t = useT();
   useEffect(() => {
     trackMetaPixelEvent("CompleteRegistration");
   }, []);
@@ -44,13 +46,13 @@ export function WebinarConfirmareShell({ firstName }: Props) {
           className="inline-flex items-center gap-2 text-xs font-medium text-white/60 transition hover:text-white"
         >
           <FaArrowLeft className="h-3 w-3" />
-          Înapoi
+          {t("webinar.shell.back")}
         </Link>
 
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
-            alt="Trade Vision"
+            alt={t("webinar.shell.logoAlt")}
             width={140}
             height={40}
             className="h-8 w-auto"

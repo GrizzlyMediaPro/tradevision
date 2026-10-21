@@ -11,6 +11,7 @@ import { formatPriceEur, getOrderFinalAmountEur } from "@/lib/practicalCoursePri
 import { reconcilePracticalCourseOrder } from "@/lib/practicalCoursePayment";
 import { getStripeClient } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/adminAuth";
+import { getT } from "@/lib/i18n/get-t";
 
 export async function getDiscountCodes() {
   await requireAdmin();
@@ -30,16 +31,17 @@ export type DiscountCodeInput = {
 
 export async function createDiscountCode(input: DiscountCodeInput) {
   await requireAdmin();
+  const t = await getT();
   const code = normalizeDiscountCode(input.code);
-  if (!code) throw new Error("Codul este obligatoriu.");
+  if (!code) throw new Error(t("admin.discounts.error.codeRequired"));
   if (input.type !== "percent" && input.type !== "fixed") {
-    throw new Error("Tipul de discount nu este valid.");
+    throw new Error(t("admin.discounts.error.type"));
   }
   if (!Number.isFinite(input.value) || input.value <= 0) {
-    throw new Error("Valoarea discountului trebuie să fie pozitivă.");
+    throw new Error(t("admin.discounts.error.value"));
   }
   if (input.type === "percent" && input.value > 100) {
-    throw new Error("Procentul nu poate depăși 100.");
+    throw new Error(t("admin.discounts.error.percent"));
   }
 
   await prisma.courseDiscountCode.create({
@@ -58,8 +60,9 @@ export async function createDiscountCode(input: DiscountCodeInput) {
 
 export async function updateDiscountCode(id: string, input: DiscountCodeInput) {
   await requireAdmin();
+  const t = await getT();
   const code = normalizeDiscountCode(input.code);
-  if (!code) throw new Error("Codul este obligatoriu.");
+  if (!code) throw new Error(t("admin.discounts.error.codeRequired"));
 
   await prisma.courseDiscountCode.update({
     where: { id },
@@ -141,8 +144,9 @@ export async function deleteStuckCourseOrder(orderId: string) {
     revalidatePath("/admin/curs-futures/clienti");
     return { deleted: true, alreadyGone: true };
   }
+  const t = await getT();
   if (order.status === "paid") {
-    throw new Error("Nu poți șterge o comandă deja plătită.");
+    throw new Error(t("admin.clients.error.paidDelete"));
   }
 
   if (order.stripeSessionId) {
@@ -150,9 +154,7 @@ export async function deleteStuckCourseOrder(orderId: string) {
     if (stripe) {
       const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId);
       if (session.payment_status === "paid") {
-        throw new Error(
-          "Plata există în Stripe. Folosește Reconciliază, nu ștergerea.",
-        );
+        throw new Error(t("admin.clients.error.paidStripe"));
       }
     }
   }

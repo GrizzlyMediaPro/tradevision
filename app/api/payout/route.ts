@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getT } from "@/lib/i18n/get-t";
 import { rateLimit } from "@/lib/rateLimit";
 import {
   isValidSnapshotDate,
@@ -9,14 +10,15 @@ import {
 } from "@/lib/payoutTracker/validation";
 
 export async function GET(req: Request) {
+  const t = await getT();
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Neautorizat." }, { status: 401 });
+    return NextResponse.json({ error: t("payout.api.unauthorized") }, { status: 401 });
   }
 
   const date = new URL(req.url).searchParams.get("date");
   if (!isValidSnapshotDate(date)) {
-    return NextResponse.json({ error: "Data este invalidă." }, { status: 400 });
+    return NextResponse.json({ error: t("payout.api.invalidDate") }, { status: 400 });
   }
 
   try {
@@ -57,16 +59,17 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error("Eroare la citirea Payout Tracker", error);
     return NextResponse.json(
-      { error: "Datele nu au putut fi încărcate." },
+      { error: t("payout.api.loadFailed") },
       { status: 500 },
     );
   }
 }
 
 export async function PUT(req: Request) {
+  const t = await getT();
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Neautorizat." }, { status: 401 });
+    return NextResponse.json({ error: t("payout.api.unauthorized") }, { status: 401 });
   }
 
   const { success } = rateLimit(`payout-tracker:${userId}`, {
@@ -75,7 +78,7 @@ export async function PUT(req: Request) {
   });
   if (!success) {
     return NextResponse.json(
-      { error: "Prea multe salvări. Încearcă din nou într-un minut." },
+      { error: t("payout.api.tooMany") },
       { status: 429 },
     );
   }
@@ -84,7 +87,7 @@ export async function PUT(req: Request) {
     const body = (await req.json()) as { date?: unknown; data?: unknown };
     if (!isValidSnapshotDate(body.date) || !isValidTrackerData(body.data)) {
       return NextResponse.json(
-        { error: "Datele trimise sunt invalide." },
+        { error: t("payout.api.invalidPayload") },
         { status: 400 },
       );
     }
@@ -114,7 +117,7 @@ export async function PUT(req: Request) {
   } catch (error) {
     console.error("Eroare la salvarea Payout Tracker", error);
     return NextResponse.json(
-      { error: "Datele nu au putut fi salvate." },
+      { error: t("payout.api.saveFailed") },
       { status: 500 },
     );
   }

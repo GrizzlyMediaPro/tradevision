@@ -10,6 +10,7 @@ import {
   readConsentFromStorage,
   type StoredConsent,
 } from "@/lib/cookieConsent";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 type ConsentMode = "pending" | StoredConsent;
 
@@ -28,6 +29,7 @@ export function CookieConsentGate({
 }: {
   children: React.ReactNode;
 }) {
+  const t = useT();
   const [consent, setConsent] = useState<ConsentMode>("pending");
   const [ready, setReady] = useState(false);
 
@@ -141,35 +143,33 @@ fbq('track','PageView');`}
                   id="cookie-consent-title"
                   className="text-base font-semibold text-white sm:text-lg"
                 >
-                  Cookie-uri și confidențialitate
+                  {t("cookies.title")}
                 </h2>
                 <p
                   id="cookie-consent-desc"
                   className="mt-2 text-sm text-white/65 leading-relaxed"
                 >
-                  Alege ce îți permiți să stocăm pe dispozitiv:{" "}
-                  <strong className="text-white/85">Deloc</strong> — nu folosim
-                  localStorage pentru progres la curs și nu încărcăm analiză /
-                  marketing; <strong className="text-white/85">Doar necesare</strong>{" "}
-                  — putem salva progresul cursului în browser, fără Google Tag
-                  Manager sau Meta Pixel; <strong className="text-white/85">
-                    Acceptă tot
-                  </strong>{" "}
-                  — include și modulele de analiză și marketing. Detalii în{" "}
+                  {t("cookies.body.before")}
+                  <strong className="text-white/85">{t("cookies.none.strong")}</strong>
+                  {t("cookies.none.rest")}
+                  <strong className="text-white/85">{t("cookies.essential.strong")}</strong>
+                  {t("cookies.essential.rest")}
+                  <strong className="text-white/85">{t("cookies.all.strong")}</strong>
+                  {t("cookies.all.rest")}
                   <Link
                     href="/politica-cookies"
                     className="text-purple-400 underline-offset-2 hover:underline"
                   >
-                    Politica de cookies
-                  </Link>{" "}
-                  și{" "}
+                    {t("cookies.policyLink")}
+                  </Link>
+                  {t("cookies.and")}
                   <Link
                     href="/politica-confidentialitate"
                     className="text-purple-400 underline-offset-2 hover:underline"
                   >
-                    Politica de confidențialitate
+                    {t("cookies.privacyLink")}
                   </Link>
-                  .
+                  {t("cookies.period")}
                 </p>
               </div>
             </div>
@@ -179,21 +179,21 @@ fbq('track','PageView');`}
                 onClick={refuseOptional}
                 className="w-full sm:min-w-0 sm:flex-1 rounded-xl border border-white/20 bg-transparent px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white cursor-pointer"
               >
-                Deloc
+                {t("cookies.refuse")}
               </button>
               <button
                 type="button"
                 onClick={essentialOnly}
                 className="w-full sm:min-w-0 sm:flex-1 rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm font-semibold text-white/95 transition hover:bg-white/10 cursor-pointer"
               >
-                Doar necesare
+                {t("cookies.essential")}
               </button>
               <button
                 type="button"
                 onClick={acceptAll}
                 className="w-full sm:min-w-0 sm:flex-1 rounded-xl bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-4 py-3 text-sm font-semibold text-slate-900 shadow-[0_10px_28px_rgba(250,204,21,0.35)] transition hover:brightness-110 cursor-pointer"
               >
-                Acceptă tot
+                {t("cookies.accept")}
               </button>
             </div>
           </div>

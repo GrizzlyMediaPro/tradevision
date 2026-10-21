@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 import { FaChevronDown, FaExternalLinkAlt, FaPen } from "react-icons/fa";
 import {
   allowsFunctionalLocalStorage,
@@ -33,17 +34,6 @@ const DEFAULT_PARTNER_LINKS: PartnerLink[] = [
   { name: "HolaPrime", url: "https://holaprime.com?affiliateId=TVR" },
 ];
 
-const COLS = [
-  "Cont",
-  "Balanță",
-  "Profit actual",
-  "Profit necesar",
-  "Zile rămase",
-  "Gata",
-  "Gata de payout",
-  "",
-];
-
 const BALANCE_OPTIONS = [25_000, 50_000, 100_000, 150_000, 300_000] as const;
 
 const GRID_COLS = "1.2fr 1fr 1fr 1fr 0.8fr 1fr 170px 34px";
@@ -55,9 +45,9 @@ function todayIso(): string {
   ).padStart(2, "0")}`;
 }
 
-function emptyAccount(index: number): Account {
+function emptyAccount(name: string): Account {
   return {
-    name: `Contul ${index}`,
+    name,
     balanta: 0,
     actual: 0,
     target: 0,
@@ -66,7 +56,10 @@ function emptyAccount(index: number): Account {
   };
 }
 
-function defaultState(date = todayIso()): TrackerState {
+function defaultState(
+  date: string,
+  accountName: (index: number) => string,
+): TrackerState {
   const month = date.slice(0, 7);
   return {
     date,
@@ -74,25 +67,25 @@ function defaultState(date = todayIso()): TrackerState {
       {
         name: "Tradeify",
         luna: month,
-        accounts: Array.from({ length: 5 }, (_, i) => emptyAccount(i + 1)),
+        accounts: Array.from({ length: 5 }, (_, i) => emptyAccount(accountName(i + 1))),
       },
       {
         name: "Blue Guardian",
         luna: month,
-        accounts: Array.from({ length: 5 }, (_, i) => emptyAccount(i + 1)),
+        accounts: Array.from({ length: 5 }, (_, i) => emptyAccount(accountName(i + 1))),
       },
     ],
   };
 }
 
-function fmt(n: number): string {
-  return (Number(n) || 0).toLocaleString("ro-RO");
+function fmt(n: number, numberLocale: string): string {
+  return (Number(n) || 0).toLocaleString(numberLocale);
 }
 
-function formatRoDate(iso: string): string {
+function formatTrackerDate(iso: string, dateLocale: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
-  return new Date(y, m - 1, d).toLocaleDateString("ro-RO", {
+  return new Date(y, m - 1, d).toLocaleDateString(dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -112,13 +105,15 @@ function MoneyInput({
   onChange: (v: number) => void;
   positive?: boolean;
 }) {
+  const { locale } = useI18n();
+  const numberLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const [draft, setDraft] = useState<string | null>(null);
-  const text = draft ?? `${fmt(value)} $`;
+  const text = draft ?? `${fmt(value, numberLocale)} $`;
 
   const handleInput = (raw: string) => {
     const digits = raw.replace(/[^\d]/g, "");
     const v = Number(digits) || 0;
-    setDraft(digits === "" ? "" : `${fmt(v)} $`);
+    setDraft(digits === "" ? "" : `${fmt(v, numberLocale)} $`);
     onChange(v);
   };
 
@@ -137,6 +132,7 @@ function MoneyInput({
 }
 
 function HowItWorks() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -154,7 +150,7 @@ function HowItWorks() {
         className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer"
       >
         <span className="text-sm md:text-base font-semibold text-white">
-          Cum funcționează tracker-ul?
+          {t("payout.how.title")}
         </span>
         <FaChevronDown
           className={`h-3.5 w-3.5 shrink-0 text-white/40 transition-transform duration-300 ${
@@ -168,32 +164,12 @@ function HowItWorks() {
       >
         <div ref={contentRef} className="px-6 pb-5">
           <ul className="flex flex-col gap-2 text-xs md:text-sm text-white/50 leading-relaxed text-left list-disc pl-4 marker:text-white/30">
-            <li>
-              Completezi pentru fiecare cont: balanța, profitul actual,
-              profitul necesar pentru payout și zilele profitabile rămase.
-            </li>
-            <li>
-              Coloana „Gata” o bifezi tu când ai atins profitul necesar —
-              bifată, contul apare marcat cu „Gata ✓”.
-            </li>
-            <li>
-              „Gata de payout” o bifezi tu manual — după bifare apare un câmp
-              în care treci suma payout-ului.
-            </li>
-            <li>
-              Fiecare firmă are sus luna, investițiile și payout-urile —
-              profitul se calculează automat (payouts − investiții).
-            </li>
-            <li>
-              Poți redenumi firmele și conturile dând click direct pe nume, și
-              poți adăuga sau șterge oricâte vrei.
-            </li>
-            <li>
-              După modificări apasă „Salvează” — datele sunt păstrate în
-              contul tău. Zilele fără salvare preiau automat ultima zi salvată,
-              până la următoarea salvare. În „My Payouts” găsești statistici,
-              istoricul salvărilor și exportul în CSV.
-            </li>
+            <li>{t("payout.how.1")}</li>
+            <li>{t("payout.how.2")}</li>
+            <li>{t("payout.how.3")}</li>
+            <li>{t("payout.how.4")}</li>
+            <li>{t("payout.how.5")}</li>
+            <li>{t("payout.how.6")}</li>
           </ul>
         </div>
       </div>
@@ -208,6 +184,14 @@ export function TrackingClient({
   initialDate?: string;
   partnerLinks?: PartnerLink[];
 }) {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
+  const money = (n: number) => fmt(n, dateLocale);
+  const accountName = useCallback(
+    (index: number) => t("payout.account.default", { index }),
+    [t],
+  );
   const partners =
     partnerLinks && partnerLinks.length > 0
       ? partnerLinks
@@ -227,10 +211,10 @@ export function TrackingClient({
       error?: string;
     };
     if (!response.ok || !Array.isArray(result.snapshots)) {
-      throw new Error(result.error || "Istoricul nu a putut fi încărcat.");
+      throw new Error(result.error || t("payout.error.history"));
     }
     return result.snapshots;
-  }, []);
+  }, [t]);
 
   const fetchSnapshot = useCallback(async (date: string) => {
     const response = await fetch(
@@ -243,21 +227,21 @@ export function TrackingClient({
       error?: string;
     };
     if (!response.ok) {
-      throw new Error(result.error || "Datele nu au putut fi încărcate.");
+      throw new Error(result.error || t("payout.error.load"));
     }
     if (result.data !== null && !isValidTrackerData(result.data)) {
-      throw new Error("Datele salvate au un format invalid.");
+      throw new Error(t("payout.error.invalid"));
     }
     const source =
       typeof result.carriedFrom === "string" ? result.carriedFrom : null;
     if (result.data === null) {
-      return { state: defaultState(date), carriedFrom: null };
+      return { state: defaultState(date, accountName), carriedFrom: null };
     }
     return {
       state: { date, firms: result.data.firms },
       carriedFrom: source,
     };
-  }, []);
+  }, [accountName, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -289,12 +273,12 @@ export function TrackingClient({
         }
       } catch (loadError) {
         if (cancelled) return;
-        setState(defaultState(date));
+        setState(defaultState(date, accountName));
         setCarriedFrom(null);
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "Datele nu au putut fi încărcate.",
+            : t("payout.error.load"),
         );
       } finally {
         if (!cancelled) setLoading(false);
@@ -305,7 +289,7 @@ export function TrackingClient({
     return () => {
       cancelled = true;
     };
-  }, [fetchHistory, fetchSnapshot, initialDate]);
+  }, [accountName, fetchHistory, fetchSnapshot, initialDate, t]);
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
@@ -334,7 +318,7 @@ export function TrackingClient({
       if (
         dirty &&
         !window.confirm(
-          "Ai modificări nesalvate. Vrei să schimbi ziua și să le pierzi?",
+          t("payout.confirmDiscard"),
         )
       ) {
         return;
@@ -352,13 +336,13 @@ export function TrackingClient({
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "Datele nu au putut fi încărcate.",
+            : t("payout.error.load"),
         );
       } finally {
         setLoading(false);
       }
     },
-    [dirty, fetchSnapshot, loading, state?.date],
+    [dirty, fetchSnapshot, loading, state?.date, t],
   );
 
   const saveSnapshot = useCallback(async (snapshot: TrackerState) => {
@@ -372,9 +356,9 @@ export function TrackingClient({
     });
     const result = (await response.json()) as { error?: string };
     if (!response.ok) {
-      throw new Error(result.error || "Datele nu au putut fi salvate.");
+      throw new Error(result.error || t("payout.error.save"));
     }
-  }, []);
+  }, [t]);
 
   const handleSave = useCallback(async () => {
     if (!state || saving) return;
@@ -390,12 +374,12 @@ export function TrackingClient({
       setError(
         saveError instanceof Error
           ? saveError.message
-          : "Datele nu au putut fi salvate.",
+          : t("payout.error.save"),
       );
     } finally {
       setSaving(false);
     }
-  }, [saveSnapshot, saving, state]);
+  }, [saveSnapshot, saving, state, t]);
 
   const migrateLocalData = useCallback(async () => {
     if (!localMigration || saving) return;
@@ -416,12 +400,12 @@ export function TrackingClient({
       setError(
         migrationError instanceof Error
           ? migrationError.message
-          : "Datele locale nu au putut fi importate.",
+          : t("payout.error.import"),
       );
     } finally {
       setSaving(false);
     }
-  }, [localMigration, saveSnapshot, saving]);
+  }, [localMigration, saveSnapshot, saving, t]);
 
   if (!state) {
     return <div className="min-h-screen" />;
@@ -433,13 +417,11 @@ export function TrackingClient({
         {/* Titlu secțiune */}
         <div className="text-center">
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Payout Tracker
+            {t("payout.title")}
           </h1>
           <div className="mt-3 h-[2px] w-[90px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-4 text-xs md:text-sm text-white/50 max-w-xl mx-auto leading-relaxed">
-            Ține evidența conturilor tale de prop firm: balanțe, profit,
-            target de payout și zile profitabile rămase — totul într-un singur
-            loc.
+            {t("payout.subtitle")}
           </p>
         </div>
 
@@ -450,7 +432,7 @@ export function TrackingClient({
               htmlFor="trackerDate"
               className="text-xs font-medium text-white/50"
             >
-              Data
+              {t("payout.date")}
             </label>
             <input
               id="trackerDate"
@@ -471,7 +453,7 @@ export function TrackingClient({
             disabled={saving || loading}
             className="inline-flex items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-2 text-xs font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer disabled:cursor-wait disabled:opacity-60"
           >
-            {saving ? "Se salvează..." : "Salvează"}
+            {saving ? t("payout.saving") : t("payout.save")}
           </button>
 
           <Link
@@ -487,16 +469,16 @@ export function TrackingClient({
                 savedFlash ? "text-emerald-300" : "text-white/40"
               }`}
             >
-              {savedFlash ? "Salvat" : "Modificări nesalvate"}
+              {savedFlash ? t("payout.saved") : t("payout.unsaved")}
             </span>
           )}
         </div>
 
         {carriedFrom && !dirty && (
           <p className="w-full text-center text-[11px] text-white/45">
-            Nu există salvare pe această zi — afișăm datele din{" "}
-            <span className="text-white/70">{formatRoDate(carriedFrom)}</span>.
-            Apasă „Salvează” ca să le păstrezi pentru ziua curentă.
+            {t("payout.carried")}
+            <span className="text-white/70">{formatTrackerDate(carriedFrom, dateLocale)}</span>
+            {t("payout.carriedAfter")}
           </p>
         )}
 
@@ -512,11 +494,10 @@ export function TrackingClient({
           <div className="flex w-full flex-col items-center justify-between gap-3 rounded-2xl border border-yellow-300/20 bg-yellow-400/5 px-6 py-4 text-center sm:flex-row sm:text-left">
             <div>
               <p className="text-sm font-medium text-white">
-                Am găsit date salvate anterior în acest browser.
+                {t("payout.migration.title")}
               </p>
               <p className="mt-1 text-xs text-white/50">
-                Le poți muta în contul tău pentru a le accesa de pe orice
-                dispozitiv.
+                {t("payout.migration.body")}
               </p>
             </div>
             <div className="flex shrink-0 gap-2">
@@ -525,7 +506,7 @@ export function TrackingClient({
                 onClick={() => setLocalMigration(null)}
                 className="cursor-pointer rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-white/65 transition hover:bg-white/10"
               >
-                Nu acum
+                {t("payout.migration.later")}
               </button>
               <button
                 type="button"
@@ -533,7 +514,7 @@ export function TrackingClient({
                 onClick={() => void migrateLocalData()}
                 className="cursor-pointer rounded-full bg-yellow-400 px-4 py-2 text-xs font-semibold text-slate-900 transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60"
               >
-                Importă în cont
+                {t("payout.migration.import")}
               </button>
             </div>
           </div>
@@ -544,10 +525,10 @@ export function TrackingClient({
           <div className="flex flex-col items-center gap-4 text-center">
             <div>
               <h2 className="text-sm md:text-base font-semibold text-white">
-                Firmele pe care noi le folosim
+                {t("payout.partners.title")}
               </h2>
               <p className="mt-1 text-xs text-white/50">
-                Cele mai bune reduceri cu codul{" "}
+                {t("payout.partners.subtitle")}
                 <span className="font-semibold text-white/85">TVR</span>
               </p>
             </div>
@@ -586,7 +567,7 @@ export function TrackingClient({
                     <FaPen className="pointer-events-none h-3 w-3 shrink-0 text-white/25 transition group-focus-within:text-yellow-300/70" />
                     <input
                       value={firm.name}
-                      placeholder="Nume firmă"
+                      placeholder={t("payout.firm.placeholder")}
                       onChange={(e) =>
                         update((d) => {
                           d.firms[fi].name = e.target.value;
@@ -612,7 +593,7 @@ export function TrackingClient({
 
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] uppercase tracking-wider text-white/40">
-                        Investiții
+                        {t("payout.firm.investments")}
                       </span>
                       <div className="w-[110px]">
                         <MoneyInput
@@ -628,7 +609,7 @@ export function TrackingClient({
 
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] uppercase tracking-wider text-white/40">
-                        Payouts
+                        {t("payout.firm.payouts")}
                       </span>
                       <div className="w-[110px]">
                         <MoneyInput
@@ -644,7 +625,7 @@ export function TrackingClient({
 
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] uppercase tracking-wider text-white/40">
-                        Profit
+                        {t("payout.firm.profit")}
                       </span>
                       <span
                         className={`text-sm font-semibold tabular-nums whitespace-nowrap ${
@@ -655,16 +636,18 @@ export function TrackingClient({
                               : "text-white/60"
                         }`}
                       >
-                        {fmt(profit)} $
+                        {money(profit)} $
                       </span>
                     </div>
 
                     <button
-                      title="Șterge firma"
+                      title={t("payout.firm.deleteTitle")}
                       onClick={() => {
                         if (
                           confirm(
-                            `Ștergi firma „${firm.name || "fără nume"}" cu toate conturile ei?`
+                            t("payout.firm.deleteConfirm", {
+                              name: firm.name || t("payout.firm.unnamed"),
+                            }),
                           )
                         ) {
                           update((d) => {
@@ -674,7 +657,7 @@ export function TrackingClient({
                       }}
                       className="text-[11px] text-red-300 hover:text-red-200 cursor-pointer ml-1"
                     >
-                      Șterge firma
+                      {t("payout.firm.delete")}
                     </button>
                   </div>
                 </div>
@@ -686,7 +669,16 @@ export function TrackingClient({
                       className="grid items-center gap-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-wider text-white/60"
                       style={{ gridTemplateColumns: GRID_COLS }}
                     >
-                      {COLS.map((c, i) => (
+                      {[
+                        t("payout.col.account"),
+                        t("payout.col.balance"),
+                        t("payout.col.current"),
+                        t("payout.col.target"),
+                        t("payout.col.days"),
+                        t("payout.col.ready"),
+                        t("payout.col.payout"),
+                        "",
+                      ].map((c, i) => (
                         <span
                           key={i}
                           className={i === 0 ? "text-left" : "text-center"}
@@ -710,7 +702,7 @@ export function TrackingClient({
                           >
                             <input
                               value={acc.name}
-                              placeholder="Nume cont"
+                              placeholder={t("payout.account.placeholder")}
                               onChange={(e) =>
                                 update((d) => {
                                   d.firms[fi].accounts[ai].name =
@@ -730,16 +722,16 @@ export function TrackingClient({
                               className={`${inputBase} cursor-pointer text-center tabular-nums [&>option]:bg-zinc-900`}
                             >
                               <option value="" disabled>
-                                Alege
+                                {t("payout.account.choose")}
                               </option>
                               {!knownBalance && balanta > 0 && (
                                 <option value={balanta}>
-                                  {fmt(balanta)} $
+                                  {money(balanta)} $
                                 </option>
                               )}
                               {BALANCE_OPTIONS.map((v) => (
                                 <option key={v} value={v}>
-                                  {fmt(v)} $
+                                  {money(v)} $
                                 </option>
                               ))}
                             </select>
@@ -820,7 +812,7 @@ export function TrackingClient({
                                       : "bg-white/30"
                                   }`}
                                 />
-                                {acc.payout ? "Gata de payout" : "Nu încă"}
+                                {acc.payout ? t("payout.account.ready") : t("payout.account.notYet")}
                               </button>
                               {acc.payout && (
                                 <MoneyInput
@@ -835,7 +827,7 @@ export function TrackingClient({
                               )}
                             </div>
                             <button
-                              title="Șterge contul"
+                              title={t("payout.account.deleteTitle")}
                               onClick={() =>
                                 update((d) => {
                                   d.firms[fi].accounts.splice(ai, 1);
@@ -857,13 +849,15 @@ export function TrackingClient({
                     onClick={() =>
                       update((d) => {
                         d.firms[fi].accounts.push(
-                          emptyAccount(d.firms[fi].accounts.length + 1)
+                          emptyAccount(
+                            accountName(d.firms[fi].accounts.length + 1),
+                          )
                         );
                       })
                     }
                     className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 transition cursor-pointer"
                   >
-                    + Adaugă cont
+                    {t("payout.account.add")}
                   </button>
                 </div>
               </div>
@@ -875,15 +869,15 @@ export function TrackingClient({
           onClick={() =>
             update((d) => {
               d.firms.push({
-                name: "Firmă nouă",
+                name: t("payout.firm.default"),
                 luna: state.date.slice(0, 7),
-                accounts: [emptyAccount(1)],
+                accounts: [emptyAccount(accountName(1))],
               });
             })
           }
           className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-2 text-xs font-semibold text-white/85 hover:bg-white/10 transition cursor-pointer"
         >
-          + Adaugă firmă
+          {t("payout.firm.add")}
         </button>
       </div>
     </section>

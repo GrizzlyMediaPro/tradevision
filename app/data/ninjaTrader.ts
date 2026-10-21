@@ -30,14 +30,14 @@ export const NINJATRADER_ASSETS = {
 export const NINJATRADER_HOME_LOGOS = {
   ninjaTrader: {
     src: NINJATRADER_ASSETS.wordmark,
-    alt: "NinjaTrader — Începe acum",
+    alt: "nt.home.logo.ninja",
     href: NINJATRADER_REGISTER_URL,
     width: 480,
     height: 80,
   },
   kinetick: {
     src: NINJATRADER_ASSETS.kinetickLogo,
-    alt: "Kinetick — Serviciu recomandat de date de piață",
+    alt: "nt.home.logo.kinetick",
     href: KINETICK_URL,
     width: 480,
     height: 160,
@@ -46,45 +46,26 @@ export const NINJATRADER_HOME_LOGOS = {
 
 export const NINJATRADER_LANDING = {
   platform: {
-    eyebrow: "Our Recommended Trading Platform",
-    intro:
-      "NinjaTrader® is our #1 recommended trading software platform preferred by traders worldwide including our clients. Download NinjaTrader & receive immediate FREE access to:",
-    benefits: [
-      "Real-time futures data",
-      "Advanced charting",
-      "Trade simulator",
-      "Strategy development and backtesting",
-    ],
-    body: [
-      "NinjaTrader's award-winning trading platform is consistently voted an industry leader by the trading community. Featuring 1000s of Apps & Add-Ons for unlimited customization, NinjaTrader is used by over 500,000 traders for advanced market analysis, professional charting and fast order execution.",
-      "For new traders, start preparing for the live markets with a free trading simulator featuring real-time market data.",
-    ],
     links: [
-      { label: "Trading platform", href: NINJATRADER_GET_STARTED_URL },
-      { label: "Download NinjaTrader", href: NINJATRADER_DOWNLOAD_URL },
-      { label: "Trading simulator", href: NINJATRADER_SIMULATOR_URL },
+      { id: "platform", href: NINJATRADER_GET_STARTED_URL },
+      { id: "download", href: NINJATRADER_DOWNLOAD_URL },
+      { id: "simulator", href: NINJATRADER_SIMULATOR_URL },
     ],
-    cta: { label: "Get Started for FREE!", href: NINJATRADER_REGISTER_URL },
+    ctaHref: NINJATRADER_REGISTER_URL,
   },
   kinetick: {
-    eyebrow: "Our Recommended Market Data Feed",
-    intro:
-      "Kinetick® delivers reliable, fast and cost-effective market data to help level the playing field for active traders. Take advantage of unfiltered, real time quotes for stocks, futures and forex that exceed the expectations of the world's most demanding traders, like us! Get started with FREE end-of-day historical market data directly through the NinjaTrader platform and learn how you can significantly reduce CME Group Globex exchange fees on real-time market data with Kinetick.",
     links: [
-      { label: "Market data", href: KINETICK_URL },
-      { label: "Historical market data", href: KINETICK_EOD_URL },
+      { id: "data", href: KINETICK_URL },
+      { id: "historical", href: KINETICK_EOD_URL },
     ],
-    cta: {
-      label: "Get Started with Free EOD Data",
-      href: KINETICK_URL,
-    },
+    ctaHref: KINETICK_URL,
   },
 } as const;
 
 export const NINJATRADER_FREE_BENEFITS = [
-  "Real-time futures data",
-  "Unlimited real-time forex data",
-  "EOD data for stocks, futures and forex",
+  "nt.free.futures",
+  "nt.free.forex",
+  "nt.free.eod",
 ] as const;
 
 export const FUTURES_RISK_DISCLOSURE =

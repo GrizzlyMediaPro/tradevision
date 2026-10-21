@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { getT } from "@/lib/i18n/get-t";
 import { getDiscountCodes } from "@/app/admin/actions/practicalCourse";
 import { AdminDiscountsClient } from "./AdminDiscountsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDiscountsPage() {
+  const t = await getT();
   const codes = await getDiscountCodes();
 
   return (
@@ -12,11 +14,11 @@ export default async function AdminDiscountsPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <Link href="/admin" className="text-sm text-white/50 hover:text-white">
-            ← Admin
+            {t("admin.common.backArrow")}
           </Link>
-          <h1 className="mt-2 text-3xl font-bold">Reduceri Curs Futures</h1>
+          <h1 className="mt-2 text-3xl font-bold">{t("admin.discounts.title")}</h1>
           <p className="mt-2 text-sm text-white/60">
-            Gestionează codurile de discount pentru achiziția Curs Futures.
+            {t("admin.discounts.subtitle")}
           </p>
         </div>
         <AdminDiscountsClient initialCodes={codes} />

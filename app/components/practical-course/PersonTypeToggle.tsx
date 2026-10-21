@@ -1,6 +1,7 @@
 "use client";
 
 import type { PersonType } from "@/lib/practicalCourseValidation";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 type PersonTypeToggleProps = {
   value: PersonType;
@@ -8,12 +9,13 @@ type PersonTypeToggleProps = {
 };
 
 export function PersonTypeToggle({ value, onChange }: PersonTypeToggleProps) {
+  const t = useT();
   return (
     <div className="grid grid-cols-2 gap-3">
       {(
         [
-          { id: "PF" as const, label: "Persoană fizică" },
-          { id: "PJ" as const, label: "Persoană juridică" },
+          { id: "PF" as const, label: t("course.person.pf") },
+          { id: "PJ" as const, label: t("course.person.pj") },
         ] as const
       ).map((option) => {
         const active = value === option.id;

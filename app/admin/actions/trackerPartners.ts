@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/adminAuth";
+import { getT } from "@/lib/i18n/get-t";
 
 export type TrackerPartner = {
   id: string;
@@ -24,7 +25,8 @@ export async function createTrackerPartner(data: {
   await requireAdmin();
   const name = data.name.trim();
   const url = data.url.trim();
-  if (!name || !url) throw new Error("Numele și link-ul sunt obligatorii.");
+  const t = await getT();
+  if (!name || !url) throw new Error(t("admin.tracker.error.required"));
 
   const count = await prisma.trackerPartnerLink.count();
   await prisma.trackerPartnerLink.create({
@@ -41,7 +43,8 @@ export async function updateTrackerPartner(
   await requireAdmin();
   const name = data.name.trim();
   const url = data.url.trim();
-  if (!name || !url) throw new Error("Numele și link-ul sunt obligatorii.");
+  const t = await getT();
+  if (!name || !url) throw new Error(t("admin.tracker.error.required"));
 
   await prisma.trackerPartnerLink.update({
     where: { id },

@@ -17,6 +17,7 @@ import {
   type AdminUserWithStats,
   type AdminUsersOverviewStats,
 } from "../actions/users";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 
 type SortKey =
   | "name"
@@ -36,14 +37,14 @@ type Filter =
   | "tracker"
   | "no-tracker";
 
-const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "Toți" },
-  { value: "admin", label: "Admini" },
-  { value: "verified", label: "Email verificat" },
-  { value: "unverified", label: "Email neverificat" },
-  { value: "banned", label: "Blocați" },
-  { value: "tracker", label: "Cu tracker" },
-  { value: "no-tracker", label: "Fără tracker" },
+const FILTERS: { value: Filter; labelKey: string }[] = [
+  { value: "all", labelKey: "admin.users.filter.all" },
+  { value: "admin", labelKey: "admin.users.filter.admin" },
+  { value: "verified", labelKey: "admin.users.filter.verified" },
+  { value: "unverified", labelKey: "admin.users.filter.unverified" },
+  { value: "banned", labelKey: "admin.users.filter.banned" },
+  { value: "tracker", labelKey: "admin.users.filter.tracker" },
+  { value: "no-tracker", labelKey: "admin.users.filter.noTracker" },
 ];
 
 const EMPTY_STATS: AdminUsersOverviewStats = {
@@ -57,9 +58,9 @@ function fullName(user: AdminUserWithStats): string {
   return `${user.firstName} ${user.lastName}`.trim() || "—";
 }
 
-function formatDate(timestamp: number | null): string {
+function formatDate(timestamp: number | null, dateLocale: string): string {
   if (!timestamp) return "—";
-  return new Date(timestamp).toLocaleDateString("ro-RO", {
+  return new Date(timestamp).toLocaleDateString(dateLocale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -68,8 +69,8 @@ function formatDate(timestamp: number | null): string {
   });
 }
 
-function formatMoney(n: number): string {
-  return `${(Number(n) || 0).toLocaleString("ro-RO")} $`;
+function formatMoney(n: number, dateLocale: string): string {
+  return `${(Number(n) || 0).toLocaleString(dateLocale)} $`;
 }
 
 function StatCard({
@@ -102,6 +103,9 @@ function StatCard({
 }
 
 export default function AdminUsersPage() {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const [users, setUsers] = useState<AdminUserWithStats[]>([]);
   const [stats, setStats] = useState<AdminUsersOverviewStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
@@ -117,7 +121,7 @@ export default function AdminUsersPage() {
         setUsers(overview.users);
         setStats(overview.stats);
       })
-      .catch(() => setError("Utilizatorii nu au putut fi încărcați."))
+      .catch(() => setError(t("admin.users.error.load")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -153,7 +157,7 @@ export default function AdminUsersPage() {
     filtered.sort((a, b) => {
       let cmp = 0;
       if (sortKey === "name") {
-        cmp = fullName(a).localeCompare(fullName(b), "ro");
+        cmp = fullName(a).localeCompare(fullName(b), locale);
       } else if (sortKey === "email") {
         cmp = a.email.localeCompare(b.email);
       } else if (sortKey === "createdAt") {
@@ -171,7 +175,7 @@ export default function AdminUsersPage() {
     });
 
     return filtered;
-  }, [filter, search, sortDir, sortKey, users]);
+  }, [filter, locale, search, sortDir, sortKey, users]);
 
   function SortIcon({ column }: { column: SortKey }) {
     if (sortKey !== column) return <FaSort className="h-3 w-3 text-white/40" />;
@@ -190,7 +194,7 @@ export default function AdminUsersPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t("admin.common.back")}</span>
         </Link>
       </div>
 
@@ -201,29 +205,31 @@ export default function AdminUsersPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Utilizatori
+          {t("admin.users.title")}
         </h1>
         <div className="mt-3 h-[2px] w-[90px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Toți utilizatorii înregistrați prin Clerk, cu statistici agregate din
-          Payout Tracker.
+          {t("admin.users.subtitle")}
         </p>
       </div>
 
       {!loading && !error && (
         <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatCard label="Cu tracker" value={String(stats.withTracker)} />
           <StatCard
-            label="Investiții totale"
-            value={formatMoney(stats.investitii)}
+            label={t("admin.users.withTracker")}
+            value={String(stats.withTracker)}
           />
           <StatCard
-            label="Payouts totale"
-            value={formatMoney(stats.payouts)}
+            label={t("admin.users.totalInvested")}
+            value={formatMoney(stats.investitii, dateLocale)}
           />
           <StatCard
-            label="Profit total"
-            value={formatMoney(stats.profit)}
+            label={t("admin.users.totalPayouts")}
+            value={formatMoney(stats.payouts, dateLocale)}
+          />
+          <StatCard
+            label={t("admin.users.totalProfit")}
+            value={formatMoney(stats.profit, dateLocale)}
             tone={
               stats.profit > 0
                 ? "positive"
@@ -242,7 +248,7 @@ export default function AdminUsersPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Caută după nume, email sau ID..."
+            placeholder={t("admin.users.search")}
             className="w-full rounded-full border border-white/15 bg-black/40 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 outline-none focus:border-purple-400/60"
           />
         </div>
@@ -258,7 +264,7 @@ export default function AdminUsersPage() {
                   : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
-              {item.label}
+              {t(item.labelKey)}
             </button>
           ))}
         </div>
@@ -272,7 +278,7 @@ export default function AdminUsersPage() {
 
       {loading ? (
         <p className="text-center text-sm text-white/40">
-          Se încarcă utilizatorii...
+          {t("admin.users.loading")}
         </p>
       ) : (
         <div className="w-full overflow-x-auto">
@@ -283,53 +289,53 @@ export default function AdminUsersPage() {
                 onClick={() => handleSort("name")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Utilizator <SortIcon column="name" />
+                {t("admin.users.col.user")} <SortIcon column="name" />
               </button>
               <button
                 onClick={() => handleSort("email")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Email <SortIcon column="email" />
+                {t("admin.common.email")} <SortIcon column="email" />
               </button>
               <button
                 onClick={() => handleSort("createdAt")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Înregistrat <SortIcon column="createdAt" />
+                {t("admin.users.col.registered")} <SortIcon column="createdAt" />
               </button>
               <button
                 onClick={() => handleSort("lastSignInAt")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Ultimul login <SortIcon column="lastSignInAt" />
+                {t("admin.users.col.lastLogin")} <SortIcon column="lastSignInAt" />
               </button>
               <button
                 onClick={() => handleSort("investitii")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Investiții <SortIcon column="investitii" />
+                {t("admin.users.col.investments")} <SortIcon column="investitii" />
               </button>
               <button
                 onClick={() => handleSort("payouts")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Payouts <SortIcon column="payouts" />
+                {t("admin.users.col.payouts")} <SortIcon column="payouts" />
               </button>
               <button
                 onClick={() => handleSort("profit")}
                 className="flex items-center gap-1.5 cursor-pointer"
               >
-                Profit <SortIcon column="profit" />
+                {t("admin.users.col.profit")} <SortIcon column="profit" />
               </button>
-              <span>Status</span>
-              <span>Tracker</span>
+              <span>{t("admin.users.col.status")}</span>
+              <span>{t("admin.users.col.tracker")}</span>
             </div>
 
             {/* Rows */}
             <div className="mt-3 flex flex-col gap-2">
               {visible.length === 0 ? (
                 <p className="py-8 text-center text-sm text-white/40">
-                  Niciun utilizator nu corespunde căutării.
+                  {t("admin.users.empty")}
                 </p>
               ) : (
                 visible.map((user) => (
@@ -367,33 +373,39 @@ export default function AdminUsersPage() {
                             : "text-white/35"
                         }`}
                       >
-                        {user.emailVerified ? "verificat" : "neverificat"}
+                        {user.emailVerified
+                          ? t("admin.users.verified")
+                          : t("admin.users.unverified")}
                       </p>
                     </div>
 
                     <span className="text-xs text-white/60 tabular-nums">
-                      {formatDate(user.createdAt)}
+                      {formatDate(user.createdAt, dateLocale)}
                     </span>
 
                     <div className="min-w-0">
                       <span className="block text-xs text-white/60 tabular-nums">
-                        {formatDate(user.lastSignInAt)}
+                        {formatDate(user.lastSignInAt, dateLocale)}
                       </span>
                       {user.lastActiveAt ? (
                         <span className="block text-[10px] text-white/30 tabular-nums">
-                          activ {formatDate(user.lastActiveAt)}
+                          {t("admin.users.activeAt", {
+                            date: formatDate(user.lastActiveAt, dateLocale),
+                          })}
                         </span>
                       ) : null}
                     </div>
 
                     <span className="text-xs tabular-nums text-white/70">
                       {user.snapshotCount > 0
-                        ? formatMoney(user.investitii)
+                        ? formatMoney(user.investitii, dateLocale)
                         : "—"}
                     </span>
 
                     <span className="text-xs tabular-nums text-white/70">
-                      {user.snapshotCount > 0 ? formatMoney(user.payouts) : "—"}
+                      {user.snapshotCount > 0
+                        ? formatMoney(user.payouts, dateLocale)
+                        : "—"}
                     </span>
 
                     <span
@@ -407,22 +419,24 @@ export default function AdminUsersPage() {
                               : "text-white/60"
                       }`}
                     >
-                      {user.snapshotCount > 0 ? formatMoney(user.profit) : "—"}
+                      {user.snapshotCount > 0
+                        ? formatMoney(user.profit, dateLocale)
+                        : "—"}
                     </span>
 
                     <div className="flex flex-wrap gap-1.5">
                       {user.isAdmin && (
                         <span className="rounded-full bg-yellow-400/15 border border-yellow-300/30 px-2.5 py-0.5 text-[10px] font-medium text-yellow-300">
-                          Admin
+                          {t("admin.users.adminBadge")}
                         </span>
                       )}
                       {user.banned ? (
                         <span className="rounded-full bg-red-400/15 border border-red-400/30 px-2.5 py-0.5 text-[10px] font-medium text-red-300">
-                          Blocat
+                          {t("admin.users.banned")}
                         </span>
                       ) : (
                         <span className="rounded-full bg-emerald-400/10 border border-emerald-400/25 px-2.5 py-0.5 text-[10px] font-medium text-emerald-300">
-                          Activ
+                          {t("admin.users.active")}
                         </span>
                       )}
                     </div>
@@ -430,13 +444,13 @@ export default function AdminUsersPage() {
                     <div>
                       <Link
                         href={`/admin/users/${user.id}/payout`}
-                        title="Vezi datele Payout Tracker"
+                        title={t("admin.users.viewTracker")}
                         className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-500/10 px-3 py-1.5 text-[11px] font-medium text-teal-200 hover:bg-teal-500/20 transition cursor-pointer"
                       >
                         <FaChartLine className="h-3 w-3" />
                         {user.snapshotCount > 0
-                          ? `${user.snapshotCount} zile`
-                          : "Vezi"}
+                          ? t("admin.users.days", { count: user.snapshotCount })
+                          : t("admin.users.view")}
                       </Link>
                     </div>
                   </div>
@@ -445,7 +459,10 @@ export default function AdminUsersPage() {
             </div>
 
             <p className="mt-4 text-center text-[11px] text-white/35">
-              {visible.length} din {users.length} utilizatori
+              {t("admin.users.count", {
+                shown: visible.length,
+                total: users.length,
+              })}
             </p>
           </div>
         </div>

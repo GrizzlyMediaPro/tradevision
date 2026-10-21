@@ -7,33 +7,39 @@ import {
 } from "@/lib/emailTemplates";
 import { generateUnsubscribeToken } from "@/lib/unsubscribe";
 import { WEBINAR_WHATSAPP_INVITE_URL } from "@/lib/webinarWhatsAppInvite";
+import type { Locale } from "@/lib/i18n/locale";
+import { messages } from "@/lib/i18n/messages/catalog";
+import { translate } from "@/lib/i18n/translate";
 
 const SITE_URL = "https://trade-vision.ro";
 
 export async function sendWebinarRegistrationConfirmationEmail(
   firstName: string,
   email: string,
+  locale: Locale = "en",
 ) {
   if (!resend) return;
 
+  const t = (id: string, vars?: Record<string, string | number>) =>
+    translate(messages[locale], id, vars);
   const trimmed = email.trim().toLowerCase();
   const name = firstName.trim();
-  const subject = "Înscrierea ta la webinarul Trade Vision este confirmată";
+  const subject = t("email.webinar.subject");
 
   const lines = [
-    name ? `Salut ${name},` : "Salut,",
+    name ? t("email.webinar.greetingNamed", { name }) : t("email.webinar.greeting"),
     "",
-    "Îți confirmăm înscrierea la webinarul Trade Vision.",
-    "Vei primi pe acest email reminder-uri și materiale utile înainte de eveniment.",
+    t("email.webinar.confirmed"),
+    t("email.webinar.reminders"),
     "",
-    "Ca să primești reminder-urile și materialele promise, intră acum în comunitatea noastră de WhatsApp:",
+    t("email.webinar.whatsapp"),
     WEBINAR_WHATSAPP_INVITE_URL,
     "",
-    `Te-am adăugat și la newsletterul nostru, ca să primești noutăți și conținut educativ despre trading. Poți oricând să te dezabonezi din orice email.`,
+    t("email.webinar.newsletter"),
     "",
-    `Pagina webinar: ${SITE_URL}/webinar`,
+    t("email.webinar.page", { url: `${SITE_URL}/webinar` }),
     "",
-    "Ne vedem la live!",
+    t("email.webinar.signoff"),
   ];
 
   const text = renderPlainTextBody(lines.join("\n"));
@@ -57,9 +63,9 @@ export async function sendWebinarRegistrationConfirmationEmail(
       text,
       html: renderEmailLayout({
         title: subject,
-        previewText:
-          "Înscrierea la webinar este confirmată. Intră în grupul de WhatsApp pentru reminder-uri și materiale.",
+        previewText: t("email.webinar.preview"),
         contentHtml,
+        locale,
         recipientEmail: trimmed,
         unsubscribeToken: generateUnsubscribeToken(trimmed),
       }),

@@ -14,17 +14,21 @@ import {
   toggleContactMessageRead,
   type ContactMessageRow,
 } from '../actions/contact';
+import { useI18n, useT } from '@/lib/i18n/I18nProvider';
 
 type Filter = 'all' | 'read' | 'unread';
 
-function formatDate(d: Date): string {
-  return new Intl.DateTimeFormat('ro-RO', {
+function formatDate(d: Date, dateLocale: string): string {
+  return new Intl.DateTimeFormat(dateLocale, {
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(new Date(d));
 }
 
 export default function AdminFormularPage() {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === 'ro' ? 'ro-RO' : 'en-GB';
   const [messages, setMessages] = useState<ContactMessageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>('all');
@@ -57,7 +61,7 @@ export default function AdminFormularPage() {
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Admin</span>
+          <span>{t('admin.common.back')}</span>
         </Link>
       </div>
 
@@ -69,13 +73,19 @@ export default function AdminFormularPage() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Formular Contact
+          {t('admin.contact.title')}
         </h1>
         <div className="mt-3 h-[2px] w-[80px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-xl mx-auto">
-          Vezi mesajele primite din formularul de contact și marchează-le ca{' '}
-          <span className="text-emerald-300 font-semibold">Citite</span> sau{' '}
-          <span className="text-yellow-300 font-semibold">Necitite</span>.
+          {t('admin.contact.subtitle.before')}{' '}
+          <span className="text-emerald-300 font-semibold">
+            {t('admin.contact.readWord')}
+          </span>{' '}
+          {t('admin.contact.or')}{' '}
+          <span className="text-yellow-300 font-semibold">
+            {t('admin.contact.unreadWord')}
+          </span>
+          .
         </p>
       </div>
 
@@ -85,7 +95,7 @@ export default function AdminFormularPage() {
           <div className="flex items-center gap-2 text-xs text-white/60">
             <FaFilter className="h-3.5 w-3.5 text-white/50" />
             <span className="uppercase tracking-[0.18em]">
-              Filtru mesaje
+              {t('admin.contact.filter')}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -98,7 +108,7 @@ export default function AdminFormularPage() {
                   : 'border border-white/20 bg-white/5 text-white/75 hover:bg-white/10'
               }`}
             >
-              Toate
+              {t('admin.contact.all')}
               <span className="ml-1 rounded-full bg-black/20 px-2 py-0.5 text-[10px]">
                 {messages.length}
               </span>
@@ -112,7 +122,7 @@ export default function AdminFormularPage() {
                   : 'border border-yellow-300/40 bg-yellow-400/10 text-yellow-200 hover:bg-yellow-400/20'
               }`}
             >
-              Necitite
+              {t('admin.contact.unread')}
               <span className="ml-1 rounded-full bg-black/20 px-2 py-0.5 text-[10px]">
                 {messages.filter((m) => !m.read).length}
               </span>
@@ -126,7 +136,7 @@ export default function AdminFormularPage() {
                   : 'border border-emerald-300/40 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/20'
               }`}
             >
-              Citite
+              {t('admin.contact.read')}
               <span className="ml-1 rounded-full bg-black/20 px-2 py-0.5 text-[10px]">
                 {messages.filter((m) => m.read).length}
               </span>
@@ -138,10 +148,10 @@ export default function AdminFormularPage() {
       {/* Messages list */}
       <section className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-5 py-5 md:px-7 md:py-6 shadow-[0_18px_45px_rgba(0,0,0,0.6)] backdrop-blur-sm">
         {loading ? (
-          <p className="text-sm text-white/45">Se încarcă...</p>
+          <p className="text-sm text-white/45">{t('admin.common.loading')}</p>
         ) : filteredMessages.length === 0 ? (
           <p className="text-sm text-white/45">
-            Nu există mesaje pentru filtrul selectat.
+            {t('admin.contact.empty')}
           </p>
         ) : (
           <div className="flex flex-col gap-4">
@@ -163,7 +173,7 @@ export default function AdminFormularPage() {
                     <div className="space-y-1">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-[11px] uppercase tracking-[0.18em] text-white/40">
-                          Nume
+                          {t('admin.common.name')}
                         </span>
                         <h2 className="text-sm md:text-base font-semibold text-white">
                           {msg.name}
@@ -172,7 +182,7 @@ export default function AdminFormularPage() {
                       <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-x-3 gap-y-1 text-[11px]">
                         <div className="flex items-center gap-1 text-white/60">
                           <span className="uppercase tracking-wide text-white/40">
-                            Email:
+                            {t('admin.common.email')}:
                           </span>
                           <span className="font-mono text-white/75 break-all">
                             {msg.email}
@@ -181,16 +191,16 @@ export default function AdminFormularPage() {
                         {msg.phone && (
                           <div className="flex items-center gap-1 text-white/60">
                             <span className="uppercase tracking-wide text-white/40">
-                              Telefon:
+                              {t('admin.common.phone')}:
                             </span>
                             <span>{msg.phone}</span>
                           </div>
                         )}
                         <div className="flex items-center gap-1 text-white/50">
                           <span className="uppercase tracking-wide text-white/40">
-                            Dată:
+                            {t('admin.contact.dateLabel')}
                           </span>
-                          <span>{formatDate(msg.createdAt)}</span>
+                          <span>{formatDate(msg.createdAt, dateLocale)}</span>
                         </div>
                       </div>
                     </div>
@@ -204,14 +214,18 @@ export default function AdminFormularPage() {
                           : 'bg-yellow-400/15 text-yellow-300 border border-yellow-300/60'
                       }`}
                     >
-                      {msg.read ? 'Citit' : 'Necitit'}
+                      {msg.read
+                        ? t('admin.contact.readBadge')
+                        : t('admin.contact.unreadBadge')}
                     </span>
                     <button
                       type="button"
                       onClick={() => toggleRead(msg.id)}
                       className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1 text-[11px] font-semibold text-white/85 hover:bg-white/10 transition cursor-pointer"
                     >
-                      {msg.read ? 'Marchează necitit' : 'Marchează citit'}
+                      {msg.read
+                        ? t('admin.contact.markUnread')
+                        : t('admin.contact.markRead')}
                     </button>
                   </div>
                 </div>
@@ -219,7 +233,7 @@ export default function AdminFormularPage() {
                 {/* Message body */}
                 <div className="mt-1 rounded-2xl bg-black/30 border border-white/5 px-3 py-2.5">
                   <span className="mb-1 block text-[11px] uppercase tracking-[0.18em] text-white/40">
-                    Mesaj
+                    {t('admin.contact.message')}
                   </span>
                   <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">
                     {msg.message}

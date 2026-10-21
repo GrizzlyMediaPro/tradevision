@@ -1,45 +1,37 @@
 import { LegalPage, LegalSection } from "@/app/components/LegalPage";
-import {
-  CFTC_HYPOTHETICAL_DISCLOSURE,
-  FUTURES_RISK_DISCLOSURE,
-  LIVE_TRADE_ROOM_DISCLOSURE,
-  TESTIMONIAL_DISCLOSURE,
-} from "@/app/data/ninjaTrader";
+import { getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Declarație de risc",
-  description:
-    "Divulgări de risc pentru trading futures, forex și opțiuni, performanță ipotetică, testimoniale și sesiuni live Trade Vision.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("legal.risk.metaTitle"),
+    description: t("legal.risk.metaDescription"),
+  };
+}
 
-export default function DeclaratieRiscPage() {
+export default async function DeclaratieRiscPage() {
+  const t = await getT();
+
   return (
-    <LegalPage
-      title="Declarație de risc"
-      description="Informații importante despre riscurile asociate tradingului și limitările conținutului educațional prezentat pe acest site."
-    >
-      <LegalSection title="Declarație generală de risc">
-        <p>{FUTURES_RISK_DISCLOSURE}</p>
+    <LegalPage title={t("legal.risk.title")} description={t("legal.risk.description")}>
+      <LegalSection title={t("legal.risk.s1.title")}>
+        <p>{t("disclosure.futures")}</p>
       </LegalSection>
 
-      <LegalSection title="Declarație privind performanța ipotetică">
-        <p>{CFTC_HYPOTHETICAL_DISCLOSURE}</p>
+      <LegalSection title={t("legal.risk.s2.title")}>
+        <p>{t("disclosure.cftc")}</p>
       </LegalSection>
 
-      <LegalSection title="Declarație privind testimonialele">
-        <p>{TESTIMONIAL_DISCLOSURE}</p>
+      <LegalSection title={t("legal.risk.s3.title")}>
+        <p>{t("disclosure.testimonial")}</p>
       </LegalSection>
 
-      <LegalSection title="Declarație pentru sala de tranzacționare live">
-        <p>{LIVE_TRADE_ROOM_DISCLOSURE}</p>
+      <LegalSection title={t("legal.risk.s4.title")}>
+        <p>{t("disclosure.liveRoom")}</p>
       </LegalSection>
 
-      <p className="text-xs text-white/45">
-        Aceste divulgări sunt incluse în conformitate cu cerințele NinjaTrader
-        Ecosystem Vendor Guidelines. Nu constituie consultanță juridică sau de
-        investiții.
-      </p>
+      <p className="text-xs text-white/45">{t("legal.risk.note")}</p>
     </LegalPage>
   );
 }

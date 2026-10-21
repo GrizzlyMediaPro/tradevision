@@ -13,24 +13,10 @@ import type {
   AdminUserPayoutTracker,
 } from "@/app/admin/actions/users";
 import type { PayoutTrackerData } from "@/lib/payoutTracker/types";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 
-const MONTHS = [
-  "Ianuarie",
-  "Februarie",
-  "Martie",
-  "Aprilie",
-  "Mai",
-  "Iunie",
-  "Iulie",
-  "August",
-  "Septembrie",
-  "Octombrie",
-  "Noiembrie",
-  "Decembrie",
-];
-
-function fmt(n: number): string {
-  return (Number(n) || 0).toLocaleString("ro-RO");
+function fmt(n: number, dateLocale: string): string {
+  return (Number(n) || 0).toLocaleString(dateLocale);
 }
 
 function fullName(user: AdminUserPayoutTracker["user"]): string {
@@ -49,9 +35,11 @@ function snapshotTotals(data: PayoutTrackerData) {
   return { investitii, payouts, profit: payouts - investitii, accounts };
 }
 
-function formatDayLabel(date: string): string {
+function formatDayLabel(
+  date: string,
+  monthName: string,
+): string {
   const day = Number(date.slice(8, 10));
-  const monthName = MONTHS[Number(date.slice(5, 7)) - 1] ?? "";
   return `${day} ${monthName.toLowerCase()} ${date.slice(0, 4)}`;
 }
 
@@ -85,10 +73,14 @@ function StatCard({
 }
 
 function SnapshotDetail({ data }: { data: PayoutTrackerData }) {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
+
   if (data.firms.length === 0) {
     return (
       <p className="px-1 py-3 text-xs text-white/40">
-        Nicio firmă salvată în această zi.
+        {t("admin.payout.noFirms")}
       </p>
     );
   }
@@ -103,11 +95,21 @@ function SnapshotDetail({ data }: { data: PayoutTrackerData }) {
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
               <p className="text-sm font-medium text-white">{firm.name}</p>
-              <p className="text-[11px] text-white/40">Luna: {firm.luna}</p>
+              <p className="text-[11px] text-white/40">
+                {t("admin.payout.monthLabel", { month: firm.luna })}
+              </p>
             </div>
             <div className="flex flex-wrap gap-3 text-[11px] tabular-nums text-white/55">
-              <span>Investiții: {fmt(Number(firm.investitii) || 0)} $</span>
-              <span>Payouts: {fmt(Number(firm.payouts) || 0)} $</span>
+              <span>
+                {t("admin.payout.investmentsValue", {
+                  amount: fmt(Number(firm.investitii) || 0, dateLocale),
+                })}
+              </span>
+              <span>
+                {t("admin.payout.payoutsValue", {
+                  amount: fmt(Number(firm.payouts) || 0, dateLocale),
+                })}
+              </span>
             </div>
           </div>
 
@@ -116,12 +118,12 @@ function SnapshotDetail({ data }: { data: PayoutTrackerData }) {
               <table className="w-full min-w-[560px] text-left text-[11px]">
                 <thead>
                   <tr className="text-white/40 uppercase tracking-wider">
-                    <th className="pb-2 font-medium">Cont</th>
-                    <th className="pb-2 font-medium">Balanță</th>
-                    <th className="pb-2 font-medium">Actual</th>
-                    <th className="pb-2 font-medium">Target</th>
-                    <th className="pb-2 font-medium">Zile</th>
-                    <th className="pb-2 font-medium">Payout</th>
+                    <th className="pb-2 font-medium">{t("admin.payout.account")}</th>
+                    <th className="pb-2 font-medium">{t("admin.payout.balance")}</th>
+                    <th className="pb-2 font-medium">{t("admin.payout.current")}</th>
+                    <th className="pb-2 font-medium">{t("admin.payout.target")}</th>
+                    <th className="pb-2 font-medium">{t("admin.payout.days")}</th>
+                    <th className="pb-2 font-medium">{t("admin.payout.payout")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -134,23 +136,23 @@ function SnapshotDetail({ data }: { data: PayoutTrackerData }) {
                         {acc.name}
                         {acc.gata ? (
                           <span className="ml-1.5 text-[10px] text-emerald-400">
-                            gata
+                            {t("admin.payout.ready")}
                           </span>
                         ) : null}
                       </td>
                       <td className="py-1.5 tabular-nums">
-                        {fmt(acc.balanta)} $
+                        {fmt(acc.balanta, dateLocale)} $
                       </td>
                       <td className="py-1.5 tabular-nums">
-                        {fmt(acc.actual)} $
+                        {fmt(acc.actual, dateLocale)} $
                       </td>
                       <td className="py-1.5 tabular-nums">
-                        {fmt(acc.target)} $
+                        {fmt(acc.target, dateLocale)} $
                       </td>
                       <td className="py-1.5 tabular-nums">{acc.zile}</td>
                       <td className="py-1.5 tabular-nums">
                         {acc.payout
-                          ? `${fmt(Number(acc.payoutSuma) || 0)} $`
+                          ? `${fmt(Number(acc.payoutSuma) || 0, dateLocale)} $`
                           : "—"}
                       </td>
                     </tr>
@@ -166,8 +168,12 @@ function SnapshotDetail({ data }: { data: PayoutTrackerData }) {
 }
 
 function SnapshotRow({ item }: { item: AdminUserPayoutSnapshot }) {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const [open, setOpen] = useState(false);
   const totals = snapshotTotals(item.data);
+  const monthName = t(`admin.month.${Number(item.date.slice(5, 7))}`);
 
   return (
     <div className="border-b border-white/5 last:border-b-0">
@@ -177,13 +183,17 @@ function SnapshotRow({ item }: { item: AdminUserPayoutSnapshot }) {
         className="group flex w-full flex-wrap items-center gap-x-5 gap-y-1.5 px-1 py-3 text-left transition hover:bg-white/3 cursor-pointer"
       >
         <span className="w-[140px] text-sm font-medium text-white">
-          {formatDayLabel(item.date)}
+          {formatDayLabel(item.date, monthName)}
         </span>
         <span className="text-xs tabular-nums text-white/50">
-          Investiții: {fmt(totals.investitii)} $
+          {t("admin.payout.investmentsValue", {
+            amount: fmt(totals.investitii, dateLocale),
+          })}
         </span>
         <span className="text-xs tabular-nums text-white/50">
-          Payouts: {fmt(totals.payouts)} $
+          {t("admin.payout.payoutsValue", {
+            amount: fmt(totals.payouts, dateLocale),
+          })}
         </span>
         <span
           className={`text-xs font-semibold tabular-nums ${
@@ -194,10 +204,15 @@ function SnapshotRow({ item }: { item: AdminUserPayoutSnapshot }) {
                 : "text-white/60"
           }`}
         >
-          Profit: {fmt(totals.profit)} $
+          {t("admin.payout.profitValue", {
+            amount: fmt(totals.profit, dateLocale),
+          })}
         </span>
         <span className="text-[11px] text-white/35">
-          {totals.accounts} conturi · {item.data.firms.length} firme
+          {t("admin.payout.summary", {
+            accounts: totals.accounts,
+            firms: item.data.firms.length,
+          })}
         </span>
         {open ? (
           <FaChevronDown className="ml-auto h-2.5 w-2.5 text-white/50" />
@@ -220,6 +235,9 @@ export function AdminUserPayoutClient({
 }: {
   payload: AdminUserPayoutTracker;
 }) {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const { user, snapshots } = payload;
   const [year, setYear] = useState(() => {
     const latest = snapshots[0]?.date.slice(0, 4);
@@ -285,7 +303,7 @@ export function AdminUserPayoutClient({
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
         >
           <FaChevronLeft className="h-3 w-3" />
-          <span>Înapoi la Utilizatori</span>
+          <span>{t("admin.common.backUsers")}</span>
         </Link>
       </div>
 
@@ -338,10 +356,10 @@ export function AdminUserPayoutClient({
             onChange={(e) => setMonth(e.target.value)}
             className={selectClass}
           >
-            <option value="all">Toate lunile</option>
+            <option value="all">{t("admin.payout.allMonths")}</option>
             {monthsInYear.map((value) => (
               <option key={value} value={value}>
-                {MONTHS[Number(value) - 1]}
+                {t(`admin.month.${Number(value)}`)}
               </option>
             ))}
           </select>
@@ -352,11 +370,17 @@ export function AdminUserPayoutClient({
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard label="Investiții" value={`${fmt(stats.investitii)} $`} />
-        <StatCard label="Payouts" value={`${fmt(stats.payouts)} $`} />
         <StatCard
-          label="Profit"
-          value={`${fmt(stats.profit)} $`}
+          label={t("admin.payout.investments")}
+          value={`${fmt(stats.investitii, dateLocale)} $`}
+        />
+        <StatCard
+          label={t("admin.payout.payouts")}
+          value={`${fmt(stats.payouts, dateLocale)} $`}
+        />
+        <StatCard
+          label={t("admin.payout.profit")}
+          value={`${fmt(stats.profit, dateLocale)} $`}
           tone={
             stats.profit > 0
               ? "positive"
@@ -365,21 +389,24 @@ export function AdminUserPayoutClient({
                 : "neutral"
           }
         />
-        <StatCard label="Zile salvate" value={String(filtered.length)} />
+        <StatCard
+          label={t("admin.payout.savedDays")}
+          value={String(filtered.length)}
+        />
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/3 px-5 py-5 md:px-6">
         <h2 className="text-sm md:text-base font-semibold text-white">
-          Istoric salvări
+          {t("admin.payout.history")}
         </h2>
 
         {snapshots.length === 0 ? (
           <p className="mt-4 text-xs leading-relaxed text-white/40">
-            Acest utilizator nu are încă nicio salvare în Payout Tracker.
+            {t("admin.payout.empty")}
           </p>
         ) : filtered.length === 0 ? (
           <p className="mt-4 text-xs leading-relaxed text-white/40">
-            Nicio salvare în perioada selectată.
+            {t("admin.payout.noneInRange")}
           </p>
         ) : (
           <div className="mt-4 flex flex-col">

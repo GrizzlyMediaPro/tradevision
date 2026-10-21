@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import {
   ensurePrivateCourse,
   getCourseAccessForCurrentUser,
 } from "@/lib/privateCourseAccess";
+import { getT } from "@/lib/i18n/get-t";
 import {
   PrivateCourseLocked,
   PrivateCoursePlayer,
@@ -12,10 +14,13 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Curs Mentorat 1-on-1",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("mentor.title"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function CursMentoratPage() {
   const { user, course, hasAccess } = await getCourseAccessForCurrentUser();

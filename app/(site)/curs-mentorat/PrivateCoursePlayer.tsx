@@ -10,6 +10,20 @@ import {
   FaLock,
   FaPlay,
 } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
+
+const PLAYBACK_ERROR_IDS: Record<string, string> = {
+  "Nu pot încărca video-ul": "mentor.playback.loadFailed",
+  "Eroare la încărcare": "mentor.playback.loadError",
+  "Video-ul nu este încă disponibil.": "mentor.playback.notReady",
+  "lessonId lipsă": "mentor.playback.missingLesson",
+  "Video indisponibil": "mentor.playback.unavailable",
+  "Mux signing keys lipsesc": "mentor.playback.muxKeys",
+  "Unauthorized: not logged in": "mentor.playback.unauthorized",
+  "Course not found": "mentor.playback.courseMissing",
+  "Forbidden: no course access": "mentor.playback.forbidden",
+  Eroare: "mentor.playback.generic",
+};
 
 export type CourseLessonView = {
   id: string;
@@ -57,6 +71,11 @@ export function PrivateCoursePlayer({
   progress: initialProgress,
   initialLessonId,
 }: Props) {
+  const t = useT();
+  const playbackMessage = (message: string) => {
+    const id = PLAYBACK_ERROR_IDS[message];
+    return id ? t(id) : message;
+  };
   const flatLessons = useMemo(
     () => chapters.flatMap((ch) => ch.lessons),
     [chapters],
@@ -99,7 +118,11 @@ export function PrivateCoursePlayer({
         `/api/private-course/playback?lessonId=${encodeURIComponent(lessonId)}`,
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Nu pot încărca video-ul");
+      if (!res.ok) {
+        throw new Error(
+          typeof data.error === "string" ? data.error : "Nu pot încărca video-ul",
+        );
+      }
       setPlayback(data as PlaybackPayload);
     } catch (err) {
       setPlaybackError(
@@ -176,9 +199,13 @@ export function PrivateCoursePlayer({
         )}
         <div className="mt-4">
           <div className="flex items-center justify-between text-xs text-white/55 mb-1.5">
-            <span>Progres curs</span>
+            <span>{t("mentor.progress")}</span>
             <span>
-              {completedCount}/{readyLessons.length} lecții · {progressPct}%
+              {t("mentor.progressCount", {
+                done: completedCount,
+                total: readyLessons.length,
+                pct: progressPct,
+              })}
             </span>
           </div>
           <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -195,7 +222,7 @@ export function PrivateCoursePlayer({
           {chapters.map((chapter, chIdx) => (
             <div key={chapter.id} className="mb-4 last:mb-0">
               <p className="px-2 mb-1.5 text-[11px] uppercase tracking-wide text-yellow-300/80">
-                Capitol {chIdx + 1}
+                {t("mentor.chapter", { n: chIdx + 1 })}
               </p>
               <p className="px-2 mb-2 text-sm font-semibold text-white">
                 {chapter.title}
@@ -234,7 +261,7 @@ export function PrivateCoursePlayer({
           ))}
           {chapters.length === 0 && (
             <p className="p-3 text-sm text-white/45">
-              Conținutul cursului nu a fost încă publicat.
+              {t("mentor.empty")}
             </p>
           )}
         </aside>
@@ -243,11 +270,11 @@ export function PrivateCoursePlayer({
           <div className="rounded-2xl border border-white/10 bg-black/40 overflow-hidden">
             <div className="aspect-video bg-black flex items-center justify-center">
               {loadingPlayback && (
-                <p className="text-sm text-white/50">Se încarcă video-ul…</p>
+                <p className="text-sm text-white/50">{t("mentor.loading")}</p>
               )}
               {!loadingPlayback && playbackError && (
                 <p className="text-sm text-white/55 px-6 text-center">
-                  {playbackError}
+                  {playbackMessage(playbackError)}
                 </p>
               )}
               {!loadingPlayback && playback && (
@@ -314,7 +341,7 @@ export function PrivateCoursePlayer({
                   className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm text-white/70 hover:bg-white/5 disabled:opacity-35 cursor-pointer"
                 >
                   <FaChevronLeft className="h-3 w-3" />
-                  Anterior
+                  {t("mentor.prev")}
                 </button>
                 <button
                   type="button"
@@ -326,7 +353,7 @@ export function PrivateCoursePlayer({
                   }
                   className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm text-white/70 hover:bg-white/5 disabled:opacity-35 cursor-pointer"
                 >
-                  Următor
+                  {t("mentor.next")}
                   <FaChevronRight className="h-3 w-3" />
                 </button>
                 {!progressMap[activeLesson.id]?.completed && (
@@ -343,7 +370,7 @@ export function PrivateCoursePlayer({
                     className="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-3 py-2 text-sm font-semibold text-black hover:bg-yellow-300 cursor-pointer"
                   >
                     <FaCheckCircle className="h-3.5 w-3.5" />
-                    Marchează complet
+                    {t("mentor.complete")}
                   </button>
                 )}
               </div>
@@ -360,18 +387,17 @@ export function PrivateCourseLocked({
 }: {
   signedIn: boolean;
 }) {
+  const t = useT();
   return (
     <main className="w-full max-w-[720px] mx-auto px-4 pt-16 md:pt-24 pb-20 text-center">
       <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-yellow-300/30 bg-yellow-400/10 mb-5">
         <FaLock className="h-5 w-5 text-yellow-300" />
       </div>
       <h1 className="text-2xl md:text-3xl font-semibold text-white">
-        Curs Mentorat 1-on-1
+        {t("mentor.title")}
       </h1>
       <p className="mt-3 text-sm md:text-base text-white/60 leading-relaxed">
-        Accesul la acest curs se acordă manual după plata și programarea
-        mentoratului 1-on-1. Dacă ai deja acces, autentifică-te cu același
-        cont.
+        {t("mentor.lockedBody")}
       </p>
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
         {!signedIn ? (
@@ -379,21 +405,21 @@ export function PrivateCourseLocked({
             href="/sign-in?redirect_url=/curs-mentorat"
             className="rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-black hover:bg-yellow-300 transition"
           >
-            Autentificare
+            {t("mentor.signIn")}
           </Link>
         ) : (
           <Link
             href="/contact"
             className="rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-black hover:bg-yellow-300 transition"
           >
-            Contactează-ne
+            {t("mentor.contact")}
           </Link>
         )}
         <Link
           href="/"
           className="rounded-xl border border-white/15 px-5 py-2.5 text-sm text-white/70 hover:bg-white/5 transition"
         >
-          Înapoi acasă
+          {t("mentor.home")}
         </Link>
       </div>
     </main>

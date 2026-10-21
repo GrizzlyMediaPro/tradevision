@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 function useCountUp(end: number, duration: number, start: boolean) {
   const [value, setValue] = useState(0);
@@ -25,23 +26,25 @@ function useCountUp(end: number, duration: number, start: boolean) {
   return value;
 }
 
-type StatItem = { value: number; suffix: string; label: string };
+type StatItem = { value: number; suffix: string; suffixId?: string; labelId: string };
 
 const stats: StatItem[] = [
-  { value: 15, suffix: "", label: "Lecții video structurate" },
-  { value: 500, suffix: "+", label: "Cursanți înscriși" },
-  { value: 0, suffix: " lei", label: "Costul cursului" },
+  { value: 15, suffix: "", labelId: "stats.lessons" },
+  { value: 500, suffix: "+", labelId: "stats.students" },
+  { value: 0, suffix: "", suffixId: "stats.costSuffix", labelId: "stats.cost" },
 ];
 
 function AnimatedStat({ item, started }: { item: StatItem; started: boolean }) {
+  const t = useT();
   const count = useCountUp(item.value, item.value > 100 ? 1800 : 1200, started);
   return (
     <div className="text-center">
       <p className="text-3xl md:text-4xl font-bold text-yellow-300">
         {count}
         {item.suffix}
+        {item.suffixId ? t(item.suffixId) : ""}
       </p>
-      <p className="mt-1 text-xs md:text-sm text-white/50">{item.label}</p>
+      <p className="mt-1 text-xs md:text-sm text-white/50">{t(item.labelId)}</p>
     </div>
   );
 }
@@ -68,7 +71,7 @@ export function StatsBar() {
         className="w-full max-w-[1250px] mx-auto px-4 py-10 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center"
       >
         {stats.map((item, i) => (
-          <div key={item.label} className="contents">
+          <div key={item.labelId} className="contents">
             {i > 0 && (
               <div className="h-12 w-px bg-linear-to-b from-transparent via-white/20 to-transparent justify-self-center" />
             )}

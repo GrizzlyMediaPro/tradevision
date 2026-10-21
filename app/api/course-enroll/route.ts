@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { subscribeNewsletterAndSendWelcome } from "@/app/admin/actions/newsletter";
+import { getT } from "@/lib/i18n/get-t";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
+  const t = await getT();
   try {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -13,7 +15,7 @@ export async function POST(req: Request) {
     });
     if (!success) {
       return NextResponse.json(
-        { error: "Prea multe cereri. Încearcă din nou într-un minut." },
+        { error: t("api.rateLimit") },
         { status: 429 },
       );
     }
@@ -32,7 +34,7 @@ export async function POST(req: Request) {
 
     if (!trimmedEmail || !trimmedFirst || !trimmedLast || !trimmedPhone) {
       return NextResponse.json(
-        { error: "Toate câmpurile sunt obligatorii." },
+        { error: t("api.enroll.required") },
         { status: 400 },
       );
     }
@@ -52,7 +54,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Eroare la înscriere curs", err);
     return NextResponse.json(
-      { error: "Eroare internă la înscriere." },
+      { error: t("api.enroll.internal") },
       { status: 500 },
     );
   }

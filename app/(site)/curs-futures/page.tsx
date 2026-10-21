@@ -1,14 +1,20 @@
-import { PracticalCourseCheckoutClient } from "./PracticalCourseCheckoutClient";
-import { getOrderCookieOrderId } from "@/lib/practicalCourseOrder";
+import { redirect } from "next/navigation";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
-import { getBasePriceEur } from "@/lib/practicalCoursePricing";
-import { getEurRonQuote } from "@/lib/eurRonExchange";
+import { CursFuturesIntro } from "./CursFuturesIntro";
+import { CursFuturesProof } from "./CursFuturesProof";
+import { getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: `Achiziție ${PRACTICAL_COURSE.title}`,
-  description: PRACTICAL_COURSE.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: t("futures.title"),
+    description: t("course.metaDescription", {
+      subtitle: t("futures.subtitle"),
+      description: t("course.description"),
+    }),
+  };
+}
 
 type PageProps = {
   searchParams: Promise<{ cancelled?: string }>;
@@ -16,18 +22,14 @@ type PageProps = {
 
 export default async function PracticalCoursePage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const orderId = await getOrderCookieOrderId();
-  const [basePriceEur, eurRonQuote] = await Promise.all([
-    getBasePriceEur(),
-    getEurRonQuote(),
-  ]);
+  if (params.cancelled === "1") {
+    redirect(`${PRACTICAL_COURSE.checkoutPath}?cancelled=1`);
+  }
 
   return (
-    <PracticalCourseCheckoutClient
-      initialOrderId={orderId}
-      cancelled={params.cancelled === "1"}
-      basePriceEur={basePriceEur}
-      eurRonQuote={eurRonQuote}
-    />
+    <div>
+      <CursFuturesIntro />
+      <CursFuturesProof />
+    </div>
   );
 }

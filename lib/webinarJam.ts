@@ -97,7 +97,10 @@ type WjWebinarResponse = {
 export async function resolveWebinarJamScheduleId(
   apiKey: string,
   webinarId: number,
-): Promise<{ scheduleId: number } | { error: string }> {
+): Promise<
+  | { scheduleId: number }
+  | { error: string; errorVars?: Record<string, string> }
+> {
   const fixed = getFixedScheduleId();
   if (fixed != null) {
     return { scheduleId: fixed };
@@ -123,15 +126,15 @@ export async function resolveWebinarJamScheduleId(
         ? ` (${data.message})`
         : "";
     return {
-      error: `Nu am putut citi programul webinarului din WebinarJam.${hint} Setează WEBINARJAM_SCHEDULE_ID în variabile de mediu dacă problema persistă.`,
+      error: "webinar.api.scheduleRead",
+      errorVars: { hint },
     };
   }
 
   const first = schedules[0]?.schedule;
   if (typeof first !== "number" || first <= 0) {
     return {
-      error:
-        "WebinarJam nu a returnat un ID de program valid. Setează WEBINARJAM_SCHEDULE_ID manual.",
+      error: "webinar.api.scheduleInvalid",
     };
   }
 
@@ -148,7 +151,7 @@ function extractErrorMessage(data: WjRegisterResponse | null): string {
   if (data?.message && typeof data.message === "string") {
     return data.message;
   }
-  return "Răspuns necunoscut de la WebinarJam.";
+  return "Unknown response from WebinarJam.";
 }
 
 /** Mesaj prietenos dacă API returnează text în engleză cunoscut */
@@ -159,12 +162,12 @@ export function mapWebinarJamErrorToUserMessage(apiMessage: string): string {
     lower.includes("duplicate") ||
     lower.includes("registered")
   ) {
-    return "Acest email pare deja înscris la webinar în WebinarJam. Folosește altă adresă sau verifică inboxul.";
+    return "webinar.api.alreadyInJam";
   }
   if (lower.includes("custom field") || lower.includes("custom_field")) {
-    return "Înscrierea prin API necesită câmpuri suplimentare configurate în WebinarJam. Contactează suportul sau verifică articolul despre custom fields în documentația WebinarJam.";
+    return "webinar.api.customFields";
   }
-  return "WebinarJam a respins înscrierea. Te rugăm să încerci din nou sau să ne contactezi.";
+  return "webinar.api.rejected";
 }
 
 export async function registerAttendeeWithWebinarJam(input: {
@@ -174,20 +177,31 @@ export async function registerAttendeeWithWebinarJam(input: {
   clientIp?: string;
 }): Promise<
   | { ok: true }
-  | { ok: false; userMessage: string; logDetail?: string; alreadyRegistered?: boolean }
+  | {
+      ok: false;
+      userMessage: string;
+      userMessageVars?: Record<string, string>;
+      logDetail?: string;
+      alreadyRegistered?: boolean;
+    }
 > {
   const apiKey = process.env.WEBINARJAM_API_KEY?.trim();
   const webinarId = getWebinarId();
   if (!apiKey || webinarId == null) {
     return {
       ok: false,
-      userMessage: "Integrarea WebinarJam nu este configurată corect pe server.",
+      userMessage: "webinar.api.notConfigured",
     };
   }
 
   const scheduleRes = await resolveWebinarJamScheduleId(apiKey, webinarId);
   if ("error" in scheduleRes) {
-    return { ok: false, userMessage: scheduleRes.error, logDetail: scheduleRes.error };
+    return {
+      ok: false,
+      userMessage: scheduleRes.error,
+      userMessageVars: scheduleRes.errorVars,
+      logDetail: scheduleRes.error,
+    };
   }
 
   const { phone_country_code, phone: phoneDigits } = splitPhoneForWebinarJam(

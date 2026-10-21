@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 import {
   formatCountdownUnit,
   formatWebinarLiveLabel,
@@ -15,9 +16,14 @@ type WebinarFinalCtaSectionProps = {
 export function WebinarFinalCtaSection({
   targetTimestamp,
 }: WebinarFinalCtaSectionProps) {
+  const t = useT();
+  const { locale } = useI18n();
   const targetDate = useMemo(() => targetTimestamp, [targetTimestamp]);
   const [timeLeft, setTimeLeft] = useState(0);
-  const liveLabel = useMemo(() => formatWebinarLiveLabel(targetDate), [targetDate]);
+  const liveLabel = useMemo(
+    () => formatWebinarLiveLabel(targetDate, locale),
+    [targetDate, locale],
+  );
 
   useEffect(() => {
     setTimeLeft(Math.max(targetDate - Date.now(), 0));
@@ -53,7 +59,7 @@ export function WebinarFinalCtaSection({
       <div className="relative w-full max-w-[1250px] mx-auto px-4 pt-16 pb-20">
         <div className="w-full flex flex-col items-center text-center gap-6">
           <span className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-yellow-300">
-            Următorul webinar live
+            {t("webinar.live.badge")}
           </span>
 
           <div>
@@ -61,8 +67,7 @@ export function WebinarFinalCtaSection({
               {liveLabel}
             </h2>
             <p className="mt-4 text-sm md:text-base text-white/55 max-w-lg mx-auto">
-              Workshop live pentru traderii care vor un sistem clar și rezultate
-              consistente, lună de lună.
+              {t("webinar.live.subtitle")}
             </p>
           </div>
 
@@ -70,7 +75,7 @@ export function WebinarFinalCtaSection({
             href="/webinar/formular"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] hover:brightness-110 transition cursor-pointer"
           >
-            ÎNSCRIE-TE ACUM
+            {t("webinar.live.cta")}
           </Link>
 
           <div className="grid grid-cols-4 gap-3 w-full max-w-[520px]">
@@ -79,7 +84,7 @@ export function WebinarFinalCtaSection({
                 {formatCountdownUnit(days)}
               </p>
               <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                zile
+                {t("webinar.countdown.days")}
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-3 py-4 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
@@ -87,7 +92,7 @@ export function WebinarFinalCtaSection({
                 {formatCountdownUnit(hours)}
               </p>
               <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                ore
+                {t("webinar.countdown.hours")}
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-3 py-4 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
@@ -95,7 +100,7 @@ export function WebinarFinalCtaSection({
                 {formatCountdownUnit(minutes)}
               </p>
               <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                minute
+                {t("webinar.countdown.minutes")}
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-3 py-4 shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
@@ -103,7 +108,7 @@ export function WebinarFinalCtaSection({
                 {formatCountdownUnit(seconds)}
               </p>
               <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-white/55">
-                secunde
+                {t("webinar.countdown.seconds")}
               </p>
             </div>
           </div>

@@ -7,33 +7,28 @@ export type CourseChapter = {
 
 export const defaultCourseChapters: CourseChapter[] = [
   {
-    title: "Capitolul 1: Introducere în Trading",
-    description:
-      "Învață bazele trading-ului, ce este piața financiară, cum funcționează bursele și ce înseamnă să fii trader. Acest capitol îți oferă fundamentele de care ai nevoie pentru a înțelege restul cursului.",
+    title: "course.fallback.1.title",
+    description: "course.fallback.1.description",
     videoId: "dQw4w9WgXcQ",
   },
   {
-    title: "Capitolul 2: Analiza Tehnică",
-    description:
-      "Descoperă principiile analizei tehnice: suport și rezistență, trend-uri, formațiuni de preț și indicatori tehnici esențiali pe care orice trader trebuie să-i cunoască.",
+    title: "course.fallback.2.title",
+    description: "course.fallback.2.description",
     videoId: "dQw4w9WgXcQ",
   },
   {
-    title: "Capitolul 3: Managementul Riscului",
-    description:
-      "Cel mai important capitol. Învață cum să-ți protejezi capitalul, cum să setezi stop-loss-uri corecte, cum să calculezi dimensiunea poziției și reguli esențiale de money management.",
+    title: "course.fallback.3.title",
+    description: "course.fallback.3.description",
     videoId: "dQw4w9WgXcQ",
   },
   {
-    title: "Capitolul 4: Psihologia Trading-ului",
-    description:
-      "Trading-ul este 80% psihologie. Înțelege emoțiile care te sabotează, cum să-ți dezvolți disciplina și cum să iei decizii raționale sub presiune.",
+    title: "course.fallback.4.title",
+    description: "course.fallback.4.description",
     videoId: "dQw4w9WgXcQ",
   },
   {
-    title: "Capitolul 5: Strategii de Trading",
-    description:
-      "Pune totul cap la cap. Învață strategii concrete de intrare și ieșire din piață, cum să-ți construiești un plan de trading și cum să-ți evaluezi performanța.",
+    title: "course.fallback.5.title",
+    description: "course.fallback.5.description",
     videoId: "dQw4w9WgXcQ",
   },
 ];

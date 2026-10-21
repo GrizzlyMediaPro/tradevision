@@ -2,24 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 import { FaArrowLeft, FaChevronRight, FaDownload } from "react-icons/fa";
 import type { PayoutTrackerData } from "@/lib/payoutTracker/types";
 import { isValidTrackerData } from "@/lib/payoutTracker/validation";
-
-const MONTHS = [
-  "Ianuarie",
-  "Februarie",
-  "Martie",
-  "Aprilie",
-  "Mai",
-  "Iunie",
-  "Iulie",
-  "August",
-  "Septembrie",
-  "Octombrie",
-  "Noiembrie",
-  "Decembrie",
-];
 
 type Snapshot = {
   date: string;
@@ -27,8 +13,8 @@ type Snapshot = {
   data: PayoutTrackerData;
 };
 
-function fmt(n: number): string {
-  return (Number(n) || 0).toLocaleString("ro-RO");
+function fmt(n: number, numberLocale: string): string {
+  return (Number(n) || 0).toLocaleString(numberLocale);
 }
 
 /** Investiții, payouts și profit agregat dintr-un snapshot. */
@@ -76,6 +62,11 @@ function StatCard({
 }
 
 export function MyPayoutsClient() {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
+  const monthName = (monthIndex: number) =>
+    new Date(2026, monthIndex, 1).toLocaleDateString(dateLocale, { month: "long" });
   const [snapshots, setSnapshots] = useState<Snapshot[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [year, setYear] = useState(() => String(new Date().getFullYear()));
@@ -94,7 +85,7 @@ export function MyPayoutsClient() {
           error?: string;
         };
         if (!response.ok || !Array.isArray(result.snapshots)) {
-          throw new Error(result.error || "Istoricul nu a putut fi încărcat.");
+          throw new Error(result.error || t("payout.error.history"));
         }
         if (cancelled) return;
         setSnapshots(
@@ -110,7 +101,7 @@ export function MyPayoutsClient() {
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "Istoricul nu a putut fi încărcat.",
+            : t("payout.error.history"),
         );
       }
     }
@@ -119,7 +110,7 @@ export function MyPayoutsClient() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   const years = useMemo(() => {
     const values = new Set(
@@ -177,9 +168,7 @@ export function MyPayoutsClient() {
     if (filtered.length === 0) return;
 
     const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
-    const rows: string[] = [
-      "Data,Firma,Luna,Investitii,Payouts,Profit",
-    ];
+    const rows: string[] = [t("payout.history.csvHeader")];
     for (const item of filtered) {
       for (const firm of item.data.firms) {
         const investitii = Number(firm.investitii) || 0;
@@ -204,12 +193,12 @@ export function MyPayoutsClient() {
     const suffix = month === "all" ? year : `${year}-${month}`;
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `My Payouts ${suffix}.csv`;
+    a.download = t("payout.history.csvFile", { suffix });
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-  }, [filtered, month, year]);
+  }, [filtered, month, t, year]);
 
   const selectClass =
     "rounded-full border border-white/20 bg-black/70 px-4 py-2 pr-8 text-xs font-medium text-white/85 outline-none cursor-pointer appearance-none shadow-sm shadow-black/40 [&>option]:bg-zinc-900";
@@ -219,11 +208,11 @@ export function MyPayoutsClient() {
       <div className="w-full flex flex-col items-center gap-8">
         <div className="text-center">
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            My Payouts
+            {t("payout.history.title")}
           </h1>
           <div className="mt-3 h-[2px] w-[90px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-4 text-xs md:text-sm text-white/50 max-w-xl mx-auto leading-relaxed">
-            Statistici și istoricul salvărilor tale din Payout Tracker.
+            {t("payout.history.subtitle")}
           </p>
         </div>
 
@@ -234,7 +223,7 @@ export function MyPayoutsClient() {
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-xs font-semibold text-white/85 hover:bg-white/10 transition cursor-pointer"
           >
             <FaArrowLeft className="h-2.5 w-2.5" />
-            Înapoi la tracker
+            {t("payout.history.back")}
           </Link>
 
           <div className="relative">
@@ -263,10 +252,10 @@ export function MyPayoutsClient() {
               onChange={(e) => setMonth(e.target.value)}
               className={selectClass}
             >
-              <option value="all">Toate lunile</option>
+              <option value="all">{t("payout.history.allMonths")}</option>
               {monthsInYear.map((value) => (
                 <option key={value} value={value}>
-                  {MONTHS[Number(value) - 1]}
+                  {monthName(Number(value) - 1)}
                 </option>
               ))}
             </select>
@@ -278,11 +267,11 @@ export function MyPayoutsClient() {
           <button
             onClick={handleExportCsv}
             disabled={filtered.length === 0}
-            title="Descarcă salvările filtrate ca fișier CSV"
+            title={t("payout.history.exportTitle")}
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-xs font-semibold text-white/85 hover:bg-white/10 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
           >
             <FaDownload className="h-2.5 w-2.5" />
-            Export CSV
+            {t("payout.history.export")}
           </button>
         </div>
 
@@ -296,11 +285,11 @@ export function MyPayoutsClient() {
 
         {/* Statistici */}
         <div className="w-full grid grid-cols-2 gap-3 md:grid-cols-4">
-          <StatCard label="Investiții" value={`${fmt(stats.investitii)} $`} />
-          <StatCard label="Payouts" value={`${fmt(stats.payouts)} $`} />
+          <StatCard label={t("payout.history.investments")} value={`${fmt(stats.investitii, dateLocale)} $`} />
+          <StatCard label={t("payout.history.payouts")} value={`${fmt(stats.payouts, dateLocale)} $`} />
           <StatCard
-            label="Profit"
-            value={`${fmt(stats.profit)} $`}
+            label={t("payout.history.profit")}
+            value={`${fmt(stats.profit, dateLocale)} $`}
             tone={
               stats.profit > 0
                 ? "positive"
@@ -309,28 +298,27 @@ export function MyPayoutsClient() {
                   : "neutral"
             }
           />
-          <StatCard label="Zile salvate" value={String(filtered.length)} />
+          <StatCard label={t("payout.history.days")} value={String(filtered.length)} />
         </div>
 
         {/* Istoric */}
         <div className="w-full rounded-2xl border border-white/10 bg-white/3 px-5 py-5 md:px-6">
           <h2 className="text-sm md:text-base font-semibold text-white">
-            Istoric salvări
+            {t("payout.history.heading")}
           </h2>
 
           {snapshots === null ? (
-            <p className="mt-4 text-xs text-white/40">Se încarcă...</p>
+            <p className="mt-4 text-xs text-white/40">{t("payout.history.loading")}</p>
           ) : filtered.length === 0 ? (
             <p className="mt-4 text-xs leading-relaxed text-white/40">
-              Nu ai salvări în perioada selectată. Salvează o zi din tracker și
-              va apărea aici.
+              {t("payout.history.empty")}
             </p>
           ) : (
             <div className="mt-4 flex flex-col">
               {filtered.map((item) => {
                 const totals = snapshotTotals(item.data);
                 const day = Number(item.date.slice(8, 10));
-                const monthName = MONTHS[Number(item.date.slice(5, 7)) - 1];
+                const savedMonth = monthName(Number(item.date.slice(5, 7)) - 1);
                 return (
                   <Link
                     key={item.date}
@@ -338,13 +326,13 @@ export function MyPayoutsClient() {
                     className="group flex flex-wrap items-center gap-x-5 gap-y-1.5 border-b border-white/5 px-1 py-3 last:border-b-0 transition hover:bg-white/3"
                   >
                     <span className="w-[120px] text-sm font-medium text-white">
-                      {day} {monthName.toLowerCase()} {item.date.slice(0, 4)}
+                      {day} {savedMonth.toLocaleLowerCase(dateLocale)} {item.date.slice(0, 4)}
                     </span>
                     <span className="text-xs tabular-nums text-white/50">
-                      Investiții: {fmt(totals.investitii)} $
+                      {t("payout.history.rowInvestments", { amount: fmt(totals.investitii, dateLocale) })}
                     </span>
                     <span className="text-xs tabular-nums text-white/50">
-                      Payouts: {fmt(totals.payouts)} $
+                      {t("payout.history.rowPayouts", { amount: fmt(totals.payouts, dateLocale) })}
                     </span>
                     <span
                       className={`text-xs font-semibold tabular-nums ${
@@ -355,7 +343,7 @@ export function MyPayoutsClient() {
                             : "text-white/60"
                       }`}
                     >
-                      Profit: {fmt(totals.profit)} $
+                      {t("payout.history.rowProfit", { amount: fmt(totals.profit, dateLocale) })}
                     </span>
                     <FaChevronRight className="ml-auto h-2.5 w-2.5 text-white/25 transition group-hover:text-white/60" />
                   </Link>

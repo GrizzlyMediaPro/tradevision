@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 type FormState = {
   firstName: string;
@@ -25,6 +26,7 @@ function isValidPhone(value: string) {
 }
 
 export function WebinarFormClient() {
+  const t = useT();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>({
@@ -74,13 +76,13 @@ export function WebinarFormClient() {
         error?: string;
       };
       if (!res.ok) {
-        setSubmitError(data.error || "Eroare la trimitere. Încearcă din nou.");
+        setSubmitError(data.error || t("webinar.form.submitError"));
         setStatus("error");
         return;
       }
       router.push("/webinar/confirmare");
     } catch {
-      setSubmitError("Nu am putut trimite datele. Verifică conexiunea și încearcă din nou.");
+      setSubmitError(t("webinar.form.networkError"));
       setStatus("error");
     }
   };
@@ -124,13 +126,13 @@ export function WebinarFormClient() {
           className="inline-flex items-center gap-2 text-xs font-medium text-white/60 transition hover:text-white"
         >
           <FaArrowLeft className="h-3 w-3" />
-          Înapoi
+          {t("webinar.form.back")}
         </Link>
 
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
-            alt="Trade Vision"
+            alt={t("webinar.shell.logoAlt")}
             width={140}
             height={40}
             className="h-8 w-auto"
@@ -161,7 +163,10 @@ export function WebinarFormClient() {
           })}
         </div>
         <p className="mt-2 text-right text-[11px] font-medium uppercase tracking-wider text-white/45">
-          Pasul {Math.min(step + 1, TOTAL_STEPS)} din {TOTAL_STEPS}
+          {t("webinar.form.step", {
+            current: Math.min(step + 1, TOTAL_STEPS),
+            total: TOTAL_STEPS,
+          })}
         </p>
       </div>
 
@@ -170,12 +175,12 @@ export function WebinarFormClient() {
           {step === 0 && (
                 <FormStep
                   number="1"
-                  question="Prenumele tău este:"
+                  question={t("webinar.form.q1")}
                   required
                 >
                   <TextInput
                     autoFocus
-                    placeholder="Scrie răspunsul aici..."
+                    placeholder={t("webinar.form.placeholder")}
                     value={form.firstName}
                     onChange={(value) =>
                       setForm((prev) => ({ ...prev, firstName: value }))
@@ -188,7 +193,7 @@ export function WebinarFormClient() {
           {step === 1 && (
                 <FormStep
                   number="2"
-                  question="Care este adresa ta de email?"
+                  question={t("webinar.form.q2")}
                   required
                 >
                   <TextInput
@@ -204,7 +209,7 @@ export function WebinarFormClient() {
                   />
                   {form.email.length > 0 && !isValidEmail(form.email) && (
                     <p className="mt-3 text-xs text-red-400">
-                      Te rugăm să introduci o adresă de email validă.
+                      {t("webinar.form.emailInvalid")}
                     </p>
                   )}
                 </FormStep>
@@ -213,7 +218,7 @@ export function WebinarFormClient() {
           {step === 2 && (
                 <FormStep
                   number="3"
-                  question="Care este numărul tău de telefon?"
+                  question={t("webinar.form.q3")}
                   required
                 >
                   <TextInput
@@ -231,7 +236,7 @@ export function WebinarFormClient() {
           )}
 
           {step === 3 && (
-                <FormStep number="4" question="Aproape gata!" required>
+                <FormStep number="4" question={t("webinar.form.q4")} required>
                   <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/3 px-4 py-4 transition hover:border-white/20">
                     <input
                       type="checkbox"
@@ -262,7 +267,7 @@ export function WebinarFormClient() {
                       )}
                     </span>
                     <span className="text-xs leading-relaxed text-white/70 sm:text-sm">
-                      Te rugăm să accepți{" "}
+                      {t("webinar.form.consent.before")}
                       <Link
                         href="/termeni-conditii"
                         target="_blank"
@@ -270,9 +275,9 @@ export function WebinarFormClient() {
                         onClick={(e) => e.stopPropagation()}
                         className="text-white underline decoration-white/40 underline-offset-2 transition hover:text-yellow-300 hover:decoration-yellow-300"
                       >
-                        termenii și condițiile
+                        {t("webinar.form.consent.terms")}
                       </Link>
-                      ,{" "}
+                      {t("webinar.form.consent.mid")}
                       <Link
                         href="/politica-confidentialitate"
                         target="_blank"
@@ -280,10 +285,9 @@ export function WebinarFormClient() {
                         onClick={(e) => e.stopPropagation()}
                         className="text-white underline decoration-white/40 underline-offset-2 transition hover:text-yellow-300 hover:decoration-yellow-300"
                       >
-                        politica de confidențialitate
-                      </Link>{" "}
-                      și transmiterea de mesaje de marketing cu privire la
-                      serviciile și produsele noastre afișate pe site.
+                        {t("webinar.form.consent.privacy")}
+                      </Link>
+                      {t("webinar.form.consent.after")}
                       <span className="text-yellow-300">*</span>
                     </span>
                   </label>
@@ -292,8 +296,7 @@ export function WebinarFormClient() {
 
           {status === "error" && (
                 <p className="mt-4 text-center text-xs text-red-400">
-                  {submitError ||
-                    "A apărut o eroare. Te rugăm să încerci din nou."}
+                  {submitError || t("webinar.form.genericError")}
                 </p>
           )}
 
@@ -305,7 +308,7 @@ export function WebinarFormClient() {
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-xs font-medium text-white/65 transition hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   <FaArrowLeft className="h-3 w-3" />
-                  Înapoi
+                  {t("webinar.form.back")}
                 </button>
 
                 {step < TOTAL_STEPS - 1 ? (
@@ -315,7 +318,7 @@ export function WebinarFormClient() {
                     disabled={!canContinue}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
-                    Mai departe
+                    {t("webinar.form.next")}
                     <svg
                       className="h-4 w-4"
                       fill="none"
@@ -338,8 +341,8 @@ export function WebinarFormClient() {
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     {status === "loading"
-                      ? "Se trimite..."
-                      : "Trimite înscrierea"}
+                      ? t("common.sending")
+                      : t("webinar.form.submit")}
                   </button>
                 )}
           </div>

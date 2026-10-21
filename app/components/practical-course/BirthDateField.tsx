@@ -2,23 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FaCalendarAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-
-const MONTHS_RO = [
-  "Ianuarie",
-  "Februarie",
-  "Martie",
-  "Aprilie",
-  "Mai",
-  "Iunie",
-  "Iulie",
-  "August",
-  "Septembrie",
-  "Octombrie",
-  "Noiembrie",
-  "Decembrie",
-];
-
-const WEEKDAYS_RO = ["Lu", "Ma", "Mi", "Jo", "Vi", "Sa", "Du"];
+import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 
 const inputClass =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-yellow-300/50";
@@ -50,13 +34,14 @@ function toIsoDate(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-function formatDisplayDate(value: string): string {
+function formatDisplayDate(value: string, dateLocale: string): string {
   const date = parseIsoDate(value);
   if (!date) return "";
-  const d = String(date.getDate()).padStart(2, "0");
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const y = date.getFullYear();
-  return `${d}.${m}.${y}`;
+  return date.toLocaleDateString(dateLocale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 }
 
 function getYearOptions(): number[] {
@@ -89,11 +74,25 @@ function isFutureDate(year: number, month: number, day: number): boolean {
 }
 
 export function BirthDateField({
-  label = "Data nașterii",
+  label,
   value,
   onChange,
   className = "",
 }: BirthDateFieldProps) {
+  const t = useT();
+  const { locale } = useI18n();
+  const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
+  const resolvedLabel = label ?? t("course.field.birthDate");
+  const months = Array.from({ length: 12 }, (_, index) =>
+    new Intl.DateTimeFormat(dateLocale, { month: "long" }).format(
+      new Date(2024, index, 1),
+    ),
+  );
+  const weekdays = Array.from({ length: 7 }, (_, index) =>
+    new Intl.DateTimeFormat(dateLocale, { weekday: "short" }).format(
+      new Date(2024, 0, 1 + index),
+    ),
+  );
   const fieldId = FIELD_ID;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const selected = parseIsoDate(value);
@@ -160,7 +159,7 @@ export function BirthDateField({
     setViewYear(nextYear);
   };
 
-  const displayValue = formatDisplayDate(value);
+  const displayValue = formatDisplayDate(value, dateLocale);
 
   return (
     <div ref={rootRef} className={`relative flex flex-col gap-2 ${className}`}>
@@ -168,7 +167,7 @@ export function BirthDateField({
         id={`${fieldId}-label`}
         className="text-xs font-medium uppercase tracking-wider text-white/50"
       >
-        {label}
+        {resolvedLabel}
       </span>
 
       <input type="hidden" name="bday" autoComplete="bday" value={value} readOnly />
@@ -185,7 +184,7 @@ export function BirthDateField({
         }`}
       >
         <span className={displayValue ? "text-white" : "text-white/30"}>
-          {displayValue || "Selectează data nașterii"}
+          {displayValue || t("course.field.birthDatePlaceholder")}
         </span>
         <FaCalendarAlt className="h-4 w-4 shrink-0 text-yellow-300/80" />
       </button>
@@ -193,7 +192,7 @@ export function BirthDateField({
       {open ? (
         <div
           role="dialog"
-          aria-label="Calendar data nașterii"
+          aria-label={t("course.field.birthDateCalendar")}
           className="absolute left-0 top-full z-50 mt-2 w-full min-w-[280px] rounded-2xl border border-white/10 bg-[#0a0d1f] p-4 shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
         >
           <div className="mb-4 flex items-center gap-2">
@@ -201,7 +200,7 @@ export function BirthDateField({
               type="button"
               onClick={goToPreviousMonth}
               className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-white/70 transition hover:border-white/25 hover:text-white"
-              aria-label="Luna anterioară"
+              aria-label={t("course.field.prevMonth")}
             >
               <FaChevronLeft className="h-3 w-3" />
             </button>
@@ -211,9 +210,9 @@ export function BirthDateField({
                 value={viewMonth}
                 onChange={(e) => setViewMonth(Number(e.target.value))}
                 className="rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-xs text-white outline-none focus:border-yellow-300/50"
-                aria-label="Luna"
+                aria-label={t("course.field.month")}
               >
-                {MONTHS_RO.map((monthName, index) => (
+                {months.map((monthName, index) => (
                   <option key={monthName} value={index} className="bg-[#0a0d1f]">
                     {monthName}
                   </option>
@@ -223,7 +222,7 @@ export function BirthDateField({
                 value={viewYear}
                 onChange={(e) => setViewYear(Number(e.target.value))}
                 className="rounded-lg border border-white/10 bg-white/5 px-2 py-2 text-xs text-white outline-none focus:border-yellow-300/50"
-                aria-label="Anul"
+                aria-label={t("course.field.year")}
               >
                 {years.map((year) => (
                   <option key={year} value={year} className="bg-[#0a0d1f]">
@@ -237,14 +236,14 @@ export function BirthDateField({
               type="button"
               onClick={goToNextMonth}
               className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-white/70 transition hover:border-white/25 hover:text-white"
-              aria-label="Luna următoare"
+              aria-label={t("course.field.nextMonth")}
             >
               <FaChevronRight className="h-3 w-3" />
             </button>
           </div>
 
           <div className="mb-2 grid grid-cols-7 gap-1">
-            {WEEKDAYS_RO.map((day) => (
+            {weekdays.map((day) => (
               <div
                 key={day}
                 className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-white/40"

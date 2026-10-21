@@ -3,55 +3,47 @@
 import Image from "next/image";
 import { FaChartLine, FaYoutube, FaUsers } from "react-icons/fa";
 import { TbTrendingUp } from "react-icons/tb";
+import { useT } from "@/lib/i18n/I18nProvider";
+
+const founderStats = [
+  { valueId: "founders.stat.daily", labelId: "founders.stat.dailyLabel", icon: FaChartLine },
+  { valueId: "founders.stat.live", labelId: "founders.stat.liveLabel", icon: FaYoutube },
+  { valueId: "founders.stat.community", labelId: "founders.stat.communityLabel", icon: FaUsers },
+];
 
 const founders = [
   {
     name: "Cristi Pașatu",
     photoSrc: "/poza-cristi-pasatu.jpeg",
-    role: "Co-fondator TradeVision",
-    bio: "Sunt Cristi Pașatu, cu 8 ani experiență în tranzacționare și 5 ani în tranzacționare cu firme de finanțare. Am testat sute de strategii și am învățat să tratez acest domeniu ca pe un business, nu ca pe un joc de noroc.",
-    bio2: "Folosesc un sistem clar de management al riscului și execuție bazată pe flux de ordine în activitatea zilnică de tranzacționare.",
-    bio3: "Prin Trade Vision, ajut traderii să abordeze piața structurat și să devină consistenți și disciplinați.",
-    stats: [
-      { value: "Zilnic", label: "Tranzacționare activă", icon: FaChartLine },
-      { value: "Live", label: "Sesiuni YouTube", icon: FaYoutube },
-      { value: "500+", label: "Comunitate", icon: FaUsers },
-    ],
+    bioIds: ["founders.pasatu.bio1", "founders.pasatu.bio2", "founders.pasatu.bio3"],
   },
   {
     name: "Cristi Barbu",
     photoSrc: "/poza-cristi-barbu.jpeg",
-    role: "Co-fondator TradeVision",
-    bio: "Am descoperit tranzacționarea acum 2 ani și am decis să o aprofundez serios, pentru a înțelege cum funcționează piețele financiare. Un moment cheie a fost participarea la cursul lui Cristi Pașatu, care mi-a schimbat perspectiva asupra acestui domeniu.",
-    bio2: "După sute de ore de studiu și practică, abordez tranzacționarea structurat, cu accent pe disciplină și management al riscului.",
-    bio3: "Prin Trade Vision, îmi propun să ajut traderii la început de drum să își găsească direcția și să abordeze piața cu mai multă claritate, disciplină și încredere.",
-    stats: [
-      { value: "Zilnic", label: "Tranzacționare activă", icon: FaChartLine },
-      { value: "Live", label: "Sesiuni YouTube", icon: FaYoutube },
-      { value: "500+", label: "Comunitate", icon: FaUsers },
-    ],
+    bioIds: ["founders.barbu.bio1", "founders.barbu.bio2", "founders.barbu.bio3"],
   },
 ];
 
 export function FoundersSection() {
+  const t = useT();
+
   return (
     <section className="w-full max-w-[1250px] mx-auto px-4 pt-20 pb-16">
       <div className="w-full flex flex-col items-center text-center gap-10">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide uppercase">
-            Cine suntem
+            {t("founders.title")}
           </h2>
           <div className="mt-3 h-[2px] w-[80px] bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
           <p className="mt-5 text-sm md:text-base text-white/55 max-w-lg mx-auto">
-            Traderi activi, nu teoreticieni. Tranzacționăm zilnic și arătăm tot
-            — inclusiv greșelile.
+            {t("founders.subtitle")}
           </p>
         </div>
 
         <div className="w-full flex flex-col gap-8">
           {founders.map((founder) => (
             <div
-              key={founder.name}
+              key={founder.bioIds[0]}
               className="rounded-3xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 shadow-[0_8px_18px_rgba(0,0,0,0.45)] overflow-hidden"
             >
               <div className="flex flex-col md:flex-row items-stretch">
@@ -75,27 +67,30 @@ export function FoundersSection() {
                   </h3>
                   <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs md:text-sm font-medium text-purple-300">
                     <TbTrendingUp className="h-4 w-4" />
-                    {founder.role}
+                    {t("founders.role")}
                   </p>
-                  <p className="mt-5 text-sm md:text-base text-white/55 leading-relaxed">
-                    {founder.bio}
-                  </p>
-                  <p className="mt-3 text-sm md:text-base text-white/55 leading-relaxed">
-                    {founder.bio2}
-                  </p>
-                  <p className="mt-3 text-sm md:text-base text-white/55 leading-relaxed">
-                    {founder.bio3}
-                  </p>
+                  {founder.bioIds.map((bioId, index) => (
+                    <p
+                      key={bioId}
+                      className={
+                        index === 0
+                          ? "mt-5 text-sm md:text-base text-white/55 leading-relaxed"
+                          : "mt-3 text-sm md:text-base text-white/55 leading-relaxed"
+                      }
+                    >
+                      {t(bioId)}
+                    </p>
+                  ))}
 
                   {/* Mini stats */}
                   <div className="mt-8 flex gap-10">
-                    {founder.stats.map((stat) => (
-                      <div key={stat.label} className="text-left">
+                    {founderStats.map((stat) => (
+                      <div key={stat.labelId} className="text-left">
                         <p className="text-lg md:text-xl font-bold text-yellow-300">
-                          {stat.value}
+                          {t(stat.valueId)}
                         </p>
                         <p className="text-[11px] md:text-xs text-white/40">
-                          {stat.label}
+                          {t(stat.labelId)}
                         </p>
                       </div>
                     ))}

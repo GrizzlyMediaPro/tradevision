@@ -14,12 +14,12 @@ import {
   FaUsers,
   FaLink,
 } from "react-icons/fa";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 const menuItems = [
   {
-    title: "Deals Carousel",
-    description:
-      "Gestionează ofertele și parteneriatele afișate în carousel pe pagina principală.",
+    titleKey: "admin.home.card.deals.title",
+    descriptionKey: "admin.home.card.deals.description",
     icon: FaTags,
     href: "/admin/deals",
     color: "from-purple-500 to-purple-600",
@@ -28,9 +28,8 @@ const menuItems = [
     shadow: "shadow-purple-500/20",
   },
   {
-    title: "Firme",
-    description:
-      "Adaugă, editează sau șterge firmele de prop trading afișate pe site.",
+    titleKey: "admin.home.card.firms.title",
+    descriptionKey: "admin.home.card.firms.description",
     icon: FaBuilding,
     href: "/admin/firme",
     color: "from-sky-500 to-sky-600",
@@ -39,9 +38,8 @@ const menuItems = [
     shadow: "shadow-sky-500/20",
   },
   {
-    title: "Link Widget YouTube",
-    description:
-      "Actualizează link-ul video-ului YouTube afișat pe pagina de acasă.",
+    titleKey: "admin.home.card.link.title",
+    descriptionKey: "admin.home.card.link.description",
     icon: FaYoutube,
     href: "/admin/linkwidget",
     color: "from-red-500 to-red-600",
@@ -50,9 +48,8 @@ const menuItems = [
     shadow: "shadow-red-500/20",
   },
   {
-    title: "Webinar",
-    description:
-      "Data și ora webinarului live, înscrierile din formular și sincronizarea cu pagina publică.",
+    titleKey: "admin.home.card.webinar.title",
+    descriptionKey: "admin.home.card.webinar.description",
     icon: FaClock,
     href: "/admin/webinar",
     color: "from-indigo-500 to-indigo-600",
@@ -61,9 +58,8 @@ const menuItems = [
     shadow: "shadow-indigo-500/20",
   },
   {
-    title: "Curs",
-    description:
-      "Gestionează capitolele cursului, video-urile și conținutul educațional.",
+    titleKey: "admin.home.card.course.title",
+    descriptionKey: "admin.home.card.course.description",
     icon: FaGraduationCap,
     href: "/admin/curs",
     color: "from-yellow-400 to-amber-500",
@@ -72,9 +68,8 @@ const menuItems = [
     shadow: "shadow-yellow-500/20",
   },
   {
-    title: "Curs Mentorat 1-on-1",
-    description:
-      "Curs video privat: capitole, upload Mux, progres și acces manual pentru clienți 1-on-1.",
+    titleKey: "admin.home.card.mentor.title",
+    descriptionKey: "admin.home.card.mentor.description",
     icon: FaGraduationCap,
     href: "/admin/curs-mentorat",
     color: "from-cyan-500 to-teal-600",
@@ -83,9 +78,8 @@ const menuItems = [
     shadow: "shadow-cyan-500/20",
   },
   {
-    title: "Prețuri cursuri",
-    description:
-      "Modifică prețurile cursurilor plătite afișate pe site și în checkout.",
+    titleKey: "admin.home.card.prices.title",
+    descriptionKey: "admin.home.card.prices.description",
     icon: FaEuroSign,
     href: "/admin/cursuri/preturi",
     color: "from-lime-500 to-green-600",
@@ -94,9 +88,8 @@ const menuItems = [
     shadow: "shadow-lime-500/20",
   },
   {
-    title: "Reduceri Curs Futures",
-    description:
-      "Coduri de discount pentru achiziția Curs Futures.",
+    titleKey: "admin.home.card.discounts.title",
+    descriptionKey: "admin.home.card.discounts.description",
     icon: FaGraduationCap,
     href: "/admin/curs-futures/reduceri",
     color: "from-orange-500 to-amber-600",
@@ -105,9 +98,8 @@ const menuItems = [
     shadow: "shadow-orange-500/20",
   },
   {
-    title: "Clienți Curs Futures",
-    description:
-      "Listă clienți care au finalizat plata pentru Curs Futures.",
+    titleKey: "admin.home.card.clients.title",
+    descriptionKey: "admin.home.card.clients.description",
     icon: FaGraduationCap,
     href: "/admin/curs-futures/clienti",
     color: "from-amber-500 to-yellow-600",
@@ -116,9 +108,8 @@ const menuItems = [
     shadow: "shadow-amber-500/20",
   },
   {
-    title: "Utilizatori",
-    description:
-      "Vezi toți utilizatorii, statisticile agregate și datele din Payout Tracker.",
+    titleKey: "admin.home.card.users.title",
+    descriptionKey: "admin.home.card.users.description",
     icon: FaUsers,
     href: "/admin/users",
     color: "from-teal-500 to-teal-600",
@@ -127,9 +118,8 @@ const menuItems = [
     shadow: "shadow-teal-500/20",
   },
   {
-    title: "Firme Tracker",
-    description:
-      "Gestionează firmele și link-urile de afiliere afișate pe pagina Payout Tracker.",
+    titleKey: "admin.home.card.tracker.title",
+    descriptionKey: "admin.home.card.tracker.description",
     icon: FaLink,
     href: "/admin/tracking-firms",
     color: "from-pink-500 to-pink-600",
@@ -138,8 +128,8 @@ const menuItems = [
     shadow: "shadow-pink-500/20",
   },
   {
-    title: "Formular Contact",
-    description: "Vizualizează mesajele primite prin formularul de contact.",
+    titleKey: "admin.home.card.contact.title",
+    descriptionKey: "admin.home.card.contact.description",
     icon: FaEnvelope,
     href: "/admin/formular",
     color: "from-emerald-500 to-emerald-600",
@@ -148,9 +138,8 @@ const menuItems = [
     shadow: "shadow-emerald-500/20",
   },
   {
-    title: "Newsletter",
-    description:
-      "Gestionează lista de abonați și trimite email-uri către abonați.",
+    titleKey: "admin.home.card.newsletter.title",
+    descriptionKey: "admin.home.card.newsletter.description",
     icon: FaPaperPlane,
     href: "/admin/newsletter",
     color: "from-orange-400 to-orange-500",
@@ -161,6 +150,8 @@ const menuItems = [
 ];
 
 export default function AdminPageClient() {
+  const t = useT();
+
   return (
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-16">
       {/* Heading */}
@@ -171,11 +162,11 @@ export default function AdminPageClient() {
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-wide uppercase">
-          Admin Panel
+          {t("admin.home.title")}
         </h1>
         <div className="mt-3 h-[2px] w-[80px] bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 rounded-full mx-auto" />
         <p className="mt-4 text-sm md:text-base text-white/60 max-w-md mx-auto">
-          Gestionează conținutul site-ului TradeVision din panoul de administrare.
+          {t("admin.home.subtitle")}
         </p>
       </div>
 
@@ -185,7 +176,7 @@ export default function AdminPageClient() {
           const Icon = item.icon;
           return (
             <Link
-              key={item.title}
+              key={item.href}
               href={item.href}
               className={`group relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] px-6 py-7 md:px-7 md:py-8 shadow-[0_8px_18px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:from-white/[0.09] hover:to-white/[0.04] hover:shadow-[0_16px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1`}
             >
@@ -199,10 +190,10 @@ export default function AdminPageClient() {
               {/* Text */}
               <div className="mt-5">
                 <h2 className="text-lg font-semibold text-white group-hover:text-white/95 transition">
-                  {item.title}
+                  {t(item.titleKey)}
                 </h2>
                 <p className="mt-2 text-sm text-white/50 leading-relaxed">
-                  {item.description}
+                  {t(item.descriptionKey)}
                 </p>
               </div>
 
@@ -211,7 +202,7 @@ export default function AdminPageClient() {
                 <span
                   className={`inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r ${item.color} px-4 py-1.5 text-xs font-semibold text-white shadow-lg ${item.shadow} transition-all duration-300 group-hover:shadow-xl group-hover:brightness-110`}
                 >
-                  Gestionează
+                  {t("admin.common.manage")}
                   <svg
                     className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5"
                     fill="none"
