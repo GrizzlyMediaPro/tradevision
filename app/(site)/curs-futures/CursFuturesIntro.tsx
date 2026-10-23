@@ -9,7 +9,7 @@ export async function CursFuturesIntro() {
   const t = await getT();
   const [titleBefore, titleAfter] = t("futures.title").split("Futures");
   const stats = [
-    { value: "8", label: t("course.intro.stat.weeks") },
+    { value: "8", label: t("course.intro.stat.sessions") },
     { value: "Live", label: t("course.intro.stat.live") },
     { value: "Video", label: t("course.intro.stat.video") },
   ];

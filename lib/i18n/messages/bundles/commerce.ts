@@ -208,17 +208,17 @@ export const commerce = defineBundle(
     "futures.subtitle": "An intensive practical training programme for the financial markets",
     "course.description":
       "A complete practical training programme with access to study materials, live sessions, and a dedicated community.",
-    "course.duration": "8 weeks",
+    "course.duration": "8 sessions",
     "course.format": "Live online + video materials",
     "course.metaDescription": "{subtitle}. {description}",
     "course.intro.badge": "Practical trading programme",
-    "course.intro.stat.weeks": "Weeks",
+    "course.intro.stat.sessions": "Sessions",
     "course.intro.stat.live": "Online sessions",
     "course.intro.stat.video": "Replayable lessons",
     "course.intro.cta": "Sign up",
     "course.included.title": "What the course includes",
     "course.included.subtitle":
-      "Everything you need to follow the programme from the first week to the last.",
+      "Everything you need to follow the programme from the first session to the last.",
     "course.included.live.title": "Live sessions",
     "course.included.live.body":
       "Online sessions held live, where we work through the material together.",
@@ -971,17 +971,17 @@ export const commerce = defineBundle(
     "futures.subtitle": "Program intensiv de training practic pentru piețele financiare",
     "course.description":
       "Program complet de training practic cu acces la materiale de studiu, sesiuni live și comunitate dedicată.",
-    "course.duration": "8 săptămâni",
+    "course.duration": "8 sesiuni",
     "course.format": "Online live + materiale video",
     "course.metaDescription": "{subtitle}. {description}",
     "course.intro.badge": "Program practic de tranzacționare",
-    "course.intro.stat.weeks": "Săptămâni",
+    "course.intro.stat.sessions": "Sesiuni",
     "course.intro.stat.live": "Sesiuni online",
     "course.intro.stat.video": "Lecții de reluat",
     "course.intro.cta": "Înscrie-te",
     "course.included.title": "Ce include cursul",
     "course.included.subtitle":
-      "Tot ce ai nevoie ca să urmezi programul din prima până în ultima săptămână.",
+      "Tot ce ai nevoie ca să urmezi programul din prima până în ultima sesiune.",
     "course.included.live.title": "Sesiuni live",
     "course.included.live.body":
       "Sesiuni online ținute live, în care lucrăm împreună pe material.",

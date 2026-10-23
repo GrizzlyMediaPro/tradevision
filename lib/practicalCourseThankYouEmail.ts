@@ -17,7 +17,6 @@ export async function sendPracticalCourseThankYouEmail(input: {
   recipientName: string;
   finalAmountEur: number;
   invoicePdf?: Buffer | null;
-  invoiceSeries?: string | null;
   invoiceNumber?: string | null;
   locale?: Locale;
 }) {

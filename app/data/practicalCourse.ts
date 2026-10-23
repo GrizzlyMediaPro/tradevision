@@ -18,7 +18,7 @@ export const PRACTICAL_COURSE = {
   priceDisplay: "599 EUR",
   priceAmount: 599,
   priceCurrency: "EUR",
-  duration: "8 săptămâni",
+  duration: "8 sesiuni",
   format: "Online live + materiale video",
   stripePriceId: process.env.PRACTICAL_COURSE_STRIPE_PRICE_ID ?? "",
   /** Grup Telegram pentru participanții înscriși */
