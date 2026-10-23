@@ -22,7 +22,7 @@ export function CursFuturesProof() {
   ];
 
   return (
-    <section className="mx-auto w-full max-w-[1100px] px-4 pb-16 pt-10">
+    <section className="mx-auto w-full max-w-[1250px] px-4 pb-16 pt-10">
       <div className="text-center">
         <h2 className="text-2xl font-semibold uppercase tracking-wide text-white md:text-3xl">
           {t("course.proof.title")}

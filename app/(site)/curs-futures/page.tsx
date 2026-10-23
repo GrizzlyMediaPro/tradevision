@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { CursFuturesIntro } from "./CursFuturesIntro";
 import { CursFuturesProof } from "./CursFuturesProof";
+import { CursFuturesFinalCta, CursFuturesSteps } from "./CursFuturesEnrol";
 import { getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 
@@ -30,6 +31,8 @@ export default async function PracticalCoursePage({ searchParams }: PageProps) {
     <div>
       <CursFuturesIntro />
       <CursFuturesProof />
+      <CursFuturesSteps />
+      <CursFuturesFinalCta />
     </div>
   );
 }

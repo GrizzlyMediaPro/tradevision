@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaClock } from "react-icons/fa";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -24,6 +24,63 @@ const lessons = [
 
 const COLUMNS = 3;
 const PAGE_SIZE = 5;
+const DRAW_MS = 2800;
+const RAIL_INSET = 8;
+const CORNER = 16;
+
+type Point = { x: number; y: number };
+
+function stepCell(index: number) {
+  const row = Math.floor(index / COLUMNS);
+  const pos = index % COLUMNS;
+  const col = row % 2 === 0 ? pos : COLUMNS - 1 - pos;
+  return { row, col };
+}
+
+function buildRoadmapPath(centers: Point[], width: number) {
+  const arrival = [0];
+  let length = 0;
+  let cursor = centers[0];
+  let d = `M ${cursor.x} ${cursor.y}`;
+
+  const lineTo = (to: Point) => {
+    length += Math.hypot(to.x - cursor.x, to.y - cursor.y);
+    d += ` L ${to.x} ${to.y}`;
+    cursor = to;
+  };
+
+  const quarterTo = (corner: Point, to: Point) => {
+    length += (Math.PI * CORNER) / 2;
+    d += ` Q ${corner.x} ${corner.y} ${to.x} ${to.y}`;
+    cursor = to;
+  };
+
+  for (let i = 0; i < centers.length - 1; i++) {
+    const next = centers[i + 1];
+    const sameRow = Math.floor(i / COLUMNS) === Math.floor((i + 1) / COLUMNS);
+    if (sameRow) {
+      lineTo(next);
+    } else {
+      const goRight = Math.floor(i / COLUMNS) % 2 === 0;
+      const railX = goRight ? width - RAIL_INSET : RAIL_INSET;
+      const dir = goRight ? 1 : -1;
+      if (next.y - cursor.y < CORNER * 2 + 4) {
+        lineTo({ x: railX, y: cursor.y });
+        lineTo({ x: railX, y: next.y });
+        lineTo(next);
+      } else {
+        lineTo({ x: railX - dir * CORNER, y: cursor.y });
+        quarterTo({ x: railX, y: cursor.y }, { x: railX, y: cursor.y + CORNER });
+        lineTo({ x: railX, y: next.y - CORNER });
+        quarterTo({ x: railX, y: next.y }, { x: railX - dir * CORNER, y: next.y });
+        lineTo(next);
+      }
+    }
+    arrival.push(length);
+  }
+
+  return { d, arrival, total: length };
+}
 
 function LessonStep({
   index,
@@ -91,51 +148,166 @@ function LessonStep({
   );
 }
 
-function DesktopLessons() {
-  const gridRef = useRef<HTMLDivElement>(null);
+function DesktopRoadmap() {
+  const t = useT();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const circleRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const drawn = useRef(false);
+  const [geom, setGeom] = useState<{ d: string; arrival: number[]; total: number } | null>(null);
+  const [pathLen, setPathLen] = useState(0);
+  const [draw, setDraw] = useState(false);
 
-  useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
 
-    const sync = () => {
-      if (getComputedStyle(grid).display === "none") return;
-      const steps = [...grid.children] as HTMLElement[];
-      const heights = steps.map((step) => {
-        const body = step.querySelector("[data-step-body]");
-        if (!(body instanceof HTMLElement)) return 0;
-        return body.getBoundingClientRect().height;
-      });
-      const max = Math.ceil(Math.max(0, ...heights));
-      if (max <= 0) return;
-      const next = `${max}px`;
-      steps.forEach((step) => {
-        if (step.style.minHeight !== next) step.style.minHeight = next;
-      });
+    const measure = () => {
+      if (getComputedStyle(wrap).display === "none") return;
+      const wrapBox = wrap.getBoundingClientRect();
+      if (wrapBox.width < 100) return;
+      const centers: Point[] = [];
+      for (let i = 0; i < lessons.length; i++) {
+        const el = circleRefs.current[i];
+        if (!el) return;
+        const box = el.getBoundingClientRect();
+        centers.push({
+          x: box.left + box.width / 2 - wrapBox.left,
+          y: box.top + box.height / 2 - wrapBox.top,
+        });
+      }
+      const next = buildRoadmapPath(centers, wrapBox.width);
+      setGeom((prev) => (prev?.d === next.d ? prev : next));
     };
 
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(grid);
-    return () => observer.disconnect();
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(wrap);
+    const fonts = document.fonts?.ready.then(measure);
+    return () => {
+      observer.disconnect();
+      void fonts;
+    };
   }, []);
 
+  useLayoutEffect(() => {
+    const path = pathRef.current;
+    if (!path || !geom) return;
+    const len = path.getTotalLength();
+    setPathLen((prev) => (Math.abs(prev - len) < 0.5 ? prev : len));
+  }, [geom]);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || pathLen <= 0 || drawn.current) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      drawn.current = true;
+      setDraw(true);
+      return;
+    }
+
+    let frame = 0;
+    const start = () => {
+      if (drawn.current) return;
+      drawn.current = true;
+      frame = requestAnimationFrame(() => setDraw(true));
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        start();
+      },
+      { threshold: 0.18 },
+    );
+    observer.observe(wrap);
+    return () => {
+      observer.disconnect();
+      if (!drawn.current) cancelAnimationFrame(frame);
+    };
+  }, [pathLen]);
+
+  const delayFor = (index: number) => {
+    if (!geom || geom.total <= 0) return 0;
+    return Math.max(0, (geom.arrival[index] / geom.total) * DRAW_MS - 180);
+  };
+
   return (
-    <div ref={gridRef} className="mt-12 hidden gap-x-10 md:grid md:grid-cols-3">
-      {Array.from({ length: PAGE_SIZE }, (_, step) =>
-        Array.from({ length: COLUMNS }, (_, column) => {
-          const index = column * PAGE_SIZE + step;
-          const lessonId = lessons[index];
-          return (
-            <LessonStep
-              key={lessonId}
-              index={index}
-              lessonId={lessonId}
-              isLast={step === PAGE_SIZE - 1}
+    <div ref={wrapRef} className="relative z-0 mt-14 hidden px-8 md:block">
+      <svg
+        className="pointer-events-none absolute inset-0 -z-10 h-full w-full overflow-visible"
+        aria-hidden
+      >
+        {geom && (
+          <>
+            <path
+              d={geom.d}
+              className="fill-none stroke-purple-400/25"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
+            <path
+              ref={pathRef}
+              d={geom.d}
+              className="fill-none stroke-purple-300"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                strokeDasharray: pathLen || geom.total,
+                strokeDashoffset: draw ? 0 : pathLen || geom.total,
+                transition: draw ? `stroke-dashoffset ${DRAW_MS}ms linear` : "none",
+              }}
+            />
+          </>
+        )}
+      </svg>
+
+      <ol className="relative z-10 grid list-none grid-cols-3 gap-x-8 gap-y-14 p-0">
+        {lessons.map((lessonId, index) => {
+          const { row, col } = stepCell(index);
+          const delay = delayFor(index);
+          return (
+            <li
+              key={lessonId}
+              style={{ gridColumn: col + 1, gridRow: row + 1 }}
+              className="flex flex-col items-center text-center"
+            >
+              <div
+                ref={(el) => {
+                  circleRefs.current[index] = el;
+                }}
+                className={`flex h-11 w-11 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-purple-600 text-sm font-bold text-white shadow-[0_8px_20px_rgba(147,51,234,0.4)] transition-all duration-500 ${
+                  draw ? "scale-100 opacity-100" : "scale-75 opacity-0"
+                }`}
+                style={{ transitionDelay: draw ? `${delay}ms` : "0ms" }}
+              >
+                {lessonId}
+              </div>
+              <div
+                className={`mt-4 px-1 transition-all duration-500 ${
+                  draw ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+                }`}
+                style={{ transitionDelay: draw ? `${delay + 60}ms` : "0ms" }}
+              >
+                <h3 className="text-sm font-semibold text-white md:text-base">
+                  {t(`curriculum.${lessonId}.title`)}
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-white/50 md:text-sm">
+                  {t(`curriculum.${lessonId}.body`)}
+                </p>
+                <span className="mt-2.5 inline-flex items-center justify-center gap-1.5 text-[11px] text-white/35">
+                  <FaClock className="h-3 w-3" />
+                  {t(`curriculum.${lessonId}.duration`)}
+                </span>
+              </div>
+            </li>
           );
-        }),
-      )}
+        })}
+      </ol>
     </div>
   );
 }
@@ -232,7 +404,7 @@ export function CurriculumSection() {
           </p>
         </div>
 
-        <DesktopLessons />
+        <DesktopRoadmap />
 
         <div className="mx-auto mt-12 w-full max-w-2xl md:hidden">
           <MobileLessonCarousel />

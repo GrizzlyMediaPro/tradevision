@@ -20,6 +20,7 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = useT();
+  const overlaysHero = pathname === "/curs-futures";
 
   return (
     <>
@@ -36,7 +37,11 @@ export function Navbar() {
         </div>
       </Link>
 
-    <nav className="relative w-full border-b border-transparent bg-transparent z-40">
+    <nav
+      className={`${
+        overlaysHero ? "absolute inset-x-0" : "relative"
+      } w-full border-b border-transparent bg-transparent z-40`}
+    >
       <div className="mx-auto flex w-full max-w-[1250px] items-center justify-between gap-2 px-3 py-3 md:gap-7 md:px-4 md:py-4">
         {/* Stânga - Logo */}
         <Link href="/" className="flex min-w-0 items-center">

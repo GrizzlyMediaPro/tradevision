@@ -211,15 +211,34 @@ export const commerce = defineBundle(
     "course.duration": "8 weeks",
     "course.format": "Live online + video materials",
     "course.metaDescription": "{subtitle}. {description}",
-    "course.intro.badge": "Practical programme · {duration}",
-    "course.intro.highlight1.title": "{duration}",
-    "course.intro.highlight1.text":
-      "A structured programme, with a clear pace from one week to the next.",
-    "course.intro.highlight2.title": "Live + video",
-    "course.intro.highlight2.text": "Live online sessions and video materials you can replay.",
-    "course.intro.highlight3.title": "Community",
-    "course.intro.highlight3.text": "A dedicated group for people enrolled in the course.",
-    "course.intro.cta": "Join now!",
+    "course.intro.badge": "Practical trading programme",
+    "course.intro.stat.weeks": "Weeks",
+    "course.intro.stat.live": "Online sessions",
+    "course.intro.stat.video": "Replayable lessons",
+    "course.intro.cta": "Sign up",
+    "course.included.title": "What the course includes",
+    "course.included.subtitle":
+      "Everything you need to follow the programme from the first week to the last.",
+    "course.included.live.title": "Live sessions",
+    "course.included.live.body":
+      "Online sessions held live, where we work through the material together.",
+    "course.included.video.title": "Video materials",
+    "course.included.video.body":
+      "Recorded lessons you can replay whenever you want to go over something again.",
+    "course.included.group.title": "The course group",
+    "course.included.group.body":
+      "A dedicated group for enrolled students, where you'll find the materials and access to the live sessions.",
+    "course.steps.title": "How to enrol",
+    "course.steps.subtitle": "It takes a few minutes, and access arrives by email.",
+    "course.steps.1.title": "Fill in your details",
+    "course.steps.1.body": "Billing details as an individual or as a company.",
+    "course.steps.2.title": "Pay online",
+    "course.steps.2.body":
+      "Secure payment through Stripe. If you have a discount code, you can apply it here.",
+    "course.steps.3.title": "Get access by email",
+    "course.steps.3.body":
+      "Once the payment is confirmed, we send you the link to the course group.",
+    "course.final.title": "Ready to start the Futures Course?",
     "course.proof.title": "Real people, real results",
     "course.proof.subtitle":
       "Active traders, not theorists. We trade every day and we show everything, including the mistakes.",
@@ -955,15 +974,34 @@ export const commerce = defineBundle(
     "course.duration": "8 săptămâni",
     "course.format": "Online live + materiale video",
     "course.metaDescription": "{subtitle}. {description}",
-    "course.intro.badge": "Program practic · {duration}",
-    "course.intro.highlight1.title": "{duration}",
-    "course.intro.highlight1.text":
-      "Program structurat, cu un ritm clar de la o săptămână la alta.",
-    "course.intro.highlight2.title": "Live + video",
-    "course.intro.highlight2.text": "Sesiuni online live și materiale video pe care le poți relua.",
-    "course.intro.highlight3.title": "Comunitate",
-    "course.intro.highlight3.text": "Grup dedicat pentru participanții înscriși la curs.",
-    "course.intro.cta": "Alătură-te acum!",
+    "course.intro.badge": "Program practic de tranzacționare",
+    "course.intro.stat.weeks": "Săptămâni",
+    "course.intro.stat.live": "Sesiuni online",
+    "course.intro.stat.video": "Lecții de reluat",
+    "course.intro.cta": "Înscrie-te",
+    "course.included.title": "Ce include cursul",
+    "course.included.subtitle":
+      "Tot ce ai nevoie ca să urmezi programul din prima până în ultima săptămână.",
+    "course.included.live.title": "Sesiuni live",
+    "course.included.live.body":
+      "Sesiuni online ținute live, în care lucrăm împreună pe material.",
+    "course.included.video.title": "Materiale video",
+    "course.included.video.body":
+      "Lecții înregistrate pe care le poți relua când vrei să revezi ceva.",
+    "course.included.group.title": "Grupul cursului",
+    "course.included.group.body":
+      "Grup dedicat cursanților, unde găsești materialele și accesul la sesiunile live.",
+    "course.steps.title": "Cum te înscrii",
+    "course.steps.subtitle": "Durează câteva minute, iar accesul îl primești pe email.",
+    "course.steps.1.title": "Completezi datele",
+    "course.steps.1.body": "Datele de facturare, ca persoană fizică sau juridică.",
+    "course.steps.2.title": "Plătești online",
+    "course.steps.2.body":
+      "Plata se face securizat prin Stripe. Dacă ai un cod de discount, îl aplici aici.",
+    "course.steps.3.title": "Primești accesul pe email",
+    "course.steps.3.body":
+      "După confirmarea plății, îți trimitem linkul către grupul cursului.",
+    "course.final.title": "Gata să începi Cursul Futures?",
     "course.proof.title": "Oameni reali, rezultate reale",
     "course.proof.subtitle":
       "Traderi activi, nu teoreticieni. Tranzacționăm zilnic și arătăm tot, inclusiv greșelile.",
