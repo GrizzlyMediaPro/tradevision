@@ -1,11 +1,9 @@
 import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
-import { getLinkWidget } from "@/app/admin/actions/linkwidget";
 import { getT } from "@/lib/i18n/get-t";
 import { ContactForm } from "./ContactForm";
 
 export default async function ContactPage() {
   const t = await getT();
-  const linkWidget = await getLinkWidget();
 
   return (
     <main className="w-full max-w-[1250px] mx-auto px-4 pt-12 md:pt-24 pb-16">
@@ -24,7 +22,7 @@ export default async function ContactPage() {
 
       {/* CTA sections */}
       <div className="mt-10">
-        <TelegramCtaAndLive linkWidget={linkWidget} />
+        <TelegramCtaAndLive />
       </div>
     </main>
   );

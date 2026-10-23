@@ -1,4 +1,5 @@
 import { LegalPage, LegalSection } from "@/app/components/LegalPage";
+import { SITE_OPERATOR, operatorMessageVars } from "@/app/data/siteOperator";
 import { getLocale, getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
   return {
     title: t("legal.privacy.metaTitle"),
-    description: t("legal.privacy.metaDescription"),
+    description: t("legal.privacy.metaDescription", operatorMessageVars()),
   };
 }
 
@@ -35,12 +36,13 @@ export default async function PoliticaConfidentialitatePage() {
 
       <LegalSection title={t("legal.privacy.s1.title")}>
         <p>
-          <strong>{t("legal.privacy.s1.operatorLabel")}</strong> TRADE VISION HUB
-          TRADING SRL, CUI <strong>54265198</strong>.
+          <strong>{t("legal.privacy.s1.operatorLabel")}</strong> {SITE_OPERATOR.legalName}, CUI{" "}
+          <strong>{SITE_OPERATOR.cui}</strong>, {t("legal.company.register")}{" "}
+          <strong>{SITE_OPERATOR.tradeRegister}</strong>.
         </p>
         <p>
           <strong>{t("legal.privacy.s1.contactLabel")}</strong>{" "}
-          <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>
+          <a href={`mailto:${SITE_OPERATOR.email}`}>{SITE_OPERATOR.email}</a>
         </p>
         <p>
           {t("legal.privacy.s1.before")}
@@ -137,7 +139,7 @@ export default async function PoliticaConfidentialitatePage() {
         <p>{t("legal.privacy.s7.p1")}</p>
         <p>
           {t("legal.privacy.s7.before")}
-          <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>
+          <a href={`mailto:${SITE_OPERATOR.email}`}>{SITE_OPERATOR.email}</a>
           {t("legal.privacy.s7.mid")}
           <strong>{t("legal.privacy.s7.authority")}</strong>
           {t("legal.privacy.s7.after")}

@@ -1,12 +1,19 @@
 /** Imagini pentru caruselele „Rezultatele noastre” și „Rezultate din comunitate”. */
+const ourResultsDir = "/rezultatele-noastre";
+
+/** PDF-urile din folder sunt afișate prin imaginile randate (4.jpg, lifetime-payout-certificate.jpg). */
 export const ourResultsScreenshots = [
-  "/WhatsApp Image 2026-03-30 at 20.04.54.jpeg",
-  "/WhatsApp Image 2026-03-30 at 20.04.54 (1).jpeg",
-  "/WhatsApp Image 2026-03-30 at 20.04.54 (2).jpeg",
-  "/WhatsApp Image 2026-03-30 at 20.04.54 (3).jpeg",
-  "/WhatsApp Image 2026-03-30 at 20.04.54 (4).jpeg",
-  "/WhatsApp Image 2026-03-30 at 20.04.55.jpeg",
-  "/WhatsApp Image 2026-03-30 at 20.05.24.jpeg",
+  `${ourResultsDir}/2.jpeg`,
+  `${ourResultsDir}/3.jpeg`,
+  `${ourResultsDir}/4.jpg`,
+  `${ourResultsDir}/lifetime-payout-certificate.jpg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 13.56.09.jpeg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 13.56.09 (1).jpeg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 13.56.09 (2).jpeg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 13.56.09 (3).jpeg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 13.56.09 (4).jpeg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 13.56.08.jpeg`,
+  `${ourResultsDir}/WhatsApp Image 2026-10-22 at 14.08.03.jpeg`,
 ];
 
 export const communityResultsScreenshots = [

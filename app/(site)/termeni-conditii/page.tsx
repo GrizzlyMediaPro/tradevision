@@ -1,4 +1,5 @@
 import { LegalPage, LegalSection } from "@/app/components/LegalPage";
+import { SITE_OPERATOR, operatorMessageVars } from "@/app/data/siteOperator";
 import { getLocale, getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 
@@ -6,7 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
   return {
     title: t("legal.terms.metaTitle"),
-    description: t("legal.terms.metaDescription"),
+    description: t("legal.terms.metaDescription", operatorMessageVars()),
   };
 }
 
@@ -41,9 +42,11 @@ export default async function TermeniConditiiPage() {
 
       <p>{t("legal.terms.intro")}</p>
       <p>
-        <strong>TRADERS HUB S.R.L.</strong>
+        <strong>{SITE_OPERATOR.legalName}</strong>
         <br />
-        CUI: <strong>54885858</strong>
+        CUI: <strong>{SITE_OPERATOR.cui}</strong>
+        <br />
+        {t("legal.company.register")}: <strong>{SITE_OPERATOR.tradeRegister}</strong>
         <br />
         {t("legal.terms.named")}
       </p>
@@ -170,9 +173,13 @@ export default async function TermeniConditiiPage() {
 
       <LegalSection title={t("legal.terms.s13.title")}>
         <p>
-          <strong>TRADERS HUB S.R.L.</strong>
+          <strong>{SITE_OPERATOR.legalName}</strong>
           <br />
-          CUI: <strong>54885858</strong>
+          CUI: <strong>{SITE_OPERATOR.cui}</strong>
+          <br />
+          {t("legal.company.register")}: <strong>{SITE_OPERATOR.tradeRegister}</strong>
+          <br />
+          <a href={`mailto:${SITE_OPERATOR.email}`}>{SITE_OPERATOR.email}</a>
         </p>
         <p>{t("legal.terms.s13.p1")}</p>
       </LegalSection>

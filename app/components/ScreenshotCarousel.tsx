@@ -11,9 +11,17 @@ type ScreenshotCarouselProps = {
   title: string;
   subtitle: string;
   images: string[];
+  /** `contain` arată imaginea întreagă (certificate, PDF-uri randate, bannere late). */
+  fit?: "cover" | "contain";
 };
 
-export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarouselProps) {
+export function ScreenshotCarousel({
+  title,
+  subtitle,
+  images,
+  fit = "cover",
+}: ScreenshotCarouselProps) {
+  const imageClass = fit === "contain" ? "object-contain" : "object-cover";
   const t = useT();
   const TOTAL = images.length;
   const [isMobile, setIsMobile] = useState(false);
@@ -168,7 +176,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                           src={src}
                           alt={t("carousel.alt", { n: (idx % TOTAL) + 1 })}
                           fill
-                          className="object-cover"
+                          className={imageClass}
                           sizes="(min-width: 768px) 33vw, 100vw"
                         />
                       </button>
@@ -231,7 +239,7 @@ export function ScreenshotCarousel({ title, subtitle, images }: ScreenshotCarous
                       src={src}
                       alt={t("carousel.alt", { n: idx + 1 })}
                       fill
-                      className="object-cover"
+                      className={imageClass}
                       sizes="(min-width: 768px) 33vw, 100vw"
                     />
                   </button>

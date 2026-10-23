@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/db";
+import { fulfillPaidPracticalCourseOrder } from "@/lib/practicalCourseFulfillment";
 import { completePaidPracticalCourseOrder } from "@/lib/practicalCoursePayment";
 import { getStripeClient } from "@/lib/stripe";
 
@@ -39,6 +40,32 @@ export async function POST(req: Request) {
         await completePaidPracticalCourseOrder(orderId, session);
       } catch (err) {
         console.error("Practical course fulfillment failed", orderId, err);
+        return NextResponse.json(
+          { error: "Fulfillment eșuat." },
+          { status: 500 },
+        );
+      }
+    }
+  }
+
+  if (event.type === "invoice.paid") {
+    const invoice = event.data.object as Stripe.Invoice;
+    const orderId = invoice.metadata?.orderId?.trim();
+    if (orderId) {
+      try {
+        await prisma.practicalCourseOrder.update({
+          where: { id: orderId },
+          data: { stripeInvoiceId: invoice.id },
+        });
+        const order = await prisma.practicalCourseOrder.findUnique({
+          where: { id: orderId },
+          select: { status: true },
+        });
+        if (order?.status === "paid") {
+          await fulfillPaidPracticalCourseOrder(orderId);
+        }
+      } catch (err) {
+        console.error("Stripe invoice fulfillment failed", orderId, err);
         return NextResponse.json(
           { error: "Fulfillment eșuat." },
           { status: 500 },

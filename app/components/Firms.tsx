@@ -9,7 +9,6 @@ import { useT } from "@/lib/i18n/I18nProvider";
 import { TelegramCtaAndLive } from "./TelegramCtaAndLive";
 import { firms as defaultFirms, platformImages } from "../data/firms";
 import type { FirmDetail, Challenge, ChallengeType } from "../data/firms";
-import type { LinkWidgetState } from "../admin/actions/linkwidget";
 
 type SortKey = "name" | "country" | "trustScore" | "maxAccounts";
 type SortDir = "asc" | "desc";
@@ -25,7 +24,7 @@ function Stars({ score }: { score: number }) {
   );
 }
 
-type FirmsProps = { firms?: FirmDetail[]; linkWidget?: LinkWidgetState };
+type FirmsProps = { firms?: FirmDetail[] };
 
 type CompareSlot = { firmSlug: string; challengeIndex: number } | null;
 type CompareDraftSlot =
@@ -57,7 +56,7 @@ function normalizeUrl(raw?: string | null): string {
   return `https://${trimmed}`;
 }
 
-export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
+export function Firms({ firms: firmsProp }: FirmsProps) {
   const t = useT();
   const firms = useMemo(() => firmsProp && firmsProp.length > 0 ? firmsProp : defaultFirms, [firmsProp]);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
@@ -609,7 +608,7 @@ export function Firms({ firms: firmsProp, linkWidget }: FirmsProps) {
         )}
 
         <div className="mt-10 w-full">
-          <TelegramCtaAndLive linkWidget={linkWidget} />
+          <TelegramCtaAndLive />
         </div>
 
         {/* Compare Modal */}

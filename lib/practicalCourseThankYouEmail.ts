@@ -33,13 +33,11 @@ export async function sendPracticalCourseThankYouEmail(input: {
   const name = input.recipientName.trim() || t("email.course.fallbackName");
   const subject = t("email.course.subject", { title });
 
-  const invoiceLine =
-    input.invoiceSeries && input.invoiceNumber
-      ? t("email.course.invoiceAttached", {
-          series: input.invoiceSeries,
-          number: input.invoiceNumber,
-        })
-      : t("email.course.invoiceLater");
+  const invoiceLine = input.invoiceNumber
+    ? t("email.course.invoiceAttached", {
+        number: input.invoiceNumber,
+      })
+    : t("email.course.invoiceLater");
 
   const telegramUrl = PRACTICAL_COURSE.telegramGroupUrl;
 
@@ -82,13 +80,11 @@ export async function sendPracticalCourseThankYouEmail(input: {
     input.invoicePdf && input.invoicePdf.length > 0
       ? [
           {
-            filename:
-              input.invoiceSeries && input.invoiceNumber
-                ? t("email.course.invoiceFilename", {
-                    series: input.invoiceSeries,
-                    number: input.invoiceNumber,
-                  })
-                : t("email.course.invoiceFilenameFallback"),
+            filename: input.invoiceNumber
+              ? t("email.course.invoiceFilename", {
+                  number: input.invoiceNumber,
+                })
+              : t("email.course.invoiceFilenameFallback"),
             content: input.invoicePdf,
           },
         ]
@@ -120,7 +116,6 @@ export async function sendPracticalCourseInvoiceEmail(input: {
   recipientEmail: string;
   recipientName: string;
   invoicePdf: Buffer;
-  invoiceSeries: string;
   invoiceNumber: string;
   locale?: Locale;
 }) {
@@ -141,7 +136,6 @@ export async function sendPracticalCourseInvoiceEmail(input: {
     "",
     t("email.invoice.body", { title }),
     t("email.invoice.number", {
-      series: input.invoiceSeries,
       number: input.invoiceNumber,
     }),
     "",
@@ -167,7 +161,6 @@ export async function sendPracticalCourseInvoiceEmail(input: {
     attachments: [
       {
         filename: t("email.course.invoiceFilename", {
-          series: input.invoiceSeries,
           number: input.invoiceNumber,
         }),
         content: input.invoicePdf,

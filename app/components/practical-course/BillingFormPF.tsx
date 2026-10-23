@@ -3,7 +3,6 @@
 import type { BillingDataPF } from "@/lib/practicalCourseValidation";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { BillingField } from "./BillingField";
-import { BirthDateField } from "./BirthDateField";
 
 type BillingFormPFProps = {
   value: BillingDataPF;
@@ -30,18 +29,6 @@ export function BillingFormPF({ value, onChange }: BillingFormPFProps) {
         autoComplete="billing given-name"
         value={value.firstName}
         onChange={(val) => set("firstName", val)}
-      />
-      <BillingField
-        label={t("course.field.cnp")}
-        name="cnp"
-        autoComplete="off"
-        value={value.cnp}
-        onChange={(val) => set("cnp", val)}
-        inputMode="numeric"
-      />
-      <BirthDateField
-        value={value.birthDate}
-        onChange={(val) => set("birthDate", val)}
       />
       <BillingField
         label={t("course.field.email")}
@@ -102,8 +89,6 @@ export function BillingFormPF({ value, onChange }: BillingFormPFProps) {
 export const emptyBillingPF: BillingDataPF = {
   firstName: "",
   lastName: "",
-  cnp: "",
-  birthDate: "",
   email: "",
   phone: "",
   street: "",

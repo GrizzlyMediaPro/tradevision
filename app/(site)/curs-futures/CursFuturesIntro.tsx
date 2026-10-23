@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { FaClock, FaUsers, FaVideo } from "react-icons/fa";
-import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { getT } from "@/lib/i18n/get-t";
 
 export async function CursFuturesIntro() {
@@ -37,7 +35,7 @@ export async function CursFuturesIntro() {
         }}
       />
 
-      <div className="relative mx-auto flex w-full max-w-[860px] flex-col items-center px-4 pb-4 pt-12 text-center md:pt-16">
+      <div className="relative mx-auto flex w-full max-w-[1100px] flex-col items-center px-4 pb-4 pt-12 text-center md:pt-16">
         <span className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-yellow-300">
           <span className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
           {t("course.intro.badge", { duration: t("course.duration") })}
@@ -59,29 +57,16 @@ export async function CursFuturesIntro() {
               key={item.title}
               className="rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-4 py-4 text-left shadow-[0_8px_18px_rgba(0,0,0,0.35)]"
             >
-              <item.icon className="h-4 w-4 text-yellow-300" aria-hidden />
-              <p className="mt-2 text-sm font-semibold text-white">{item.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-white/55">{item.text}</p>
+              <item.icon className="h-5.5 w-5.5 text-yellow-300" aria-hidden />
+              <p className="mt-2 text-base font-semibold leading-relaxed text-white md:text-lg">
+                {item.title}
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-white/55 md:text-base">
+                {item.text}
+              </p>
             </div>
           ))}
         </div>
-
-        <Link
-          href={PRACTICAL_COURSE.checkoutPath}
-          className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110"
-        >
-          {t("course.intro.cta")}
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
-            aria-hidden
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
       </div>
     </section>
   );

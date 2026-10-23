@@ -1,4 +1,5 @@
 import { LegalPage, LegalSection } from "@/app/components/LegalPage";
+import { SITE_OPERATOR, operatorMessageVars } from "@/app/data/siteOperator";
 import { getLocale, getT } from "@/lib/i18n/get-t";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
   return {
     title: t("legal.cookies.metaTitle"),
-    description: t("legal.cookies.metaDescription"),
+    description: t("legal.cookies.metaDescription", operatorMessageVars()),
   };
 }
 
@@ -26,7 +27,7 @@ export default async function PoliticaCookiesPage() {
   return (
     <LegalPage
       title={t("legal.cookies.title")}
-      description={t("legal.cookies.description")}
+      description={t("legal.cookies.description", operatorMessageVars())}
     >
       <p className="text-sm text-white/55">
         {t("legal.updated")}
@@ -34,7 +35,7 @@ export default async function PoliticaCookiesPage() {
       </p>
 
       <LegalSection title={t("legal.cookies.s1.title")}>
-        <p>{t("legal.cookies.s1.p1")}</p>
+        <p>{t("legal.cookies.s1.p1", operatorMessageVars())}</p>
         <p>
           {t("legal.cookies.s1.before")}
           <Link href="/politica-confidentialitate">{t("legal.cookies.s1.link")}</Link>
@@ -136,10 +137,14 @@ export default async function PoliticaCookiesPage() {
 
       <LegalSection title={t("legal.cookies.s7.title")}>
         <p>
-          <a href="mailto:tradevisionro@gmail.com">tradevisionro@gmail.com</a>
+          <a href={`mailto:${SITE_OPERATOR.email}`}>{SITE_OPERATOR.email}</a>
         </p>
         <p>
-          <strong>TRADE VISION HUB TRADING SRL</strong> · CUI 54265198
+          <strong>{SITE_OPERATOR.legalName}</strong>
+          {" · "}
+          CUI {SITE_OPERATOR.cui}
+          {" · "}
+          {t("legal.company.register")} {SITE_OPERATOR.tradeRegister}
         </p>
       </LegalSection>
     </LegalPage>

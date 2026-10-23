@@ -9,7 +9,7 @@ export const home = defineBundle(
       "15 video lessons from a trader with 6 years of trading experience. No promises, only things that have been tested and work on the charts.",
     "hero.cta": "Access the free course",
     "hero.noCard": "No card, no obligations",
-    "hero.students": "500+ active students",
+    "hero.students": "2000+ active students",
     "hero.videoTitle": "Trade Vision intro video",
     "hero.liveBadge": "Weekly live sessions",
     "stats.lessons": "Structured video lessons",
@@ -74,6 +74,10 @@ export const home = defineBundle(
     "curriculum.title": "15 lessons. One goal: understand the market.",
     "curriculum.subtitle":
       "Go through them in order. At the end, you will look at a chart and know exactly what you are seeing.",
+    "curriculum.prev": "Previous lessons",
+    "curriculum.next": "Next lessons",
+    "curriculum.page": "Lessons {from}–{to}",
+    "curriculum.lesson": "Lesson {n}",
     "curriculum.01.title": "What is trading?",
     "curriculum.01.body":
       "Markets, instruments and why most people lose money before they have a process.",
@@ -152,7 +156,7 @@ export const home = defineBundle(
     "founders.stat.dailyLabel": "Active trading",
     "founders.stat.live": "Live",
     "founders.stat.liveLabel": "YouTube sessions",
-    "founders.stat.community": "500+",
+    "founders.stat.community": "2000+",
     "founders.stat.communityLabel": "Community",
     "results.ours.title": "Our results",
     "results.ours.subtitle":
@@ -242,7 +246,7 @@ export const home = defineBundle(
       "15 lecții video de la un trader cu o experiență de 6 ani în tranzacționare. Fără promisiuni, doar lucruri testate și care funcționează pe grafice.",
     "hero.cta": "Accesează cursul gratuit",
     "hero.noCard": "Fără card, fără obligații",
-    "hero.students": "500+ cursanți activi",
+    "hero.students": "2000+ cursanți activi",
     "hero.videoTitle": "Video prezentare Trade Vision",
     "hero.liveBadge": "Sesiuni live săptămânal",
     "stats.lessons": "Lecții video structurate",
@@ -307,6 +311,10 @@ export const home = defineBundle(
     "curriculum.title": "15 lecții. Un singur obiectiv: să înțelegi piața.",
     "curriculum.subtitle":
       "Parcurge-le în ordine. La final, o să te uiți la un grafic și o să știi exact ce vezi.",
+    "curriculum.prev": "Lecțiile anterioare",
+    "curriculum.next": "Lecțiile următoare",
+    "curriculum.page": "Lecțiile {from}–{to}",
+    "curriculum.lesson": "Lecția {n}",
     "curriculum.01.title": "Ce este tranzacționarea?",
     "curriculum.01.body":
       "Piețele, instrumentele și de ce majoritatea pierd bani înainte să aibă un proces.",
@@ -387,7 +395,7 @@ export const home = defineBundle(
     "founders.stat.dailyLabel": "Tranzacționare activă",
     "founders.stat.live": "Live",
     "founders.stat.liveLabel": "Sesiuni YouTube",
-    "founders.stat.community": "500+",
+    "founders.stat.community": "2000+",
     "founders.stat.communityLabel": "Comunitate",
     "results.ours.title": "Rezultatele noastre",
     "results.ours.subtitle":

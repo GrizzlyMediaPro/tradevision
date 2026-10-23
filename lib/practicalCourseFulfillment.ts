@@ -10,13 +10,8 @@ import {
   sendPracticalCourseInvoiceEmail,
   sendPracticalCourseThankYouEmail,
 } from "@/lib/practicalCourseThankYouEmail";
-import {
-  createCourseInvoice,
-  downloadInvoicePdf,
-  getSmartBillConfig,
-  type CourseInvoiceDiscount,
-} from "@/lib/smartbill";
-import { convertEurToRon } from "@/lib/eurRonExchange";
+import { downloadStripeInvoice, invoiceIdFromSession } from "@/lib/stripeInvoice";
+import { getStripeClient } from "@/lib/stripe";
 import { messages } from "@/lib/i18n/messages/catalog";
 import { parseLocale, type Locale } from "@/lib/i18n/locale";
 import { translate } from "@/lib/i18n/translate";
@@ -47,70 +42,57 @@ function parseSmartBillError(err: unknown, locale: Locale): string {
   }
 }
 
-async function issueSmartBillInvoice(input: {
+async function issueStripeInvoice(input: {
   orderId: string;
-  personType: PersonType;
-  billingData: BillingData;
-  finalAmountRon: number;
-  listAmountRon: number;
-  discount: CourseInvoiceDiscount | null;
-  paidAt: Date | null;
-  existingSeries: string | null;
-  existingNumber: string | null;
+  stripeSessionId: string | null;
+  existingInvoiceId: string | null;
   locale: Locale;
 }): Promise<{
-  invoiceSeries: string | null;
   invoiceNumber: string | null;
   invoicePdf: Buffer | null;
   error?: string;
 }> {
-  const smartBillConfig = getSmartBillConfig();
-  if (!smartBillConfig) {
-    return {
-      invoiceSeries: null,
-      invoiceNumber: null,
-      invoicePdf: null,
-    };
+  const stripe = getStripeClient();
+  if (!stripe) {
+    return { invoiceNumber: null, invoicePdf: null };
   }
 
-  let invoiceSeries = input.existingSeries;
-  let invoiceNumber = input.existingNumber;
-
+  let invoiceId = input.existingInvoiceId;
   try {
-    if (!invoiceSeries || !invoiceNumber) {
-      const invoice = await createCourseInvoice({
-        personType: input.personType,
-        billingData: input.billingData,
-        amount: input.finalAmountRon,
-        listAmountRon: input.listAmountRon,
-        discount: input.discount,
-        currency: "RON",
-        paidAt: input.paidAt,
-      });
-      invoiceSeries = invoice.series;
-      invoiceNumber = invoice.number;
-
-      await prisma.practicalCourseOrder.update({
-        where: { id: input.orderId },
-        data: {
-          smartbillInvoiceSeries: invoiceSeries,
-          smartbillInvoiceNumber: invoiceNumber,
-        },
-      });
+    if (!invoiceId && input.stripeSessionId) {
+      const session = await stripe.checkout.sessions.retrieve(input.stripeSessionId);
+      invoiceId = invoiceIdFromSession(session);
+      if (invoiceId) {
+        await prisma.practicalCourseOrder.update({
+          where: { id: input.orderId },
+          data: { stripeInvoiceId: invoiceId },
+        });
+      }
     }
 
-    const invoicePdf = await downloadInvoicePdf({
-      series: invoiceSeries,
-      number: invoiceNumber,
+    if (!invoiceId) {
+      return {
+        invoiceNumber: null,
+        invoicePdf: null,
+        error: translate(messages[input.locale], "course.invoice.notReady"),
+      };
+    }
+
+    const invoice = await downloadStripeInvoice(invoiceId);
+    await prisma.practicalCourseOrder.update({
+      where: { id: input.orderId },
+      data: {
+        stripeInvoiceId: invoice.id,
+        stripeInvoiceNumber: invoice.number,
+      },
     });
 
-    return { invoiceSeries, invoiceNumber, invoicePdf };
+    return { invoiceNumber: invoice.number, invoicePdf: invoice.pdf };
   } catch (err) {
     const error = parseSmartBillError(err, input.locale);
-    console.error(`SmartBill failed for order ${input.orderId}`, err);
+    console.error(`Stripe invoice failed for order ${input.orderId}`, err);
     return {
-      invoiceSeries: invoiceSeries ?? null,
-      invoiceNumber: invoiceNumber ?? null,
+      invoiceNumber: null,
       invoicePdf: null,
       error,
     };
@@ -147,56 +129,24 @@ export async function fulfillPaidPracticalCourseOrder(
   const paymentAmounts = await getOrderPaymentAmounts(order);
   const alreadyEmailed = Boolean(order.fulfillmentEmailSentAt);
   const alreadyInvoiced = Boolean(
-    order.smartbillInvoiceSeries && order.smartbillInvoiceNumber,
+    order.stripeInvoiceNumber ||
+      (order.smartbillInvoiceSeries && order.smartbillInvoiceNumber),
   );
 
   if (alreadyEmailed && alreadyInvoiced) {
     return { emailSent: true, invoiceIssued: true };
   }
 
-  let invoiceDiscount: CourseInvoiceDiscount | null = null;
-  let listAmountRon = paymentAmounts.finalAmountRon;
-
-  if (
-    order.discountCode &&
-    order.discountType &&
-    typeof order.discountAmountEur === "number" &&
-    order.discountAmountEur > 0
-  ) {
-    const discountAmountRon = convertEurToRon(
-      order.discountAmountEur,
-      paymentAmounts.eurRonRate,
-    );
-    listAmountRon = convertEurToRon(
-      paymentAmounts.finalAmountEur + order.discountAmountEur,
-      paymentAmounts.eurRonRate,
-    );
-
-    invoiceDiscount = {
-      code: order.discountCode,
-      type: order.discountType as "percent" | "fixed",
-      value: order.discountValue ?? 0,
-      amountRon: discountAmountRon,
-    };
-  }
-
-  const invoiceResult = await issueSmartBillInvoice({
+  const invoiceResult = await issueStripeInvoice({
     orderId,
-    personType,
-    billingData,
-    finalAmountRon: paymentAmounts.finalAmountRon,
-    listAmountRon,
-    discount: invoiceDiscount,
-    paidAt: order.paidAt,
-    existingSeries: order.smartbillInvoiceSeries,
-    existingNumber: order.smartbillInvoiceNumber,
+    stripeSessionId: order.stripeSessionId,
+    existingInvoiceId: order.stripeInvoiceId,
     locale,
   });
 
   const invoiceIssued = Boolean(
     invoiceResult.invoicePdf &&
       invoiceResult.invoicePdf.length > 0 &&
-      invoiceResult.invoiceSeries &&
       invoiceResult.invoiceNumber,
   );
 
@@ -206,7 +156,6 @@ export async function fulfillPaidPracticalCourseOrder(
       recipientName,
       finalAmountEur: paymentAmounts.finalAmountEur,
       invoicePdf: invoiceResult.invoicePdf,
-      invoiceSeries: invoiceResult.invoiceSeries,
       invoiceNumber: invoiceResult.invoiceNumber,
       locale,
     });
@@ -215,13 +164,12 @@ export async function fulfillPaidPracticalCourseOrder(
       where: { id: orderId },
       data: { fulfillmentEmailSentAt: new Date() },
     });
-  } else if (invoiceIssued) {
+  } else if (invoiceIssued && invoiceResult.invoicePdf && invoiceResult.invoiceNumber) {
     await sendPracticalCourseInvoiceEmail({
       recipientEmail,
       recipientName,
-      invoicePdf: invoiceResult.invoicePdf!,
-      invoiceSeries: invoiceResult.invoiceSeries!,
-      invoiceNumber: invoiceResult.invoiceNumber!,
+      invoicePdf: invoiceResult.invoicePdf,
+      invoiceNumber: invoiceResult.invoiceNumber,
       locale,
     });
   }

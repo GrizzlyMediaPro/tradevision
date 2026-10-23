@@ -175,6 +175,8 @@ model PracticalCourseOrder {
   status                String    @default("draft")
   stripeSessionId       String?
   stripePaymentIntentId String?
+  stripeInvoiceId       String?
+  stripeInvoiceNumber   String?
   paidAt                DateTime?
   smartbillInvoiceSeries String?
   smartbillInvoiceNumber String?

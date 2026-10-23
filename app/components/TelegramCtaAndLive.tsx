@@ -1,14 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import type { LinkWidgetState } from "../admin/actions/linkwidget";
 import { useT } from "@/lib/i18n/I18nProvider";
 
-type Props = {
-  linkWidget?: LinkWidgetState;
-};
-
-export function TelegramCtaAndLive({ linkWidget }: Props) {
+export function TelegramCtaAndLive() {
   const t = useT();
   return (
     <div className="flex flex-col gap-10">
@@ -76,60 +71,6 @@ export function TelegramCtaAndLive({ linkWidget }: Props) {
             <span>{t("telegram.cta")}</span>
           </a>
         </div>
-      </div>
-
-      {/* Live YouTube CTA card */}
-      <div className="w-full rounded-3xl border border-white/10 bg-linear-to-r from-white/4 to-white/2 px-6 py-6 md:px-10 md:py-8 flex flex-col md:flex-row items-stretch gap-8">
-        <div className="md:w-1/2 flex flex-col items-start justify-center text-left gap-4">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-purple-300">
-            {linkWidget?.badge ?? t("live.badge")}
-          </p>
-          <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {linkWidget?.title ?? t("live.title")}
-          </h3>
-          <p className="text-sm md:text-base text-white/70 max-w-md">
-            {linkWidget?.description ?? t("live.body")}
-          </p>
-          {/* Desktop button lângă text */}
-          <a
-            href={linkWidget?.youtubeUrl || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 hidden md:inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs md:text-sm font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer"
-          >
-            {linkWidget?.buttonText ?? t("live.button")}
-          </a>
-        </div>
-        <div className="md:w-1/2 flex items-center justify-center">
-          <div className="relative w-full max-w-xl aspect-video overflow-hidden rounded-2xl border border-white/10 shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
-            <Image
-              src={
-                linkWidget?.thumbnail?.startsWith("blob:")
-                  ? "/thumbnail.png"
-                  : (linkWidget?.thumbnail || "/thumbnail.png")
-              }
-              alt={linkWidget?.title || t("live.thumbAlt")}
-              fill
-              className="object-cover"
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              priority
-            />
-          </div>
-        </div>
-        {/* Mobile button sub thumbnail */}
-        <div className="w-full md:hidden mt-4 flex justify-center">
-          <a
-            href={linkWidget?.youtubeUrl || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center rounded-full border border-purple-400/70 bg-transparent px-6 py-2.5 text-xs font-semibold text-purple-200 hover:bg-purple-500/15 transition cursor-pointer"
-          >
-            {linkWidget?.buttonText ?? t("live.button")}
-          </a>
-        </div>
-        <p className="text-[10px] md:text-[11px] leading-relaxed text-white/45 max-w-3xl">
-          {t("disclosure.liveRoom")}
-        </p>
       </div>
     </div>
   );

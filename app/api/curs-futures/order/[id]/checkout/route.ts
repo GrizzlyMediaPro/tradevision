@@ -16,6 +16,11 @@ import {
   ronToStripeBani,
 } from "@/lib/eurRonExchange";
 import { getSiteUrl, getStripeClient } from "@/lib/stripe";
+import {
+  buildCheckoutCustomer,
+  buildInvoiceCreation,
+} from "@/lib/stripeInvoice";
+import type { PersonType } from "@/lib/practicalCourseValidation";
 import { getT } from "@/lib/i18n/get-t";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -59,15 +64,33 @@ export async function POST(_req: Request, context: RouteContext) {
     }
 
     const billing = order.billingData as Record<string, string>;
-    const customerEmail = billing.email?.trim();
+    const personType = order.personType === "PJ" ? "PJ" : "PF";
     const finalAmountEur = await getOrderFinalAmountEur(order);
     const eurRonQuote = await getEurRonQuote();
     const finalAmountRon = convertEurToRon(finalAmountEur, eurRonQuote.rate);
     const siteUrl = getSiteUrl();
+    const description = t("course.stripeDescription", {
+      subtitle: t("futures.subtitle"),
+      amount: finalAmountEur,
+    });
+
+    const customer = await stripe.customers.create(
+      buildCheckoutCustomer({
+        personType: personType as PersonType,
+        billing,
+        orderId: id,
+      }),
+    );
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      customer_email: customerEmail || undefined,
+      customer: customer.id,
+      invoice_creation: buildInvoiceCreation({
+        orderId: id,
+        personType: personType as PersonType,
+        billing,
+        description,
+      }),
       line_items: [
         {
           quantity: 1,
@@ -76,10 +99,7 @@ export async function POST(_req: Request, context: RouteContext) {
             unit_amount: ronToStripeBani(finalAmountRon),
             product_data: {
               name: t("futures.title"),
-              description: t("course.stripeDescription", {
-                subtitle: t("futures.subtitle"),
-                amount: finalAmountEur,
-              }),
+              description,
             },
           },
         },

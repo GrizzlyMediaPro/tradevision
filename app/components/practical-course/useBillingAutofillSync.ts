@@ -18,8 +18,6 @@ import type {
 const PF_FIELD_MAP: Record<string, keyof BillingDataPF> = {
   "given-name": "firstName",
   "family-name": "lastName",
-  cnp: "cnp",
-  bday: "birthDate",
   email: "email",
   tel: "phone",
   "address-line1": "street",

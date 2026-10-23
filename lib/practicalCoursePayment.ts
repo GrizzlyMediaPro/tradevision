@@ -54,6 +54,7 @@ async function buildConfirmResult(orderId: string): Promise<{
       billingData: true,
       smartbillInvoiceSeries: true,
       smartbillInvoiceNumber: true,
+      stripeInvoiceNumber: true,
     },
   });
 
@@ -61,7 +62,8 @@ async function buildConfirmResult(orderId: string): Promise<{
     status: "paid",
     fulfillmentSent: Boolean(refreshed?.fulfillmentEmailSentAt),
     invoiceIssued: Boolean(
-      refreshed?.smartbillInvoiceSeries && refreshed?.smartbillInvoiceNumber,
+      refreshed?.stripeInvoiceNumber ||
+        (refreshed?.smartbillInvoiceSeries && refreshed?.smartbillInvoiceNumber),
     ),
     email: getBillingEmailFromOrder(refreshed?.billingData),
   };
@@ -91,6 +93,10 @@ export async function completePaidPracticalCourseOrder(
       status: "paid",
       stripeSessionId: session.id,
       stripePaymentIntentId: getPaymentIntentId(session),
+      stripeInvoiceId:
+        (typeof session.invoice === "string"
+          ? session.invoice
+          : session.invoice?.id) ?? existing.stripeInvoiceId,
       paidAt: existing.paidAt ?? new Date(),
     },
   });

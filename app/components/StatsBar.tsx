@@ -30,7 +30,7 @@ type StatItem = { value: number; suffix: string; suffixId?: string; labelId: str
 
 const stats: StatItem[] = [
   { value: 15, suffix: "", labelId: "stats.lessons" },
-  { value: 500, suffix: "+", labelId: "stats.students" },
+  { value: 2000, suffix: "+", labelId: "stats.students" },
   { value: 0, suffix: "", suffixId: "stats.costSuffix", labelId: "stats.cost" },
 ];
 

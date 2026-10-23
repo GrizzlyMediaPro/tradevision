@@ -11,7 +11,6 @@ import { BonusesSection } from "@/app/components/BonusesSection";
 import { FaqSection } from "@/app/components/FaqSection";
 import { FinalCta } from "@/app/components/FinalCta";
 import { TelegramCtaAndLive } from "@/app/components/TelegramCtaAndLive";
-import { getLinkWidget } from "@/app/admin/actions/linkwidget";
 import {
   communityResultsScreenshots,
   ourResultsScreenshots,
@@ -19,7 +18,6 @@ import {
 import { getT } from "@/lib/i18n/get-t";
 
 export default async function Home() {
-  const linkWidget = await getLinkWidget();
   const t = await getT();
 
   return (
@@ -42,6 +40,7 @@ export default async function Home() {
         title={t("results.ours.title")}
         subtitle={t("results.ours.subtitle")}
         images={ourResultsScreenshots}
+        fit="contain"
       />
 
       <TestimonialsSection />
@@ -59,7 +58,7 @@ export default async function Home() {
       <FinalCta />
 
       <section className="w-full max-w-[1250px] mx-auto px-4 py-16">
-        <TelegramCtaAndLive linkWidget={linkWidget} />
+        <TelegramCtaAndLive />
       </section>
     </div>
   );

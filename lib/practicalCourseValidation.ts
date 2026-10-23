@@ -3,8 +3,6 @@ export type PersonType = "PF" | "PJ";
 export type BillingDataPF = {
   firstName: string;
   lastName: string;
-  cnp: string;
-  birthDate: string;
   email: string;
   phone: string;
   street: string;
@@ -43,10 +41,6 @@ export function isValidEmail(value: string) {
 
 export function isValidPhone(value: string) {
   return value.replace(/\D/g, "").length >= 8;
-}
-
-export function isValidCnp(value: string) {
-  return /^\d{13}$/.test(value.replace(/\s/g, ""));
 }
 
 export function isValidCui(value: string) {
@@ -97,12 +91,6 @@ export function validateBillingPayload(body: BillingPayload): string | null {
     }
     if (!pf.lastName?.trim() || pf.lastName.trim().length < 2) {
       return "course.validation.lastName";
-    }
-    if (!isValidCnp(pf.cnp ?? "")) {
-      return "course.validation.cnp";
-    }
-    if (!pf.birthDate?.trim()) {
-      return "course.validation.birthDate";
     }
   } else {
     const pj = data as BillingDataPJ;

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NinjaTraderDisclosures } from "@/app/components/NinjaTraderDisclosures";
+import { SITE_OPERATOR } from "@/app/data/siteOperator";
 import { FaTelegramPlane, FaInstagram, FaHeart } from "react-icons/fa";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -109,6 +110,9 @@ export function Footer() {
               {t("footer.privacyShort")}
             </Link>
           </nav>
+          <p className="text-center text-[11px] text-white/45">
+            {SITE_OPERATOR.legalName} · CUI {SITE_OPERATOR.cui} · {SITE_OPERATOR.tradeRegister}
+          </p>
           <div className="text-center text-[11px] md:text-xs text-white/70 flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3">
             <span>{t("footer.copyright")}</span>
             <span className="hidden md:inline-block">|</span>

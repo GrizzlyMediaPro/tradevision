@@ -184,7 +184,7 @@ export const commerce = defineBundle(
     "email.course.purchased": "You purchased: {title}.",
     "email.course.paid": "Amount paid: {amount}.",
     "email.course.invoiceAttached":
-      "Tax invoice {series} {number} is attached to this email.",
+      "Invoice {number} is attached to this email.",
     "email.course.invoiceLater":
       "The tax invoice will be sent separately, if applicable.",
     "email.course.group":
@@ -194,16 +194,16 @@ export const commerce = defineBundle(
     "email.course.success": "We wish you every success on your learning path!",
     "email.course.preview":
       "Your course payment is confirmed. You will find the link to the course group in this email.",
-    "email.course.invoiceFilename": "Invoice_{series}_{number}.pdf",
+    "email.course.invoiceFilename": "Invoice_{number}.pdf",
     "email.course.invoiceFilenameFallback": "Invoice.pdf",
     "email.invoice.subject": "Your invoice for {title}",
     "email.invoice.body": "We are sending the tax invoice for your purchase of {title}.",
-    "email.invoice.number": "Invoice number: {series} {number}.",
+    "email.invoice.number": "Invoice number: {number}.",
     "email.invoice.attached": "The PDF document is attached to this email.",
     "email.invoice.preview": "The tax invoice for the Futures Course is attached.",
     "operator.identity":
-      "{legalName}, CUI {cui}, email: {email}, operating under the brand {brand}",
-    "operator.contactBlock": "Email: {email}\nOperator: {legalName} · CUI {cui}",
+      "{legalName}, CUI {cui}, trade register no. {register}, email: {email}, operating under the brand {brand}",
+    "operator.contactBlock": "Email: {email}\nOperator: {legalName} · CUI {cui} · {register}",
     "futures.title": "Futures Course",
     "futures.subtitle": "An intensive practical training programme for the financial markets",
     "course.description":
@@ -260,14 +260,6 @@ export const commerce = defineBundle(
     "course.field.city": "City",
     "course.field.county": "County",
     "course.field.postalCode": "Postal code",
-    "course.field.cnp": "CNP",
-    "course.field.birthDate": "Date of birth",
-    "course.field.birthDatePlaceholder": "Select your date of birth",
-    "course.field.birthDateCalendar": "Date of birth calendar",
-    "course.field.prevMonth": "Previous month",
-    "course.field.nextMonth": "Next month",
-    "course.field.month": "Month",
-    "course.field.year": "Year",
     "course.field.company": "Company name",
     "course.field.cui": "CUI",
     "course.field.regCom": "Trade Register no.",
@@ -309,7 +301,8 @@ export const commerce = defineBundle(
     "course.thanks.sentEmail":
       "We sent the confirmation email to {email}. Also check the Spam folder.",
     "course.thanks.invoiceError":
-      "The invoice could not be issued automatically: {error}. Correct the SmartBill series in `.env` (`SMARTBILL_INVOICE_SERIES`) and reload this page to resend.",
+      "The invoice could not be issued automatically: {error}. Reload this page to try again.",
+    "course.invoice.notReady": "The Stripe invoice is not ready yet.",
     "course.thanks.confirmDelayed":
       "The payment was recorded, but automatic confirmation was delayed.",
     "course.thanks.home": "Back home",
@@ -320,8 +313,6 @@ export const commerce = defineBundle(
     "course.validation.privacy": "You must accept the privacy policy.",
     "course.validation.firstName": "First name must be at least 2 characters.",
     "course.validation.lastName": "Last name must be at least 2 characters.",
-    "course.validation.cnp": "The national ID number (CNP) is not valid.",
-    "course.validation.birthDate": "Date of birth is required.",
     "course.validation.company": "The company name is required.",
     "course.validation.cui": "The CUI is not valid.",
     "course.validation.regCom": "The Trade Register number is required.",
@@ -478,9 +469,10 @@ export const commerce = defineBundle(
     "legal.risk.note":
       "These disclosures are included in accordance with the NinjaTrader Ecosystem Vendor Guidelines. They do not constitute legal or investment advice.",
     "legal.updated": "Last updated: ",
+    "legal.company.register": "Trade register no.",
     "legal.terms.metaTitle": "Terms and conditions",
     "legal.terms.metaDescription":
-      "The terms and conditions for taking part in the introductory course on trading futures contracts, organised by TRADERS HUB S.R.L.",
+      "The terms and conditions for taking part in the introductory course on trading futures contracts, organised by {legalName}.",
     "legal.terms.title": "Terms and conditions",
     "legal.terms.description": "Futures Course",
     "legal.terms.intro":
@@ -600,10 +592,10 @@ export const commerce = defineBundle(
       "How Trade Vision România uses cookies and similar technologies on the site.",
     "legal.cookies.title": "Cookie policy",
     "legal.cookies.description":
-      "Information about cookies and similar technologies used on the website operated by TRADE VISION HUB TRADING SRL.",
+      "Information about cookies and similar technologies used on the website operated by {legalName} (CUI {cui}).",
     "legal.cookies.s1.title": "1. Operator",
     "legal.cookies.s1.p1":
-      "This policy is issued by TRADE VISION HUB TRADING SRL, CUI 54265198 (the “Operator”), in connection with the Trade Vision România website and the related services.",
+      "This policy is issued by {legalName}, CUI {cui}, trade register no. {register} (the “Operator”), in connection with the {brand} website and the related services.",
     "legal.cookies.s1.before": "For the processing of personal data, also see the ",
     "legal.cookies.s1.link": "Privacy Policy",
     "legal.cookies.s1.after": ".",
@@ -661,7 +653,7 @@ export const commerce = defineBundle(
     "legal.cookies.s7.title": "7. Contact",
     "legal.privacy.metaTitle": "Privacy policy",
     "legal.privacy.metaDescription":
-      "How we process personal data at Trade Vision România — TRADE VISION HUB TRADING SRL.",
+      "How we process personal data at {brand} — {legalName}, CUI {cui}, trade register no. {register}.",
     "legal.privacy.title": "Privacy policy",
     "legal.privacy.description":
       "Information about the processing of personal data under the GDPR and Romanian law.",
@@ -936,7 +928,7 @@ export const commerce = defineBundle(
     "email.course.purchased": "Ai achiziționat: {title}.",
     "email.course.paid": "Suma plătită: {amount}.",
     "email.course.invoiceAttached":
-      "Factura fiscală {series} {number} este atașată la acest email.",
+      "Factura {number} este atașată la acest email.",
     "email.course.invoiceLater":
       "Factura fiscală îți va fi trimisă separat, dacă este cazul.",
     "email.course.group":
@@ -946,16 +938,16 @@ export const commerce = defineBundle(
     "email.course.success": "Îți dorim mult succes în parcursul tău de învățare!",
     "email.course.preview":
       "Plata cursului a fost confirmată. Găsești linkul către grupul de curs în acest email.",
-    "email.course.invoiceFilename": "Factura_{series}_{number}.pdf",
+    "email.course.invoiceFilename": "Factura_{number}.pdf",
     "email.course.invoiceFilenameFallback": "Factura.pdf",
     "email.invoice.subject": "Factura ta {title}",
     "email.invoice.body": "Îți trimitem factura fiscală pentru achiziția {title}.",
-    "email.invoice.number": "Număr factură: {series} {number}.",
+    "email.invoice.number": "Număr factură: {number}.",
     "email.invoice.attached": "Documentul PDF este atașat la acest email.",
     "email.invoice.preview": "Factura fiscală pentru Curs Futures este atașată.",
     "operator.identity":
-      "{legalName}, CUI {cui}, e-mail: {email}, operând sub marca {brand}",
-    "operator.contactBlock": "Email: {email}\nOperator: {legalName} · CUI {cui}",
+      "{legalName}, CUI {cui}, nr. înregistrare {register}, e-mail: {email}, operând sub marca {brand}",
+    "operator.contactBlock": "Email: {email}\nOperator: {legalName} · CUI {cui} · {register}",
     "futures.title": "Curs Futures",
     "futures.subtitle": "Program intensiv de training practic pentru piețele financiare",
     "course.description":
@@ -1012,14 +1004,6 @@ export const commerce = defineBundle(
     "course.field.city": "Localitate",
     "course.field.county": "Județ",
     "course.field.postalCode": "Cod poștal",
-    "course.field.cnp": "CNP",
-    "course.field.birthDate": "Data nașterii",
-    "course.field.birthDatePlaceholder": "Selectează data nașterii",
-    "course.field.birthDateCalendar": "Calendar data nașterii",
-    "course.field.prevMonth": "Luna anterioară",
-    "course.field.nextMonth": "Luna următoare",
-    "course.field.month": "Luna",
-    "course.field.year": "Anul",
     "course.field.company": "Denumire firmă",
     "course.field.cui": "CUI",
     "course.field.regCom": "Nr. Reg. Com.",
@@ -1061,7 +1045,8 @@ export const commerce = defineBundle(
     "course.thanks.sentEmail":
       "Am trimis emailul de confirmare la {email}. Verifică și folderul Spam.",
     "course.thanks.invoiceError":
-      "Factura nu a putut fi emisă automat: {error}. Corectează seria SmartBill în `.env` (`SMARTBILL_INVOICE_SERIES`) și reîncarcă această pagină pentru retrimitere.",
+      "Factura nu a putut fi emisă automat: {error}. Reîncarcă pagina ca să încerci din nou.",
+    "course.invoice.notReady": "Factura Stripe nu este încă disponibilă.",
     "course.thanks.confirmDelayed":
       "Plata a fost înregistrată, dar confirmarea automată a întârziat.",
     "course.thanks.home": "Înapoi acasă",
@@ -1072,8 +1057,6 @@ export const commerce = defineBundle(
     "course.validation.privacy": "Trebuie să accepți politica de confidențialitate.",
     "course.validation.firstName": "Prenumele trebuie să aibă cel puțin 2 caractere.",
     "course.validation.lastName": "Numele trebuie să aibă cel puțin 2 caractere.",
-    "course.validation.cnp": "CNP-ul nu este valid.",
-    "course.validation.birthDate": "Data nașterii este obligatorie.",
     "course.validation.company": "Denumirea firmei este obligatorie.",
     "course.validation.cui": "CUI-ul nu este valid.",
     "course.validation.regCom": "Numărul Reg. Com. este obligatoriu.",
@@ -1230,9 +1213,10 @@ export const commerce = defineBundle(
     "legal.risk.note":
       "Aceste divulgări sunt incluse în conformitate cu cerințele NinjaTrader Ecosystem Vendor Guidelines. Nu constituie consultanță juridică sau de investiții.",
     "legal.updated": "Ultima actualizare: ",
+    "legal.company.register": "Nr. înregistrare",
     "legal.terms.metaTitle": "Termeni și condiții",
     "legal.terms.metaDescription":
-      "Termenii și condițiile de participare la cursul de inițiere în tranzacționarea contractelor futures, organizat de TRADERS HUB S.R.L.",
+      "Termenii și condițiile de participare la cursul de inițiere în tranzacționarea contractelor futures, organizat de {legalName}.",
     "legal.terms.title": "Termeni și condiții",
     "legal.terms.description": "Curs Futures",
     "legal.terms.intro":
@@ -1353,10 +1337,10 @@ export const commerce = defineBundle(
       "Modul în care Trade Vision România utilizează cookie-uri și tehnologii similare pe site.",
     "legal.cookies.title": "Politica de cookies",
     "legal.cookies.description":
-      "Informații despre cookie-uri și tehnologii similare utilizate pe site-ul operat de TRADE VISION HUB TRADING SRL.",
+      "Informații despre cookie-uri și tehnologii similare utilizate pe site-ul operat de {legalName} (CUI {cui}).",
     "legal.cookies.s1.title": "1. Operator",
     "legal.cookies.s1.p1":
-      "Prezenta politică este emisă de TRADE VISION HUB TRADING SRL, CUI 54265198 (în continuare „Operatorul”), în legătură cu site-ul Trade Vision România și serviciile aferente.",
+      "Prezenta politică este emisă de {legalName}, CUI {cui}, nr. înregistrare {register} (în continuare „Operatorul”), în legătură cu site-ul {brand} și serviciile aferente.",
     "legal.cookies.s1.before": "Pentru prelucrarea datelor cu caracter personal, consultați și ",
     "legal.cookies.s1.link": "Politica de confidențialitate",
     "legal.cookies.s1.after": ".",
@@ -1415,7 +1399,7 @@ export const commerce = defineBundle(
     "legal.cookies.s7.title": "7. Contact",
     "legal.privacy.metaTitle": "Politica de confidențialitate",
     "legal.privacy.metaDescription":
-      "Cum prelucrăm datele cu caracter personal în cadrul Trade Vision România — TRADE VISION HUB TRADING SRL.",
+      "Cum prelucrăm datele cu caracter personal în cadrul {brand} — {legalName}, CUI {cui}, nr. înregistrare {register}.",
     "legal.privacy.title": "Politica de confidențialitate",
     "legal.privacy.description":
       "Informații despre prelucrarea datelor cu caracter personal conform GDPR și legislației române.",
