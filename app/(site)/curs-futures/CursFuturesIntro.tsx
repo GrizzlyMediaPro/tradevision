@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { getT } from "@/lib/i18n/get-t";
 
-const included = ["live", "video", "group"] as const;
+const included = ["live", "group", "deepchart"] as const;
 
 export async function CursFuturesIntro() {
   const t = await getT();
@@ -29,15 +29,7 @@ export async function CursFuturesIntro() {
 
         <div className="relative z-10 flex min-h-screen items-center justify-center pt-24 pb-14 md:pt-28 md:pb-16">
           <div className="flex w-full max-w-[1100px] flex-col items-center px-4 text-center sm:px-6">
-            <Image
-              src="/logo.png"
-              alt="TradeVision"
-              width={520}
-              height={520}
-              priority
-              className="h-auto w-[240px] sm:w-[300px] md:w-[360px]"
-            />
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold tracking-wide text-yellow-300 sm:text-xs">
+            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold tracking-wide text-yellow-300 sm:text-xs">
               {t("course.intro.badge")}
             </div>
             <h1 className="mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">

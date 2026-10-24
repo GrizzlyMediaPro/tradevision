@@ -11,7 +11,7 @@ export const COURSE_CATALOG: CourseCatalogItem[] = [
   {
     slug: "curs-futures",
     title: "Curs Futures",
-    subtitle: "Program intensiv de training practic pentru piețele financiare",
+    subtitle: "Bootcamp intensiv pentru futures",
     defaultPriceAmount: 599,
     priceCurrency: "EUR",
     adminPath: "/curs-futures",

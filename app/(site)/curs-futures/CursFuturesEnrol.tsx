@@ -61,12 +61,17 @@ export async function CursFuturesFinalCta() {
       />
 
       <div className="relative mx-auto flex w-full max-w-[1250px] flex-col items-center gap-6 px-4 pt-20 pb-24 text-center">
-        <h2 className="text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
-          {t("course.final.title")}
-        </h2>
-        <p className="text-sm text-white/55 md:text-base">
-          {t("course.duration")} · {t("course.format")}
-        </p>
+        <div className="flex flex-col items-center gap-3">
+          <h2 className="text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
+            {t("course.final.title")}
+          </h2>
+          <p className="text-sm font-medium text-white/80 md:text-base">
+            {t("course.final.tagline")}
+          </p>
+          <p className="text-sm text-white/55 md:text-base">
+            {t("course.duration")} · {t("course.format")}
+          </p>
+        </div>
         <Link
           href={PRACTICAL_COURSE.checkoutPath}
           className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-8 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110"

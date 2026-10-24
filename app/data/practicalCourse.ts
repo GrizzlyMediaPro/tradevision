@@ -12,7 +12,7 @@ export const PRACTICAL_COURSE = {
   thanksPath: "/curs-futures/multumim",
   apiPath: "/api/curs-futures",
   title: "Curs Futures",
-  subtitle: "Program intensiv de training practic pentru piețele financiare",
+  subtitle: "Bootcamp intensiv pentru futures",
   description:
     "Program complet de training practic cu acces la materiale de studiu, sesiuni live și comunitate dedicată.",
   priceDisplay: "599 EUR",
@@ -24,7 +24,7 @@ export const PRACTICAL_COURSE = {
   /** Grup Telegram pentru participanții înscriși */
   telegramGroupUrl:
     process.env.PRACTICAL_COURSE_TELEGRAM_GROUP_URL?.trim() ||
-    "https://t.me/+Flp1J44Afg41YmQ0",
+    "https://t.me/+xIxSBOsYMno0ZjE0",
 } as const;
 
 export function getPracticalCourseStripePriceId(): string {
