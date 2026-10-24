@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
-import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import {
   payoutImageSrc,
   previousEditionPayouts,
@@ -121,32 +119,35 @@ export function CursFuturesProof() {
   const openPayout = active === null ? null : previousEditionPayouts[active];
 
   return (
-    <section className="mx-auto w-full max-w-[1250px] px-4 pb-16 pt-10">
-      <div className="text-center">
-        <h2 className="mx-auto max-w-3xl text-2xl font-semibold uppercase tracking-wide text-white md:text-3xl">
-          {t("course.proof.title")}
-        </h2>
-        <div className="mx-auto mt-3 h-[2px] w-[80px] rounded-full bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500" />
-        <p className="mx-auto mt-5 max-w-xl text-sm text-white/55 md:text-base">{t("course.proof.subtitle")}</p>
+    <section className="w-full pb-16 pt-10">
+      <div className="mx-auto w-full max-w-[1250px] px-4">
+        <div className="text-center">
+          <h2 className="mx-auto max-w-3xl text-2xl font-semibold uppercase tracking-wide text-white md:text-3xl">
+            {t("course.proof.title")}
+          </h2>
+          <div className="mx-auto mt-3 h-[2px] w-[80px] rounded-full bg-linear-to-r from-yellow-400 via-yellow-300 to-yellow-500" />
+          <p className="mx-auto mt-5 max-w-xl text-sm text-white/55 md:text-base">{t("course.proof.subtitle")}</p>
+        </div>
+
+        <div className="mx-auto mt-8 w-full rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-4 py-5 text-center shadow-[0_8px_18px_rgba(0,0,0,0.35)] md:max-w-xs">
+          <p className="text-2xl font-bold text-yellow-300 lg:text-[1.65rem]">
+            {formatUsd(previousEditionProfitCents, locale)}
+          </p>
+          <p className="mt-1 text-xs text-white/55 lg:text-[0.8rem]">{t("course.proof.stat.share")}</p>
+        </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-xs rounded-2xl border border-white/10 bg-linear-to-b from-white/8 to-white/3 px-4 py-5 text-center shadow-[0_8px_18px_rgba(0,0,0,0.35)]">
-        <p className="text-2xl font-bold text-yellow-300 lg:text-[1.65rem]">
-          {formatUsd(previousEditionProfitCents, locale)}
-        </p>
-        <p className="mt-1 text-xs text-white/55 lg:text-[0.8rem]">{t("course.proof.stat.share")}</p>
-      </div>
-
-      <div className="mt-10">
-        <h3 className="text-center text-sm font-semibold uppercase tracking-[0.16em] text-white/70">
+      <div className="relative mt-10">
+        <h3 className="mx-auto w-full max-w-[1250px] px-4 text-center text-sm font-semibold uppercase tracking-[0.16em] text-white/70">
           {t("course.proof.results")}
         </h3>
-        <div className="relative mt-5 px-11">
+        <div className="relative mt-5">
           <button
             type="button"
             onClick={() => scrollRail(-1)}
             aria-label={t("course.proof.prev")}
-            className="absolute top-1/2 left-0 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white shadow-lg"
+            className="absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white shadow-lg"
+            style={{ left: "max(0.75rem, calc((100% - 1250px) / 2 - 3.25rem))" }}
           >
             <FaChevronLeft className="h-3.5 w-3.5" />
           </button>
@@ -154,31 +155,34 @@ export function CursFuturesProof() {
             type="button"
             onClick={() => scrollRail(1)}
             aria-label={t("course.proof.next")}
-            className="absolute top-1/2 right-0 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white shadow-lg"
+            className="absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white shadow-lg"
+            style={{ right: "max(0.75rem, calc((100% - 1250px) / 2 - 3.25rem))" }}
           >
             <FaChevronRight className="h-3.5 w-3.5" />
           </button>
 
-          <div
-            ref={railRef}
-            className="edition-rail flex snap-x snap-mandatory overflow-x-auto"
-          >
-            {previousEditionPayouts.map((payout, index) => (
-              <div key={payout.id} className="w-full shrink-0 snap-start px-1 lg:w-1/3 lg:px-2">
-                <PayoutCard
-                  payout={payout}
-                  locale={locale}
-                  lifetimeLabel={t("course.proof.lifetime")}
-                  openLabel={t("course.proof.enlarge", { name: payout.name })}
-                  onOpen={() => setActive(index)}
-                />
-              </div>
-            ))}
+          <div className="mx-auto w-full max-w-[1250px] px-3 md:px-4">
+            <div
+              ref={railRef}
+              className="edition-rail flex snap-x snap-mandatory overflow-x-auto"
+            >
+              {previousEditionPayouts.map((payout, index) => (
+                <div key={payout.id} className="w-full shrink-0 snap-start px-1 lg:w-1/3 lg:px-2">
+                  <PayoutCard
+                    payout={payout}
+                    locale={locale}
+                    lifetimeLabel={t("course.proof.lifetime")}
+                    openLabel={t("course.proof.enlarge", { name: payout.name })}
+                    onOpen={() => setActive(index)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mx-auto mt-12 w-full max-w-[1250px] px-4">
         <h3 className="text-center text-sm font-semibold uppercase tracking-[0.16em] text-white/70">
           {t("course.proof.reviews")}
         </h3>
@@ -197,18 +201,10 @@ export function CursFuturesProof() {
             />
           </div>
         </div>
-      </div>
 
-      <div className="mt-10 text-center">
-        <p className="mx-auto max-w-3xl text-[10px] leading-relaxed text-white/45 md:text-[11px]">
+        <p className="mx-auto mt-10 max-w-3xl text-center text-[10px] leading-relaxed text-white/45 md:text-[11px]">
           {t("disclosure.testimonial")}
         </p>
-        <Link
-          href={PRACTICAL_COURSE.checkoutPath}
-          className="mt-6 inline-flex items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110"
-        >
-          {t("course.proof.cta")}
-        </Link>
       </div>
 
       {openPayout && active !== null ? (

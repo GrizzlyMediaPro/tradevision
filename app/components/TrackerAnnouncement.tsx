@@ -27,10 +27,10 @@ export function TrackerAnnouncement() {
 
   return (
     <section className="w-full max-w-[1250px] mx-auto px-4 pt-20">
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 px-6 py-10 md:px-12 md:py-12 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
-        {/* Glow decorativ */}
-        <div className="pointer-events-none absolute -top-24 right-0 h-64 w-64 rounded-full bg-purple-500/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 left-0 h-64 w-64 rounded-full bg-yellow-400/8 blur-3xl" />
+      <div className="relative md:overflow-hidden md:rounded-3xl md:border md:border-white/10 md:bg-linear-to-b md:from-white/6 md:to-white/2 md:px-12 md:py-12 md:shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
+        {/* Glow decorativ — doar pe desktop, în interiorul cardului */}
+        <div className="pointer-events-none absolute -top-24 right-0 hidden h-64 w-64 rounded-full bg-purple-500/15 blur-3xl md:block" />
+        <div className="pointer-events-none absolute -bottom-24 left-0 hidden h-64 w-64 rounded-full bg-yellow-400/8 blur-3xl md:block" />
 
         <div className="relative flex flex-col items-center text-center gap-8">
           {/* Badge NOU */}

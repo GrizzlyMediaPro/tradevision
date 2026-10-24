@@ -222,10 +222,8 @@ export function Navbar() {
               </div>
             </div>
           </SignedIn>
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-xs tracking-wide text-zinc-400">
-              {t("lang.switcher")}
-            </span>
+          <div className="flex items-center justify-between py-2">
+            <span>{t("lang.switcher")}</span>
             <LanguageSwitcher />
           </div>
         </div>

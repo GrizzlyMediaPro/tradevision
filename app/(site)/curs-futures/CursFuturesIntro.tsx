@@ -1,9 +1,26 @@
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import Link from "next/link";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { getT } from "@/lib/i18n/get-t";
 
 const included = ["live", "group", "deepchart"] as const;
+
+const { props: desktopHero } = getImageProps({
+  src: "/webinarhero.png",
+  alt: "",
+  width: 1774,
+  height: 887,
+  sizes: "100vw",
+});
+
+const { props: mobileHero } = getImageProps({
+  src: "/webinarhero-mobile.webp",
+  alt: "",
+  width: 960,
+  height: 1575,
+  sizes: "100vw",
+  priority: true,
+});
 
 export async function CursFuturesIntro() {
   const t = await getT();
@@ -16,18 +33,18 @@ export async function CursFuturesIntro() {
 
   return (
     <>
-      <section className="relative isolate min-h-screen w-full overflow-hidden">
-        <Image
-          src="/webinarhero.png"
-          alt=""
-          width={1920}
-          height={1080}
-          priority
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.86)_20%,rgba(0,0,0,1)_100%)] backdrop-blur-[6px]" />
+      <section className="relative isolate min-h-[calc(100svh-2.875rem)] w-full overflow-hidden sm:min-h-screen">
+        <picture>
+          <source media="(min-width: 640px)" srcSet={desktopHero.srcSet} sizes={desktopHero.sizes} />
+          <img
+            {...mobileHero}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[40%_top] sm:object-center"
+          />
+        </picture>
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.8)_80%,rgba(0,0,0,1)_100%)] backdrop-blur-[3px] sm:backdrop-blur-[6px] sm:bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.86)_20%,rgba(0,0,0,1)_100%)]" />
 
-        <div className="relative z-10 flex min-h-screen items-center justify-center pt-24 pb-14 md:pt-28 md:pb-16">
+        <div className="relative z-10 flex min-h-[calc(100svh-2.875rem)] items-center sm:min-h-screen justify-center pt-24 pb-14 md:pt-28 md:pb-16">
           <div className="flex w-full max-w-[1100px] flex-col items-center px-4 text-center sm:px-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-400/10 px-4 py-1.5 text-[11px] font-semibold tracking-wide text-yellow-300 sm:text-xs">
               {t("course.intro.badge")}
@@ -78,7 +95,7 @@ export async function CursFuturesIntro() {
       </section>
 
       <section className="relative w-full">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-b from-black to-transparent sm:h-32" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.9)_15%,rgba(0,0,0,0.7)_35%,rgba(0,0,0,0.45)_55%,rgba(0,0,0,0.2)_75%,rgba(0,0,0,0.06)_90%,transparent_100%)] sm:h-96" />
         <div className="relative mx-auto w-full max-w-[1250px] px-4 pt-16 pb-16">
           <div className="text-center">
             <h2 className="text-2xl font-semibold uppercase tracking-wide text-white md:text-3xl">
