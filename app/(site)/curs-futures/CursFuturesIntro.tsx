@@ -24,11 +24,11 @@ const { props: mobileHero } = getImageProps({
 
 export async function CursFuturesIntro() {
   const t = await getT();
-  const [titleBefore, titleAfter] = t("futures.title").split("Futures");
+  const heroTitleParts = t("futures.subtitle").split(/(futures)/i);
   const stats = [
     { value: "8", label: t("course.intro.stat.sessions") },
     { value: "Live", label: t("course.intro.stat.live") },
-    { value: "Video", label: t("course.intro.stat.video") },
+    { value: t("course.intro.stat.group"), label: t("course.intro.stat.dedicated") },
   ];
 
   return (
@@ -50,15 +50,19 @@ export async function CursFuturesIntro() {
               {t("course.intro.badge")}
             </div>
             <h1 className="mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
-              {titleBefore}
-              <span className="bg-linear-to-r from-purple-300 via-purple-200 to-yellow-300 bg-clip-text text-transparent">
-                Futures
-              </span>
-              {titleAfter}
+              {heroTitleParts.map((part, index) =>
+                part.toLowerCase() === "futures" ? (
+                  <span
+                    key={index}
+                    className="bg-linear-to-r from-purple-300 via-purple-200 to-yellow-300 bg-clip-text text-transparent"
+                  >
+                    {part}
+                  </span>
+                ) : (
+                  part
+                ),
+              )}
             </h1>
-            <p className="mt-4 max-w-3xl px-2 text-sm text-white/80 sm:text-base md:text-xl">
-              {t("futures.subtitle")}
-            </p>
             <Link
               href={PRACTICAL_COURSE.checkoutPath}
               className="mt-8 inline-flex w-full max-w-[340px] items-center justify-center rounded-full bg-linear-to-r from-yellow-400 via-amber-300 to-yellow-500 px-6 py-3 text-sm font-bold text-slate-900 shadow-[0_14px_30px_rgba(250,204,21,0.35)] transition hover:brightness-110 sm:px-8 sm:py-3.5 md:w-auto md:max-w-none md:px-10 md:py-4 md:text-base"

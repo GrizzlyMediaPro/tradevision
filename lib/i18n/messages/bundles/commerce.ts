@@ -214,7 +214,8 @@ export const commerce = defineBundle(
     "course.intro.badge": "Practical trading programme",
     "course.intro.stat.sessions": "Sessions",
     "course.intro.stat.live": "Live sessions on Zoom",
-    "course.intro.stat.video": "Dedicated group",
+    "course.intro.stat.group": "Group",
+    "course.intro.stat.dedicated": "Dedicated",
     "course.intro.cta": "Sign up",
     "course.included.title": "What the course includes",
     "course.included.subtitle":
@@ -979,7 +980,8 @@ export const commerce = defineBundle(
     "course.intro.badge": "Program practic de tranzacționare",
     "course.intro.stat.sessions": "Sesiuni",
     "course.intro.stat.live": "Sesiuni live pe Zoom",
-    "course.intro.stat.video": "Grup dedicat",
+    "course.intro.stat.group": "Grup",
+    "course.intro.stat.dedicated": "dedicat",
     "course.intro.cta": "Înscrie-te",
     "course.included.title": "Ce include cursul",
     "course.included.subtitle":

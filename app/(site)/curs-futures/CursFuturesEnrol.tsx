@@ -68,9 +68,6 @@ export async function CursFuturesFinalCta() {
           <p className="text-sm font-medium text-white/80 md:text-base">
             {t("course.final.tagline")}
           </p>
-          <p className="text-sm text-white/55 md:text-base">
-            {t("course.duration")} · {t("course.format")}
-          </p>
         </div>
         <Link
           href={PRACTICAL_COURSE.checkoutPath}
