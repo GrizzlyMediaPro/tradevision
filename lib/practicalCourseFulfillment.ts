@@ -13,11 +13,11 @@ import {
 import { downloadStripeInvoice, invoiceIdFromSession } from "@/lib/stripeInvoice";
 import { getStripeClient } from "@/lib/stripe";
 import { messages } from "@/lib/i18n/messages/catalog";
-import { parseLocale, type Locale } from "@/lib/i18n/locale";
+import { DEFAULT_LOCALE, parseLocale, type Locale } from "@/lib/i18n/locale";
 import { translate } from "@/lib/i18n/translate";
 
 function readOrderLocale(billingData: unknown): Locale {
-  if (!billingData || typeof billingData !== "object") return "en";
+  if (!billingData || typeof billingData !== "object") return DEFAULT_LOCALE;
   const value = (billingData as { locale?: unknown }).locale;
   return parseLocale(typeof value === "string" ? value : undefined);
 }

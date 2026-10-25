@@ -7,7 +7,7 @@ import {
 } from "@/lib/emailTemplates";
 import { generateUnsubscribeToken } from "@/lib/unsubscribe";
 import { WEBINAR_WHATSAPP_INVITE_URL } from "@/lib/webinarWhatsAppInvite";
-import type { Locale } from "@/lib/i18n/locale";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locale";
 import { messages } from "@/lib/i18n/messages/catalog";
 import { translate } from "@/lib/i18n/translate";
 
@@ -16,7 +16,7 @@ const SITE_URL = "https://trade-vision.ro";
 export async function sendWebinarRegistrationConfirmationEmail(
   firstName: string,
   email: string,
-  locale: Locale = "en",
+  locale: Locale = DEFAULT_LOCALE,
 ) {
   if (!resend) return;
 

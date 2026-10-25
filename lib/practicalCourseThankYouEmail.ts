@@ -8,7 +8,7 @@ import {
 import { generateUnsubscribeToken } from "@/lib/unsubscribe";
 import { PRACTICAL_COURSE } from "@/app/data/practicalCourse";
 import { formatPriceEur } from "@/lib/practicalCoursePricing";
-import type { Locale } from "@/lib/i18n/locale";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locale";
 import { messages } from "@/lib/i18n/messages/catalog";
 import { translate, type Vars } from "@/lib/i18n/translate";
 
@@ -25,7 +25,7 @@ export async function sendPracticalCourseThankYouEmail(input: {
     return;
   }
 
-  const locale = input.locale ?? "en";
+  const locale = input.locale ?? DEFAULT_LOCALE;
   const t = (id: string, vars?: Vars) => translate(messages[locale], id, vars);
   const title = t("futures.title");
   const email = input.recipientEmail.trim().toLowerCase();
@@ -123,7 +123,7 @@ export async function sendPracticalCourseInvoiceEmail(input: {
     return;
   }
 
-  const locale = input.locale ?? "en";
+  const locale = input.locale ?? DEFAULT_LOCALE;
   const t = (id: string, vars?: Vars) => translate(messages[locale], id, vars);
   const title = t("futures.title");
   const email = input.recipientEmail.trim().toLowerCase();

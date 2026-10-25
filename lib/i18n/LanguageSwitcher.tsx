@@ -4,8 +4,8 @@ import { useI18n } from "./I18nProvider";
 import type { Locale } from "./locale";
 
 const OPTIONS: { locale: Locale; label: string }[] = [
-  { locale: "en", label: "EN" },
   { locale: "ro", label: "RO" },
+  { locale: "en", label: "EN" },
 ];
 
 export function LanguageSwitcher({ className = "" }: { className?: string }) {

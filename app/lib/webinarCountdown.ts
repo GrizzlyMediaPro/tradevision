@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/i18n/locale";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locale";
 import { messages } from "@/lib/i18n/messages/catalog";
 import { translate } from "@/lib/i18n/translate";
 
@@ -28,7 +28,7 @@ export function getWebinarCountdownTarget(targetDate?: string | Date | null) {
 
 export function formatWebinarLiveLabel(
   targetTimestamp: number,
-  locale: Locale = "en",
+  locale: Locale = DEFAULT_LOCALE,
 ) {
   const dateLocale = locale === "ro" ? "ro-RO" : "en-GB";
   const targetDate = new Date(targetTimestamp);

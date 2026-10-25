@@ -1,6 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 import { convert } from "html-to-text";
-import type { Locale } from "@/lib/i18n/locale";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locale";
 import { messages } from "@/lib/i18n/messages/catalog";
 import { translate, type Vars } from "@/lib/i18n/translate";
 
@@ -170,7 +170,7 @@ export function renderEmailLayout(options: {
   locale?: Locale;
 }): string {
   const { title, previewText, contentHtml, recipientEmail, unsubscribeToken } = options;
-  const locale = options.locale ?? "en";
+  const locale = options.locale ?? DEFAULT_LOCALE;
   const t = (id: string, vars?: Vars) => translate(messages[locale], id, vars);
 
   const preview = previewText
